@@ -1,0 +1,47 @@
+.icon-row {
+    margin: 0 auto 10px auto;
+    width: 70%;
+    background-color: rgb(243, 243, 243);
+    border-radius: 8px;
+    padding: 10px 0 10px 0;
+    border: 1px solid gainsboro;
+    // justify-content: space-between;
+
+    .slick-prev:before,
+    .slick-next:before {
+        color: #17a589;
+    }
+
+    span {
+        margin-left: 8px;
+    }
+}
+
+.icon-item {
+    width: 140px;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px;
+    margin: 0 0 0 10%;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+
+    span {
+        margin-right: 8px;
+    }
+}
+
+.icon-item:hover {
+    border-width: 4px;
+    background-color: white;
+    border-color: white; /* Change to your desired color */
+}
+
+.icon-item.selected {
+    border-color: #17a589; /* Change to your desired color */
+    border-width: 4px;
+    background-color: white;
+}
