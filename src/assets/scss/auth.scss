@@ -1,0 +1,15 @@
+.login {
+    margin: auto;
+}
+
+.customTextField .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    color: #2c3d50 !important;
+}
+
+.customTextField .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    color: #2c3d50;
+}
+
+.customTextField .MuiInputLabel.Mui-focused {
+    color: #2c3d50;
+}

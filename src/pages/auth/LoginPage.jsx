@@ -4,7 +4,24 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { jwtDecode } from "jwt-decode";
 import { LOGIN } from "../../services/graphql/auth";
-import { Alert, Snackbar } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  CssBaseline,
+  FormControlLabel,
+  Grid,
+  Link,
+  Snackbar,
+  TextField,
+  ThemeProvider,
+  Typography,
+  styled,
+} from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -62,63 +79,105 @@ const LoginPage = () => {
       localStorage.removeItem("errorMsg");
     }
   };
+
   return (
-    <div className="app">
-      <div className="container-fluid ps-md-0">
-        <div className="row g-0">
-          <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
-          <div className="col-md-8 col-lg-6">
-            <div className="login d-flex align-items-center py-5">
-              <div className="container">
-                <div className="row">
-                  <div className="col-md-9 col-lg-8 mx-auto">
-                    <h3 className="login-heading mb-4">Chào mừng trở lại!</h3>
-
-                    <form>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="email"
-                          className={"form-control "}
-                          id="floatingInput"
-                          name="email"
-                          placeholder="name@example.com"
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                          }}
-                        />
-                        <label htmlFor="floatingInput">Địa chỉ email</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="password"
-                          className={"form-control "}
-                          id="floatingPassword"
-                          name="password"
-                          placeholder="Password"
-                          onChange={(e) => {
-                            setPassword(e.target.value);
-                          }}
-                        />
-                        <label htmlFor="floatingPassword">Mật khẩu</label>
-                      </div>
-
-                      <div className="d-grid">
-                        <button
-                          className="btn btn-lg btn-success btn-login text-uppercase fw-bold mb-2"
-                          type="button"
-                          onClick={login}
-                        >
-                          Đăng nhập
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="login">
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 20,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "#2c3d50" }}>
+            <LockIcon />
+          </Avatar>
+          <Typography component="h1" variant="h3" style={{ marginTop: 10 }}>
+            BTSS Admin
+          </Typography>
+          <Typography component="h1" variant="h5" style={{ marginTop: 10 }}>
+            Đăng nhập
+          </Typography>
+          <Box component="form" noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Địa chỉ email"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              sx={{
+                "& label.Mui-focused": {
+                  color: "black",
+                },
+                "& .MuiInput-underline:after": {
+                  borderBottomColor: "black",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "black",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "black",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black",
+                  },
+                },
+              }}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Mật khẩu"
+              type="password"
+              id="password"
+              sx={{
+                "& label.Mui-focused": {
+                  color: "black",
+                },
+                "& .MuiInput-underline:after": {
+                  borderBottomColor: "black",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "black",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "black",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black",
+                  },
+                },
+              }}
+              autoComplete="current-password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={login}
+              style={{ backgroundColor: "#2c3d50" }}
+            >
+              Đăng nhập
+            </Button>
+          </Box>
+        </Box>
+      </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={snackbarOpen}

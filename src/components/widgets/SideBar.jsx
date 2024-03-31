@@ -23,7 +23,7 @@ const SideBar = () => {
     <div className="sidebar">
       <div className="top">
         <Link to="/" style={{ textDecoration: "none" }}>
-          <span className="logo">Greenwheels</span>
+          <span className="logo">BTSS</span>
         </Link>
       </div>
       <div className="center">
@@ -77,13 +77,11 @@ const SideBar = () => {
             {role === "ADMIN" && (
               <div className="user_info">
                 <span className="name">Administrator</span>
-                <span className="role">Greenwheels admin</span>
+                <span className="role">BTSS Admin</span>
               </div>
             )}
-          </div>
-          <div>
             <button
-              className="btn btn-lg text-uppercase fw-bold"
+              className="user_logout"
               type="button"
               onClick={(e) => {
                 localStorage.removeItem("token");

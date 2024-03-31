@@ -1,9 +1,10 @@
-import "../../assets/scss/planPage.scss";
-import "../../assets/scss/planTable.scss";
+import "../../assets/scss/plans.scss";
+import "../../assets/scss/header.scss";
 import "../../assets/scss/filter.scss";
 import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from "@mui/icons-material/Search";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -11,12 +12,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import NoCrashIcon from "@mui/icons-material/NoCrash";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
-import {
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-} from "@mui/material";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
@@ -34,11 +29,6 @@ const PlanPage = () => {
   ];
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(planStat[0]);
-  const [isHidden, setIsHidden] = useState(false);
-  const [isReadyHidden, setIsReadyHidden] = useState(true);
-  const [isVeriHidden, setIsVeriHidden] = useState(true);
-  const [registerReadyStatus, setRegisterReadyStatus] = useState("incoming");
-  const [registerVeriStatus, setRegisterVeriStatus] = useState("happening");
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -179,12 +169,11 @@ const PlanPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
           />
+          <button className="link" onClick={() => {}}>
+            <SearchIcon />
+          </button>
         </div>
         <div className="right">
-          {/* <Link to="/products/new" className="link">
-              <AddIcon />
-              <span>Thêm dịch vụ</span>
-            </Link> */}
           <button className="link">
             <span>Tải xuống file Excel</span>
             <CloudDownloadIcon />
@@ -213,23 +202,6 @@ const PlanPage = () => {
                   selectedDiv === index ? "selected" : ""
                 }`}
                 onClick={() => {
-                  // if (index == 0) {
-                  //   setIsHidden(false);
-                  //   setIsReadyHidden(true);
-                  //   setIsVeriHidden(true);
-                  // } else if (index == 1) {
-                  //   setIsReadyHidden(false);
-                  //   setIsHidden(true);
-                  //   setIsVeriHidden(true);
-                  // } else if (index == 3) {
-                  //   setIsReadyHidden(true);
-                  //   setIsHidden(true);
-                  //   setIsVeriHidden(false);
-                  // } else {
-                  //   setIsHidden(true);
-                  //   setIsReadyHidden(true);
-                  //   setIsVeriHidden(true);
-                  // }
                   handleClick(index);
                 }}
               >
@@ -256,61 +228,6 @@ const PlanPage = () => {
             ))}
           </Slider>
         </div>
-        <FormControl>
-          <RadioGroup
-            row
-            aria-labelledby="demo-row-radio-buttons-group-label"
-            name="row-radio-buttons-group"
-            defaultValue={"incoming"}
-            sx={{ marginBottom: 2, marginLeft: 2 }}
-            hidden={isReadyHidden}
-            onClick={(e) => {}}
-          >
-            <FormControlLabel
-              value="incoming"
-              control={
-                <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green",
-                    },
-                  }}
-                />
-              }
-              label="Sắp tới"
-            />
-            <FormControlLabel
-              value="happening"
-              control={
-                <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green",
-                    },
-                  }}
-                />
-              }
-              label="Đang diễn ra"
-            />
-            <FormControlLabel
-              value="ended"
-              control={
-                <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green",
-                    },
-                  }}
-                />
-              }
-              label="Kết thúc"
-            />
-          </RadioGroup>
-        </FormControl>
-
         <PlanTable plans={plans} />
       </div>
     </div>

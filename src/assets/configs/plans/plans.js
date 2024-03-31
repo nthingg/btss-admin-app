@@ -50,7 +50,7 @@ export const plansColumns = [
     renderCell: (params) => {
       return (
         <div>
-          {params.row.memberCount} / {params.row.maxMember}
+          {params.row.memberCount} / {params.row.maxMemberCount}
         </div>
       );
     },

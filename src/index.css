@@ -12,10 +12,10 @@ body,
   font-family: "Source Sans Pro", sans-serif;
 }
 
-.app {
+/* .app {
   display: flex;
   position: relative;
-}
+} */
 
 .content {
   flex-grow: 1;

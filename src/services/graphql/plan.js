@@ -15,7 +15,7 @@ export const LOAD_PLANS_FILTER = gql`
         departDate
         startDate
         memberCount
-        maxMember
+        maxMemberCount
         endDate
         status
       }
@@ -47,9 +47,9 @@ export const LOAD_DETAIL_PLAN = gql`
         }
         regCloseAt
         createdAt
-        currentGcoinBudget
+        actualGcoinBudget
         memberCount
-        maxMember
+        maxMemberCount
         status
         departDate
         departure {

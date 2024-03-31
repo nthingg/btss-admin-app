@@ -82,7 +82,7 @@ const PlanDetailPage = () => {
 
   function formatPhoneNumberCen(phoneNumber) {
     // Replace leading "+84" with "0" (if present)
-    phoneNumber = phoneNumber.replace(/^\+84/, "0"); // Replace leading "+84" with "0"
+    phoneNumber = phoneNumber.replace(/^\84/, "0"); // Replace leading "+84" with "0"
 
     let formattedParts;
     switch (phoneNumber.length) {
@@ -144,7 +144,7 @@ const PlanDetailPage = () => {
       };
       setPositionDepart(depart);
 
-      const departDate = new Date(data["plans"]["nodes"][0]["departAt"]);
+      const departDate = new Date(data["plans"]["nodes"][0]["departDate"]);
       setDepartDate(
         departDate.toLocaleDateString("vi-VN", {
           timeZone: "UTC",
@@ -238,7 +238,7 @@ const PlanDetailPage = () => {
           <RestartAltIcon
             sx={{
               fontSize: 80,
-              color: "#2ECC71",
+              color: "#2c3d50",
             }}
           />
         </div>
@@ -275,7 +275,7 @@ const PlanDetailPage = () => {
             </div>
             <div className="center">
               <div className="item">
-                <h1 className="itemTitle">Thông tin chi tiết</h1>
+                <h1 className="item-title">Thông tin chi tiết</h1>
                 <div className="details">
                   <div className="left">
                     <div className="detailItem">
@@ -293,17 +293,9 @@ const PlanDetailPage = () => {
                     <div className="detailItem">
                       <span className="itemKey">Thành viên:</span>
                       <span className="itemValue">
-                        {plan?.memberCount}/{plan?.maxMember} người
+                        {plan?.memberCount}/{plan?.maxMemberCount} người
                       </span>
                     </div>
-                    {/* <div className="detailItem">
-                  <span className="itemKey">Ngày bắt đầu:</span>
-                  <span className="itemValue">{startDate}</span>
-                </div>
-                <div className="detailItem">
-                  <span className="itemKey">Ngày kết thúc:</span>
-                  <span className="itemValue">{endDate}</span>
-                </div> */}
                   </div>
                   <div className="right">
                     <div className="detailItem">
@@ -485,7 +477,7 @@ const PlanDetailPage = () => {
             </Accordion> */}
                 <div className="bottom">
                   <div className="item">
-                    <h1 className="itemTitle">Danh sách đơn hàng</h1>
+                    <h1 className="item-title">Danh sách đơn hàng</h1>
                     <PlanOrderTable orders={orders} />
                   </div>
                 </div>

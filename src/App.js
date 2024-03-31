@@ -20,7 +20,9 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <div className="app">
-        <SideBar />
+        <div style={!token ? { display: "none" } : { display: "block" }}>
+          <SideBar />
+        </div>
         <main className={token ? "content" : "loginContent"}>
           <Routes>
             <Route

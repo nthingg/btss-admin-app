@@ -143,7 +143,7 @@ const EmulatorPage = () => {
             departure: plan.departure,
             destinationId: plan.destinationId,
             gcoinBudgetPerCapita: plan.gcoinBudgetPerCapita,
-            maxMember: plan.maxMember,
+            maxMemberCount: plan.maxMemberCount,
             maxMemberWeight: plan.maxMemberWeight,
             departureAddress: plan.departureAddress,
             name: plan.name + count,
@@ -822,8 +822,8 @@ const EmulatorPage = () => {
           </div>
         </div>
         <div className="emulatorContainer">
-          <div className="emulatorTitle">
-            <p>Chi tiết</p>
+          <div className="emulator-title">
+            <p>Máy ảo</p>
           </div>
           <div className="details">
             <div id="recaptcha-container"></div>
@@ -860,8 +860,7 @@ const EmulatorPage = () => {
                   ...theme,
                   colors: {
                     ...theme.colors,
-                    primary25: "#58D68D",
-                    primary: "#28B463",
+                    primary: "#2c3d50",
                   },
                 })}
               />
@@ -869,9 +868,6 @@ const EmulatorPage = () => {
                 style={
                   idInputVisible ? { display: "block" } : { display: "none" }
                 }
-                sx={{
-                  width: "15%",
-                }}
                 id="outlined-disabled"
                 className="basic-text ml-2"
                 type="text"
@@ -881,13 +877,49 @@ const EmulatorPage = () => {
                 onChange={(e) => {
                   setJoinId(e.target.value);
                 }}
-                color="success"
+                sx={{
+                  width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
               />
               <TextField
                 id="outlined-disabled"
                 style={dateVisible ? { display: "block" } : { display: "none" }}
                 sx={{
                   width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
                 }}
                 className="basic-text ml-2"
                 type="date"
