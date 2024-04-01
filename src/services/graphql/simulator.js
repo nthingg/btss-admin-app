@@ -63,7 +63,7 @@ export const LOAD_PLANS_SIMULATOR = gql`
         }
         status
         memberCount
-        maxMember
+        maxMemberCount
         joinMethod
       }
     }
@@ -88,7 +88,7 @@ export const LOAD_PLANS_BY_ID_SIMULATOR = gql`
         }
         status
         memberCount
-        maxMember
+        maxMemberCount
         joinMethod
       }
     }

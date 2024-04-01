@@ -145,7 +145,7 @@ export const planData = [
         ],
         note: null,
         type: "MEAL",
-        period: "AFTERNOON",
+        period: "NOON",
         serveDates: [
           nineDaysLater.toLocaleDateString(),
           tenDaysLater.toLocaleDateString(),
@@ -171,7 +171,7 @@ export const planData = [
       {
         cart: [
           {
-            key: 1,
+            key: 7,
             value: 4,
           },
         ],

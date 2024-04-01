@@ -199,61 +199,6 @@ const EmulatorPage = () => {
     }
   }, [data, loading, error]);
 
-  // const onCaptchaVerify = () => {
-  //   if (!window.recaptchaVerifier) {
-  //     auth.settings.appVerificationDisabledForTesting = true;
-
-  //     window.recaptchaVerifier = new RecaptchaVerifier(
-  //       auth,
-  //       "recaptcha-container",
-  //       {
-  //         size: "invisible",
-  //         callback: (response) => {
-  //           onSignIn();
-  //         },
-  //         "expired-callback": () => {},
-  //       }
-  //     );
-  //   }
-  // };
-
-  // const onSignIn = (phone) => {
-  //   onCaptchaVerify();
-
-  //   const appVerifier = window.recaptchaVerifier;
-  //   signInWithPhoneNumber(auth, phone, appVerifier)
-  //     .then((confirmationResult) => {
-  //       window.confirmationResult = confirmationResult;
-  //       console.log("OTP sended successfully!");
-  //       onOTPVerified();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
-  // const onOTPVerified = () => {
-  //   window.confirmationResult
-  //     .confirm("123123")
-  //     .then((res) => {
-  //       const decoded = jwtDecode(res.user["accessToken"]);
-  //       for (let i = 0; i < accounts.length; i++) {
-  //         if (accounts[i].phone === decoded["phone_number"]) {
-  //           accounts[i].token = res.user["accessToken"];
-  //           if (accounts[i].phone === accounts[accounts.length - 1].phone) {
-  //             setLoading(false);
-  //           }
-  //           break;
-  //         }
-  //       }
-  //       setAccounts(accounts);
-  //       localStorage.setItem("loggedAcc", JSON.stringify(accounts));
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
   const handlingAuth = async (travelerPhone) => {
     try {
       const { data: dataRqOTP } = await rqOTP({
@@ -346,6 +291,7 @@ const EmulatorPage = () => {
           },
         },
       });
+      console.log("hello");
       const response = {
         userName: acc.name,
         action: "Tham gia kế hoạch",
@@ -453,10 +399,20 @@ const EmulatorPage = () => {
     for (let i = 0; i < loggedAcc?.length; i++) {
       localStorage.setItem("userToken", loggedAcc[i].token);
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-      const { data } = await refetchLoadPlans({
-        id: loggedAcc[i].id, // Always refetches a new list
-      });
-      let currentPlans = data["plans"]["nodes"];
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
