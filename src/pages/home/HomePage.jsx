@@ -16,6 +16,7 @@ import {
   LOAD_NUMBERS_FLAWED,
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
+  LOAD_NUMBERS_VERIFIED,
 } from "../../services/graphql/plan";
 import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER } from "../../services/graphql/account";
@@ -113,6 +114,20 @@ const HomePage = () => {
   }, [dataComplete, loadingComplete, errComplete]);
 
   const {
+    error: errVeri,
+    loading: loadingVeri,
+    data: dataVeri,
+    refetch: refetchVeri,
+  } = useQuery(LOAD_NUMBERS_VERIFIED);
+  const [veri, setVeri] = useState(0);
+  useEffect(() => {
+    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]["nodes"]) {
+      let res = dataVeri.plans.nodes.map(({ __typename, ...rest }) => rest);
+      setCompleted(res.length);
+    }
+  }, [dataVeri, loadingVeri, errVeri]);
+
+  const {
     errorTemp,
     loadingTemp,
     data: dataTemp,
@@ -195,17 +210,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn temp">
-                    <ErrorOutlineOutlinedIcon
-                      sx={{ fontSize: 90, color: "white" }}
-                    />
+                    <ErrorOutlineOutlinedIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom temp">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
           <div className="item-container info">
@@ -217,15 +225,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ fontSize: 90, color: "white" }} />
+                    <InfoIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom info">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
           <div className="item-container success">
@@ -237,17 +240,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn success">
-                    <CheckCircleOutlineOutlinedIcon
-                      sx={{ fontSize: 90, color: "white" }}
-                    />
+                    <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom success">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
           <div className="item-container info">
@@ -259,15 +255,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ fontSize: 90, color: "white" }} />
+                    <InfoIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom info">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
           <div className="item-container cancel">
@@ -279,15 +270,25 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn cancel">
-                    <CancelOutlinedIcon sx={{ fontSize: 90, color: "white" }} />
+                    <CancelOutlinedIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="item-bottom cancel">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
+          </div>
+          <div className="item-container cancel">
+            <div className="item-top">
+              <div className="item-title">Số kế hoạch check-in</div>
+              <div className="item-body">
+                <div className="left">
+                  <p>{veri}</p>
+                </div>
+                <div className="right">
+                  <div className="btn cancel">
+                    <CancelOutlinedIcon sx={{ color: "white" }} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="item-container info">
@@ -299,15 +300,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ fontSize: 90, color: "white" }} />
+                    <InfoIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom info">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
           <div className="item-container info">
@@ -319,15 +315,10 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ fontSize: 90, color: "white" }} />
+                    <InfoIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="item-bottom info">
-              <a href="">
-                Xem chi tiết <ForwardIcon />
-              </a>
             </div>
           </div>
         </div>

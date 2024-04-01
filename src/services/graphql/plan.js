@@ -162,3 +162,13 @@ export const LOAD_NUMBERS_REGISTERING = gql`
     }
   }
 `;
+
+export const LOAD_NUMBERS_VERIFIED = gql`
+  {
+    plans(first: 100, where: { status: { eq: VERIFIED } }) {
+      nodes {
+        id
+      }
+    }
+  }
+`;

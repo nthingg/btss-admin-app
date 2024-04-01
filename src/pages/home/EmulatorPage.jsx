@@ -946,7 +946,7 @@ const EmulatorPage = () => {
     }
   };
 
-  const handleCVerifyPlan = async (planId, count, acc, planName) => {
+  const handleVerifyPlan = async (planId, count, acc, planName) => {
     try {
       const { data } = await planConfirm({
         variables: {
@@ -955,8 +955,8 @@ const EmulatorPage = () => {
       });
       const response = {
         userName: acc.name,
-        action: "Chốt kế hoạch",
-        detail: `[${acc.name}] chốt kế hoạch [${planName}]`,
+        action: "Check-in kế hoạch",
+        detail: `[${acc.name}] check-in kế hoạch [${planName}]`,
         status: true,
         id: count,
       };
@@ -969,7 +969,7 @@ const EmulatorPage = () => {
       localStorage.removeItem("errorMsg");
       const response = {
         userName: acc.name,
-        action: "Chốt kế hoạch",
+        action: "Check-in kế hoạch",
         detail: `${msg}`,
         status: false,
         id: count,
@@ -985,7 +985,11 @@ const EmulatorPage = () => {
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
-      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
+      if (
+        loggedAcc[i].id === 6 ||
+        loggedAcc[i].id === 10 ||
+        loggedAcc[i].id === 9
+      ) {
         continue;
       }
 
@@ -1012,8 +1016,8 @@ const EmulatorPage = () => {
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
-          log += `[Chốt kế hoạch] ${loggedAcc[i].name} \n`;
-          const res = await handleConfirmMember(
+          log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
+          const res = await handleVerifyPlan(
             currentPlans[j].id,
             count,
             loggedAcc[i],
@@ -1264,6 +1268,7 @@ const EmulatorPage = () => {
                     setResponseMsg(response);
                     setLoginMsg(log);
                   } else if (selectedSimulator === 8) {
+                    simulateVerifyPlan();
                   }
                 }}
               >
