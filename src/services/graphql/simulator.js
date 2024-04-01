@@ -31,12 +31,6 @@ export const JOIN_PLAN_SIMULATOR = gql`
   mutation joinPlanSimulator($dto: PlanJoinInput!) {
     joinPlan(dto: $dto) {
       id
-      plan {
-        name
-      }
-      account {
-        name
-      }
     }
   }
 `;
@@ -105,7 +99,7 @@ export const CREATE_PLAN_SIMULATOR = gql`
 
 export const CHANGE_JOIN_METHOD_SIMULATOR = gql`
   mutation updateJoinMethodSimulator($dto: JoinMethodUpdateInput!) {
-    changePlanJoinMethod(dto: $dto) {
+    updateJoinMethod(dto: $dto) {
       id
       name
       joinMethod

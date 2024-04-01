@@ -19,9 +19,6 @@ import {
   REQUEST_OTP_SIMULATOR,
   SET_TIME_SIMULATOR,
 } from "../../services/graphql/simulator";
-import { GraphQLError } from "graphql";
-import { onError } from "@apollo/client/link/error";
-import { jwtDecode } from "jwt-decode";
 import { planData } from "../../assets/constants/plans";
 import { companionData } from "../../assets/constants/companions";
 
@@ -38,7 +35,10 @@ const EmulatorPage = () => {
   const [selectedSimulator, setSelectedSimulator] = useState(0);
   const [idInputVisible, setIdInputVisible] = useState(false);
   const [joinId, setJoinId] = useState(0);
+  const [joinNum, setJoinNum] = useState(0);
+  const [planNum, setPlanNum] = useState(0);
   const [dateVisible, setDateVisible] = useState(false);
+  const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
 
   const emulatorOptions = [
@@ -287,11 +287,9 @@ const EmulatorPage = () => {
           dto: {
             companions: dto.companions,
             planId: dto.planId,
-            weight: dto.weight,
           },
         },
       });
-      console.log("hello");
       const response = {
         userName: acc.name,
         action: "Tham gia kế hoạch",
@@ -392,13 +390,12 @@ const EmulatorPage = () => {
     // console.log(loggedAcc);
     // return;
 
-    localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
-      localStorage.setItem("userToken", loggedAcc[i].token);
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+      localStorage.setItem("checkIsUserCall", "no");
+
       let currentPlans = [];
       try {
         const { data } = await refetchLoadPlans({
@@ -413,18 +410,21 @@ const EmulatorPage = () => {
         localStorage.removeItem("errorMsg");
       }
 
+      localStorage.setItem("checkIsUserCall", "yes");
+      localStorage.setItem("userToken", loggedAcc[i].token);
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
           const joinData = {
             companions: null,
             planId: currentPlans[j].id,
-            weight: 1,
             planName: currentPlans[j].name,
           };
           let currentJoinMethod = "NONE";
           if (currentPlans[j].joinMethod === "NONE") {
-            if (loggedAcc[i].id !== 44 && loggedAcc[i].id !== 45) {
+            if (loggedAcc[i].id !== 6 && loggedAcc[i].id !== 7) {
               currentJoinMethod = "INVITE";
             } else {
               currentJoinMethod = "SCAN";
@@ -484,16 +484,28 @@ const EmulatorPage = () => {
   const simulateMassJoinPlan = async () => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
-    localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
-      localStorage.setItem("userToken", loggedAcc[i].token);
-      const { data } = await refetchLoadPlans({
-        id: loggedAcc[i].id, // Always refetches a new list
-      });
-      let currentPlans = data["plans"]["nodes"];
+      localStorage.setItem("checkIsUserCall", "no");
+
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
+      localStorage.setItem("checkIsUserCall", "yes");
+
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           let setThree = false;
@@ -576,17 +588,30 @@ const EmulatorPage = () => {
   const simulateConfirmPlan = async () => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
-    localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+      localStorage.setItem("checkIsUserCall", "no");
+
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
+      localStorage.setItem("checkIsUserCall", "yes");
       localStorage.setItem("userToken", loggedAcc[i].token);
-      const { data } = await refetchLoadPlans({
-        id: loggedAcc[i].id, // Always refetches a new list
-      });
-      let currentPlans = data["plans"]["nodes"];
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
@@ -696,23 +721,31 @@ const EmulatorPage = () => {
     localStorage.setItem("checkIsUserCall", "no");
   };
 
-  const simulateJoinPlanByID = async (currentPlan) => {
+  //add logic change test account if already join plan
+  const simulateJoinPlanByID = async (currentPlan, numJoin) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
-    for (let i = 0; i < loggedAcc?.length; i++) {
+    for (let i = 0; i < 1; i++) {
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
       count++;
       localStorage.setItem("userToken", loggedAcc[i].token);
+
+      let comp = [];
+      for (let index = 0; index < numJoin; index++) {
+        comp.push(companionData[index]);
+      }
+
       const joinData = {
-        companions: null,
+        companions: comp,
         planId: parseInt(joinId, 10),
-        weight: 1,
+        weight: numJoin,
         planName: currentPlan.name,
       };
+
       log += `[Tham gia kế hoạch] ${loggedAcc[i].name} \n`;
       const resJoin = await handleJoinPlan(joinData, count, loggedAcc[i]);
       response.push(resJoin);
@@ -795,17 +828,25 @@ const EmulatorPage = () => {
                     if (e.value === 0) {
                       setIdInputVisible(true);
                       setDateVisible(false);
+                      setPlanNumVisible(false);
+                    } else if (e.value === 1) {
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setPlanNumVisible(true);
                     } else if (e.value === 6) {
                       setDateVisible(true);
                       setIdInputVisible(false);
+                      setPlanNumVisible(false);
                     } else {
                       setIdInputVisible(false);
                       setDateVisible(false);
+                      setPlanNumVisible(false);
                     }
                   } else {
                     setSelectLoading(true);
                     setIdInputVisible(false);
                     setDateVisible(false);
+                    setPlanNumVisible(false);
                   }
                 }}
                 theme={(theme) => ({
@@ -828,6 +869,74 @@ const EmulatorPage = () => {
                 name="id"
                 onChange={(e) => {
                   setJoinId(e.target.value);
+                }}
+                sx={{
+                  width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              <TextField
+                style={
+                  idInputVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="text"
+                placeholder="Nhập số lượng tham gia"
+                size="small"
+                name="numberJoin"
+                onChange={(e) => {
+                  setJoinNum(e.target.value);
+                }}
+                sx={{
+                  width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              <TextField
+                style={
+                  planNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="text"
+                placeholder="Nhập số lượng kế hoạch"
+                size="small"
+                name="numberJoin"
+                onChange={(e) => {
+                  setPlanNum(e.target.value);
                 }}
                 sx={{
                   width: "15%",
@@ -881,7 +990,6 @@ const EmulatorPage = () => {
                 onChange={(e) => {
                   setDateSimulator(e.target.value);
                 }}
-                color="success"
               />
             </div>
             {selectState && (
@@ -910,6 +1018,15 @@ const EmulatorPage = () => {
                     simulateOrderPlan();
                   } else if (selectedSimulator === 0) {
                     try {
+                      if (joinNum < 0 && joinId < 0) {
+                        console.log(error);
+                        const msg = `Nhập số lớn hơn 0`;
+                        setErrMsg(msg);
+                        handleClick();
+                        return;
+                      }
+                      const num = parseInt(joinNum, 10);
+
                       const { data } = await refetchLoadPlansById({
                         id: parseInt(joinId, 10), // Always refetches a new list
                       });
@@ -919,7 +1036,7 @@ const EmulatorPage = () => {
                         setErrMsg(msg);
                         handleClick();
                       } else {
-                        simulateJoinPlanByID(plan);
+                        simulateJoinPlanByID(plan, num);
                       }
                     } catch (error) {
                       console.log(error);
