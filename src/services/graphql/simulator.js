@@ -155,6 +155,12 @@ export const INVITE_PLANS_SIMULATOR = gql`
 
 export const SET_TIME_SIMULATOR = gql`
   mutation setTime($time: DateTime!) {
-    setSystemTime(time: $time)
+    setSystemDateTime(dateTime: $time)
+  }
+`;
+
+export const RESET_TIME_SIMULATOR = gql`
+  mutation resetTime {
+    resetSystemDateTime
   }
 `;

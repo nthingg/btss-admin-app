@@ -18,6 +18,7 @@ import {
   ORDER_CREATE_SIMULATOR,
   REQUEST_AUTH_SIMULATOR,
   REQUEST_OTP_SIMULATOR,
+  RESET_TIME_SIMULATOR,
   SET_TIME_SIMULATOR,
 } from "../../services/graphql/simulator";
 import { planData } from "../../assets/constants/plans";
@@ -67,6 +68,14 @@ const EmulatorPage = () => {
     {
       value: 6,
       label: "Giả lập chỉnh sửa thời gian hệ thống.",
+    },
+    {
+      value: 7,
+      label: "Giả lập đặt lại thời gian hệ thống.",
+    },
+    {
+      value: 8,
+      label: "Giả lập check-in kế hoạch.",
     },
   ];
 
@@ -127,6 +136,9 @@ const EmulatorPage = () => {
 
   const [setTime, { data: dataSetTime, error: errorSetTime }] =
     useMutation(SET_TIME_SIMULATOR);
+
+  const [resetTime, { data: dataResetTime, error: errorResetTime }] =
+    useMutation(RESET_TIME_SIMULATOR);
 
   const [changeJoinMethod, { data: dataJoinMethod, error: errorJoinMethod }] =
     useMutation(CHANGE_JOIN_METHOD_SIMULATOR);
@@ -754,24 +766,51 @@ const EmulatorPage = () => {
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
+        continue;
+      }
+
+      localStorage.setItem("checkIsUserCall", "no");
+
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
+      localStorage.setItem("checkIsUserCall", "yes");
       localStorage.setItem("userToken", loggedAcc[i].token);
-      const { data } = await refetchLoadPlans({
-        id: loggedAcc[i].id, // Always refetches a new list
-      });
-      let currentPlans = data["plans"]["nodes"];
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           let temp = [];
-          if (loggedAcc[i].id !== 44 && loggedAcc[i].id !== 45) {
+          if (loggedAcc[i].id === 7) {
             temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
             console.log("half");
             console.log(temp);
-          } else {
+          } else if (loggedAcc[i].id === 8) {
             temp = planData[0].tempOrders;
             console.log("full");
             console.log(temp);
+          } else {
+            temp = [
+              planData[0].tempOrders[0],
+              planData[0].tempOrders[1],
+              planData[0].tempOrders[2],
+            ];
+            console.log("70%");
+            console.log(temp);
           }
+
           for (let k = 0; k < temp.length; k++) {
             count++;
             const orderData = {
@@ -863,6 +902,42 @@ const EmulatorPage = () => {
       const response = {
         userName: "Quản trị hệ thống",
         action: "Thay đổi thời gian hệ thống",
+        detail: `${msg}`,
+        status: false,
+        id: 1,
+      };
+      return response;
+    }
+  };
+
+  const handleResetSystemTime = async () => {
+    try {
+      const { data } = await resetTime();
+      let dt = "";
+      let st = false;
+      if (data) {
+        st = true;
+        dt = `Quản trị hệ thống đặt lại thời gian thành công.`;
+      } else {
+        dt = `Quản trị hệ thống thay đổi thời gian thất bại`;
+      }
+      const response = {
+        userName: "Quản trị hệ thống",
+        action: "Đặt lại thời gian hệ thống",
+        detail: dt,
+        status: st,
+        id: 1,
+      };
+      return response;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClick();
+      localStorage.removeItem("errorMsg");
+      const response = {
+        userName: "Quản trị hệ thống",
+        action: "Đặt lại thời gian hệ thống",
         detail: `${msg}`,
         status: false,
         id: 1,
@@ -1046,7 +1121,6 @@ const EmulatorPage = () => {
                   if (loadingState) {
                     await MassLogin();
                   }
-                  console.log("123");
 
                   if (selectedSimulator === 1) {
                     simulateCreatePlans();
@@ -1097,6 +1171,18 @@ const EmulatorPage = () => {
                     response.push(res);
                     setResponseMsg(response);
                     setLoginMsg(log);
+                  } else if (selectedSimulator === 7) {
+                    let log = "";
+                    log += "[Đăng nhập] Quản trị hệ thống \n";
+                    log +=
+                      "[Chỉnh sửa thời gian hệ thống] Quản trị hệ thống \n";
+                    let response = [];
+                    const res = await handleResetSystemTime();
+
+                    response.push(res);
+                    setResponseMsg(response);
+                    setLoginMsg(log);
+                  } else if (selectedSimulator === 8) {
                   }
                 }}
               >

@@ -158,7 +158,7 @@ export const planData = [
       },
     ],
     surcharges: [
-      { alreadyDivided: false, gcoinAmount: 10000, note: "Mua bia" },
+      { alreadyDivided: true, gcoinAmount: 100000, note: "Mua thêm thức ăn" },
     ], //done
     tempOrders: [
       //done
