@@ -995,13 +995,13 @@ const EmulatorPage = () => {
 
             <div className="response-table">
               <div className="resultTable">
-                <p className="title">Đăng nhập</p>
+                <p className="title">Hành động</p>
                 <div className="body login-res">
                   <span className="response">{loginMsg}</span>
                 </div>
               </div>
               <div className="resultTable">
-                <p className="title">Kết quả</p>
+                <p className="title">Logs</p>
                 <div className="body">
                   {responseMsg.map((message, index) => (
                     <div key={index} className="response-item">

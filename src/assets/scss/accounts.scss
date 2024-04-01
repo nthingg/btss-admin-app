@@ -1,0 +1,57 @@
+//account table
+.accountTable {
+    width: fit-content;
+    margin: 30px auto 0 auto;
+    height: 580px;
+
+    .cellWithImg {
+        display: flex;
+        align-items: center;
+
+        .cellImg {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+    }
+
+    .prestigePoint {
+        width: 100%;
+        padding-right: 40%;
+        text-align: right;
+    }
+}
+
+//account page
+.account {
+    background-color: #f8f9f9;
+    padding: 20px 0 40px 0;
+    height: fit-content;
+    min-height: 100vh;
+
+    .ic-r-ml {
+        margin-left: 30%;
+    }
+
+    p {
+        padding-left: 30px;
+    }
+
+    .icon-item {
+        width: 180px !important;
+    }
+
+    .accountContainer {
+        padding: 40px 40px 40px 40px;
+        background-color: white;
+        /* Optional: Add a max-width to limit the width of the container */
+        max-width: 91%; /* Adjust as needed */
+        margin: 0 auto;
+        box-shadow:
+            0 4px 8px 0 rgba(0, 0, 0, 0.1),
+            0 6px 20px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+}

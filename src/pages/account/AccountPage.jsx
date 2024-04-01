@@ -1,16 +1,11 @@
-import "../../assets/scss/accountPage.scss";
+import "../../assets/scss/accounts.scss";
+import "../../assets/scss/header.scss";
 import "../../assets/scss/filter.scss";
 import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import {
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-} from "@mui/material";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
@@ -26,7 +21,6 @@ const AccountPage = () => {
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(accountRole[0]);
-  const [isVeriHidden, setIsVeriHidden] = useState(true);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -180,7 +174,7 @@ const AccountPage = () => {
                   <ManageAccountsRoundedIcon sx={{ color: "#3498DB" }} />
                 )}
                 <span>
-                  {index === 0 && `Nhà du lịch (${accountTravelers})`}
+                  {index === 0 && `Phượt thủ (${accountTravelers})`}
                   {index === 1 && `Nhà cung cấp (${accountSuppliers})`}
                   {index === 2 && `Quản lý (${accountStaffs})`}
                 </span>
@@ -188,50 +182,6 @@ const AccountPage = () => {
             ))}
           </Slider>
         </div>
-        <FormControl>
-          <RadioGroup
-            row
-            aria-labelledby="demo-row-radio-buttons-group-label"
-            name="row-radio-buttons-group"
-            defaultValue={"happening"}
-            sx={{ marginBottom: 2, marginLeft: 2 }}
-            hidden={isVeriHidden}
-            onClick={(e) => {
-              // handleClick(3);
-              // setSelectedDiv(3);
-              // setRegisterVeriStatus(e.target.value);
-            }}
-          >
-            <FormControlLabel
-              value="happening"
-              control={
-                <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green",
-                    },
-                  }}
-                />
-              }
-              label="Đang diễn ra"
-            />
-            <FormControlLabel
-              value="ended"
-              control={
-                <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green",
-                    },
-                  }}
-                />
-              }
-              label="Kết thúc"
-            />
-          </RadioGroup>
-        </FormControl>
         {selectedStatus === "TRAVELER" && <AccountTable travelers={accounts} />}
         {selectedStatus === "PROVIDER" && <AccountTable suppliers={accounts} />}
         {selectedStatus === "STAFF" && <AccountTable staffs={accounts} />}

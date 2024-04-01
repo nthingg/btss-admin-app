@@ -34,7 +34,7 @@ export const accountTravelersColumn = [
         </div>
       );
     },
-    renderHeader: () => <span>Tài khoản</span>,
+    renderHeader: () => <span>TÀI KHOẢN</span>,
   },
   {
     field: "phone",
@@ -44,7 +44,7 @@ export const accountTravelersColumn = [
     renderCell: (params) => {
       function formatPhoneNumberCen(phoneNumber) {
         // Replace leading "+84" with "0" (if present)
-        phoneNumber = phoneNumber.replace(/^\+84/, "0"); // Replace leading "+84" with "0"
+        phoneNumber = phoneNumber.replace(/^84/, "0"); // Replace leading "+84" with "0"
 
         let formattedParts;
         switch (phoneNumber.length) {
@@ -99,7 +99,7 @@ export const accountTravelersColumn = [
     renderCell: (params) => {
       return <div>{params.row.isMale === true ? "Nam" : "Nữ"}</div>;
     },
-    renderHeader: () => <span>Giới tính</span>,
+    renderHeader: () => <span>GIỚI TÍNH</span>,
   },
   {
     field: "prestigePoint",
@@ -109,6 +109,6 @@ export const accountTravelersColumn = [
     renderCell: (params) => {
       return <div className="prestigePoint">{params.row.prestigePoint}</div>;
     },
-    renderHeader: () => <span>Điểm uy tín</span>,
+    renderHeader: () => <span>ĐIỂM UY TÍN</span>,
   },
 ];

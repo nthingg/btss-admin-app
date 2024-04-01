@@ -1,21 +1,16 @@
-import "../../assets/scss/accountTable.scss";
+import "../../assets/scss/accounts.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
-import { IconButton, Menu, MenuItem, Switch } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import React from "react";
+import { Switch } from "@mui/material";
 import { accountTravelersColumn } from "../../assets/configs/accounts/accountTravelers";
 import { providerAccountsColumn } from "../../assets/configs/accounts/accountProvider";
 import { staffAccountsColumn } from "../../assets/configs/accounts/accountStaffs";
 
 const AccountTable = ({ travelers, suppliers, staffs }) => {
-  const navigate = useNavigate();
-
   const actionColumn = [
     {
       field: "action",
-      width: 100,
+      width: 140,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -24,11 +19,18 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
             checked={params.row.isActive}
             onChange={() => {}}
             inputProps={{ "aria-label": "controlled" }}
-            color="success"
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "#2c3d50",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#2c3d50",
+              },
+            }}
           />
         );
       },
-      renderHeader: () => <span>Thao tác</span>,
+      renderHeader: () => <span>TRẠNG THÁI</span>,
     },
   ];
   return (
@@ -44,14 +46,13 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: "#2ECC71",
+                backgroundColor: "#2c3d50",
                 color: "white",
                 fontWeight: "bold",
               },
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
-              boxShadow: 2,
             }}
           />
         </div>
@@ -63,12 +64,11 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
             columns={providerAccountsColumn.concat(actionColumn)}
             rowSelection={false}
             pagination
-            pageSizeOptions={[]}
-            autoHeight={true}
+            autoPageSize={true}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: "#2ECC71",
+                backgroundColor: "#2c3d50",
                 color: "white",
                 fontWeight: "bold",
               },
@@ -87,12 +87,11 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
             columns={staffAccountsColumn.concat(actionColumn)}
             rowSelection={false}
             pagination
-            pageSizeOptions={[]}
-            autoHeight={true}
+            autoPageSize={true}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: "#2ECC71",
+                backgroundColor: "#2c3d50",
                 color: "white",
                 fontWeight: "bold",
               },

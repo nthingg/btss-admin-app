@@ -1,4 +1,4 @@
-import "../../assets/scss/destinationDetail.scss";
+import "../../assets/scss/destinations.scss";
 import "../../assets/scss/shared.scss";
 import EditIcon from "@mui/icons-material/Edit";
 import { useEffect, useState } from "react";
@@ -31,6 +31,7 @@ const DestinationDetailPage = () => {
   const [destination, setDestination] = useState(null);
   const [emergencies, setEmergencies] = useState([]);
   const [activities, setActivities] = useState("");
+  const [seasons, setSeasons] = useState("");
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState(null);
 
@@ -102,9 +103,39 @@ const DestinationDetailPage = () => {
             break;
         }
       }
+
+      let seasons = "";
+      for (
+        let index = 0;
+        index < data["destinations"]["nodes"][0]["seasons"].length;
+        index++
+      ) {
+        switch (data["destinations"]["nodes"][0]["seasons"][index]) {
+          case "SPRING":
+            seasons += "Xuân, ";
+            break;
+          case "SUMMER":
+            seasons += "Hạ, ";
+            break;
+          case "FALL":
+            seasons += "Thu, ";
+            break;
+          case "WINTER":
+            seasons += "Đông, ";
+            break;
+          default:
+            seasons += "Khác, ";
+            break;
+        }
+      }
+
       const lastSpaceIndex = acts.lastIndexOf(", ");
       const newString = acts.substring(0, lastSpaceIndex);
       setActivities(newString);
+
+      const lastSpaceIndexSea = seasons.lastIndexOf(", ");
+      const newStringSea = seasons.substring(0, lastSpaceIndexSea);
+      setSeasons(newStringSea);
 
       const destination = {
         lat: data["destinations"]["nodes"][0].coordinate.coordinates[1],
@@ -241,7 +272,7 @@ const DestinationDetailPage = () => {
                 <span className="itemKey">Mùa:</span>
                 <span className="itemValue">
                   <div className="period-container">
-                    {destination?.seasons.map((season) => (
+                    {/* {destination?.seasons.map((season) => (
                       <div
                         key={season}
                         className={`period-item ${season.toLowerCase()}`}
@@ -250,20 +281,21 @@ const DestinationDetailPage = () => {
                           {(() => {
                             switch (season) {
                               case "SPRING":
-                                return "Xuân";
+                                return "Xuân, ";
                               case "SUMMER":
-                                return "Hạ";
+                                return "Hạ, ";
                               case "FALL":
-                                return "Thu";
+                                return "Thu, ";
                               case "WINTER":
-                                return "Đông";
+                                return "Đông, ";
                               default:
                                 return "Khác";
                             }
                           })()}
                         </span>
                       </div>
-                    ))}
+                    ))} */}
+                    {seasons}
                   </div>
                 </span>
               </div>
@@ -282,12 +314,15 @@ const DestinationDetailPage = () => {
           </div>
         </div> */}
         <div className="bottom">
-          <Accordion>
+          <Accordion sx={{ boxShadow: "none", width: 1400 }}>
             <AccordionSummary
               sx={{
                 fontSize: 24,
+                backgroundColor: "#2c3d50",
+                color: "white",
+                borderRadius: "10px",
               }}
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
               aria-controls="panel1-content"
               id="panel1-header"
             >
@@ -295,7 +330,7 @@ const DestinationDetailPage = () => {
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                minWidth: 1400,
+                backgroundColor: "#f8f9f9",
               }}
             >
               {destination?.description}

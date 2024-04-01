@@ -21,7 +21,7 @@ export const providerAccountsColumn = [
     renderCell: (params) => {
       return <div>{params.row.name}</div>;
     },
-    renderHeader: () => <span>Tài khoản</span>,
+    renderHeader: () => <span>TÀI KHOẢN</span>,
   },
   {
     field: "providerName",
@@ -48,7 +48,7 @@ export const providerAccountsColumn = [
         );
       }
     },
-    renderHeader: () => <span>Nhà cung cấp</span>,
+    renderHeader: () => <span>NHÀ CUNG CẤP</span>,
   },
   {
     field: "phone",
@@ -113,6 +113,6 @@ export const providerAccountsColumn = [
     renderCell: (params) => {
       return <div>{params.row.email}</div>;
     },
-    renderHeader: () => <span>Email</span>,
+    renderHeader: () => <span>EMAIL</span>,
   },
 ];

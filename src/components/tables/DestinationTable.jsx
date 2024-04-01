@@ -1,4 +1,5 @@
-import "../../assets/scss/destinationTable.scss";
+import "../../assets/scss/destinations.scss";
+import "../../assets/scss/header.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
@@ -93,7 +94,7 @@ const DestinationTable = ({ destinations }) => {
           </div>
         );
       },
-      renderHeader: () => <span>Thao tác</span>,
+      renderHeader: () => <span>THAO TÁC</span>,
     },
   ];
   return (
@@ -107,7 +108,7 @@ const DestinationTable = ({ destinations }) => {
         showColumnVerticalBorder={true}
         sx={{
           "& .MuiDataGrid-columnHeader": {
-            backgroundColor: "#2ECC71",
+            backgroundColor: "#2c3d50",
             color: "white",
             fontWeight: "bold",
           },

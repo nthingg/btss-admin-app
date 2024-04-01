@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
-import "../../assets/scss/destinationPage.scss";
+import "../../assets/scss/destinations.scss";
 import "../../assets/scss/shared.scss";
-import AddIcon from "@mui/icons-material/Add";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";

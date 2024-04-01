@@ -1,9 +1,6 @@
-import "../../assets/scss/planOrderTable.scss";
+import "../../assets/scss/plans.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import { IconButton, Menu, MenuItem } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { planOrdersColumn } from "../../assets/configs/plans/planOrders";
 
 const PlanOrderTable = ({ orders }) => {

@@ -30,7 +30,7 @@ export const staffAccountsColumn = [
         </div>
       );
     },
-    renderHeader: () => <span>Tài khoản</span>,
+    renderHeader: () => <span>TÀI KHOẢN</span>,
   },
   {
     field: "email",
@@ -40,6 +40,6 @@ export const staffAccountsColumn = [
     renderCell: (params) => {
       return <div>{params.row.email}</div>;
     },
-    renderHeader: () => <span>Email</span>,
+    renderHeader: () => <span>EMAIL</span>,
   },
 ];

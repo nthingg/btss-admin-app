@@ -15,7 +15,7 @@ export const accountPlansColumns = [
     renderCell: (params) => {
       return <div>{params.row.name}</div>;
     },
-    renderHeader: () => <span>Kế hoạch</span>,
+    renderHeader: () => <span>KẾ HOẠCH</span>,
   },
   {
     field: "destination",
@@ -25,7 +25,7 @@ export const accountPlansColumns = [
     renderCell: (params) => {
       return <div>{params.row.destination.name}</div>;
     },
-    renderHeader: () => <span>Địa điểm</span>,
+    renderHeader: () => <span>ĐỊA ĐIỂM</span>,
   },
   {
     field: "memberCount",
@@ -40,7 +40,7 @@ export const accountPlansColumns = [
         </div>
       );
     },
-    renderHeader: () => <span>Thành viên</span>,
+    renderHeader: () => <span>THÀNH VIÊN</span>,
   },
   {
     field: "departAt",
@@ -63,7 +63,7 @@ export const accountPlansColumns = [
         </div>
       );
     },
-    renderHeader: () => <span>Ngày khởi hành</span>,
+    renderHeader: () => <span>KHỞI HÀNH</span>,
   },
   {
     field: "endDate",
@@ -86,6 +86,6 @@ export const accountPlansColumns = [
         </div>
       );
     },
-    renderHeader: () => <span>Ngày kết thúc</span>,
+    renderHeader: () => <span>KẾT THÚC</span>,
   },
 ];

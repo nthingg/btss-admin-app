@@ -1,4 +1,4 @@
-import "../../assets/scss/planDetail.scss";
+import "../../assets/scss/plans.scss";
 import "../../assets/scss/loading.scss";
 import "../../assets/scss/shared.scss";
 import { Link, useParams } from "react-router-dom";
