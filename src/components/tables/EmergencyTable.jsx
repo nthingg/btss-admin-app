@@ -16,14 +16,14 @@ const EmergencyTable = ({ list }) => {
         showColumnVerticalBorder={true}
         sx={{
           "& .MuiDataGrid-columnHeader": {
-            backgroundColor: "#2ECC71",
+            backgroundColor: "#2c3d50",
             color: "white",
             fontWeight: "bold",
           },
           "& .MuiDataGrid-columnHeader--withRightBorder": {
             borderRightWidth: "2px",
           },
-          boxShadow: 2,
+          backgroundColor: "white",
         }}
       />
     </div>

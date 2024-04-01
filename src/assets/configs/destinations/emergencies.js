@@ -15,20 +15,20 @@ export const emergenciesColumns = [
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
-          {/* <img
+          <img
             className="cellImg"
             src={
-              params.row.imageUrl != null
-                ? params.row.imageUrl
+              params.row.imagePath != null
+                ? `https://d38ozmgi8b70tu.cloudfront.net${params.row.imagePath}`
                 : "https://vinhphucwater.com.vn/wp-content/uploads/2023/05/no-image.jpg"
             }
             alt="avatar"
-          /> */}
+          />
           {params.row.name}
         </div>
       );
     },
-    renderHeader: () => <span>Tên</span>,
+    renderHeader: () => <span>TÊN</span>,
   },
   {
     field: "host",
@@ -72,7 +72,7 @@ export const emergenciesColumns = [
       }
       return <div>{formatPhoneNumberCen(params.row.phone)}</div>;
     },
-    renderHeader: () => <span>Số điện thoại</span>,
+    renderHeader: () => <span>SĐT</span>,
   },
   {
     field: "address",
@@ -82,32 +82,6 @@ export const emergenciesColumns = [
     renderCell: (params) => {
       return <div>{params.row.address}</div>;
     },
-    renderHeader: () => <span>Địa chỉ</span>,
-  },
-  {
-    field: "type",
-    width: 150,
-    align: "center",
-    headerAlign: "center",
-    renderCell: (params) => {
-      switch (params.row.type) {
-        case "MEDICAL":
-          return <div>Trạm xá</div>;
-        case "RESCUE":
-          return <div>Cứu hộ</div>;
-        case "FIRE":
-          return <div>Cứu hỏa</div>;
-        case "GROCERY":
-          return <div>Tạp hóa</div>;
-        case "SECURITY":
-          return <div>Bảo an</div>;
-        case "VEHICLE":
-          return <div>Xe cộ</div>;
-        default:
-          // Handle default case or unknown status
-          break;
-      }
-    },
-    renderHeader: () => <span>Loại</span>,
+    renderHeader: () => <span>ĐỊA CHỈ</span>,
   },
 ];

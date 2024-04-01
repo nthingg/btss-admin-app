@@ -946,6 +946,88 @@ const EmulatorPage = () => {
     }
   };
 
+  const handleCVerifyPlan = async (planId, count, acc, planName) => {
+    try {
+      const { data } = await planConfirm({
+        variables: {
+          dto: planId,
+        },
+      });
+      const response = {
+        userName: acc.name,
+        action: "Chốt kế hoạch",
+        detail: `[${acc.name}] chốt kế hoạch [${planName}]`,
+        status: true,
+        id: count,
+      };
+      return response;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClick();
+      localStorage.removeItem("errorMsg");
+      const response = {
+        userName: acc.name,
+        action: "Chốt kế hoạch",
+        detail: `${msg}`,
+        status: false,
+        id: count,
+      };
+      return response;
+    }
+  };
+
+  const simulateVerifyPlan = async () => {
+    const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
+
+    let response = [];
+    let count = 0;
+    let log = "";
+    for (let i = 0; i < loggedAcc?.length; i++) {
+      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
+        continue;
+      }
+
+      localStorage.setItem("checkIsUserCall", "no");
+
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
+      localStorage.setItem("checkIsUserCall", "yes");
+      localStorage.setItem("userToken", loggedAcc[i].token);
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+
+      if (currentPlans.length > 0) {
+        for (let j = 0; j < currentPlans?.length; j++) {
+          count++;
+          log += `[Chốt kế hoạch] ${loggedAcc[i].name} \n`;
+          const res = await handleConfirmMember(
+            currentPlans[j].id,
+            count,
+            loggedAcc[i],
+            currentPlans[j].name
+          );
+          response.push(res);
+          setLoginMsg(log);
+          setResponseMsg(response);
+        }
+      }
+    }
+    localStorage.setItem("checkIsUserCall", "no");
+  };
+
   const [loginMsg, setLoginMsg] = useState("");
 
   return (
@@ -1100,7 +1182,7 @@ const EmulatorPage = () => {
                   },
                 }}
                 className="basic-text ml-2"
-                type="date"
+                type="datetime-local"
                 // placeholder="Nhập ID"
                 size="small"
                 name="id"
@@ -1174,8 +1256,7 @@ const EmulatorPage = () => {
                   } else if (selectedSimulator === 7) {
                     let log = "";
                     log += "[Đăng nhập] Quản trị hệ thống \n";
-                    log +=
-                      "[Chỉnh sửa thời gian hệ thống] Quản trị hệ thống \n";
+                    log += "[Đặt lại thời gian hệ thống] Quản trị hệ thống \n";
                     let response = [];
                     const res = await handleResetSystemTime();
 

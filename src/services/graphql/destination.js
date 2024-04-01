@@ -86,6 +86,9 @@ export const LOAD_DESTINATIONS_FILTER = gql`
             name
           }
         }
+        coordinate {
+          coordinates
+        }
       }
     }
   }
