@@ -69,6 +69,7 @@
                 border: none;
                 align-items: center;
                 justify-content: center;
+                transition: 0.4s;
 
                 span {
                     margin-left: 4px;
@@ -86,9 +87,11 @@
                 cursor: pointer;
                 display: flex;
                 border: none;
+                align-items: center;
                 justify-content: center;
-                p {
-                    margin: 0;
+
+                span {
+                    margin-left: 4px;
                 }
             }
 

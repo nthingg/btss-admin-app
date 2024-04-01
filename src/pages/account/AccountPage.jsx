@@ -6,6 +6,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
+import SearchIcon from "@mui/icons-material/Search";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
@@ -129,6 +130,9 @@ const AccountPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
           />
+          <button className="link">
+            <SearchIcon />
+          </button>
         </div>
         <div className="right">
           {/* <Link to="/products/new" className="link">

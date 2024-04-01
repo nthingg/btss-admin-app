@@ -302,10 +302,6 @@ const EmulatorPage = () => {
     }
   };
 
-  const Toast = async () => {
-    console.log("ayo im here nigga");
-  };
-
   const MassLogin = async () => {
     for (let i = 0; i < accounts?.length; i++) {
       await handlingAuth(accounts[i].phone);

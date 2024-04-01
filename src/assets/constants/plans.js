@@ -128,30 +128,30 @@ export const planData = [
         ],
         providerId: 5,
       },
-      // {
-      //   cart: [
-      //     {
-      //       key: 9,
-      //       value: 4,
-      //     },
-      //     {
-      //       key: 10,
-      //       value: 4,
-      //     },
-      //     {
-      //       key: 11,
-      //       value: 2,
-      //     },
-      //   ],
-      //   note: null,
-      //   type: "MEAL",
-      //   period: "AFTERNOON",
-      //   serveDates: [
-      //     nineDaysLater.toLocaleDateString(),
-      //     tenDaysLater.toLocaleDateString(),
-      //   ],
-      //   providerId: 9,
-      // },
+      {
+        cart: [
+          {
+            key: 9,
+            value: 4,
+          },
+          {
+            key: 10,
+            value: 4,
+          },
+          {
+            key: 11,
+            value: 2,
+          },
+        ],
+        note: null,
+        type: "MEAL",
+        period: "AFTERNOON",
+        serveDates: [
+          nineDaysLater.toLocaleDateString(),
+          tenDaysLater.toLocaleDateString(),
+        ],
+        providerId: 9,
+      },
       {
         cart: [
           {
@@ -168,22 +168,22 @@ export const planData = [
         ],
         providerId: 8,
       },
-      // {
-      //   cart: [
-      //     {
-      //       key: 1,
-      //       value: 4,
-      //     },
-      //   ],
-      //   note: null,
-      //   type: "MEAL",
-      //   period: "NOON",
-      //   serveDates: [
-      //     nineDaysLater.toLocaleDateString(),
-      //     tenDaysLater.toLocaleDateString(),
-      //   ],
-      //   providerId: 3,
-      // },
+      {
+        cart: [
+          {
+            key: 1,
+            value: 4,
+          },
+        ],
+        note: null,
+        type: "MEAL",
+        period: "NOON",
+        serveDates: [
+          nineDaysLater.toLocaleDateString(),
+          tenDaysLater.toLocaleDateString(),
+        ],
+        providerId: 3,
+      },
     ],
     travelDuration: "05:42:10", //done
     sourceId: null, //done

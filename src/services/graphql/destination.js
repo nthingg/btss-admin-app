@@ -58,3 +58,35 @@ export const LOAD_DESTINATIONS = gql`
     }
   }
 `;
+
+export const LOAD_DESTINATIONS_FILTER = gql`
+  query LoadDestinations($topo: [Topographic!]) {
+    destinations(
+      first: 100
+      order: { id: ASC }
+      where: { topographic: { in: $topo } }
+    ) {
+      nodes {
+        id
+        name
+        description
+        imagePaths
+        isVisible
+        address
+        seasons
+        topographic
+        activities
+        province {
+          name
+        }
+        comments {
+          comment
+          createdAt
+          account {
+            name
+          }
+        }
+      }
+    }
+  }
+`;

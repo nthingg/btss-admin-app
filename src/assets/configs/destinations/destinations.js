@@ -19,7 +19,7 @@ export const destinationsColumns = [
     renderCell: (params) => {
       return <div>{params.row.name}</div>;
     },
-    renderHeader: () => <span>Tên địa điểm</span>,
+    renderHeader: () => <span>ĐỊA ĐIỂM</span>,
   },
   {
     field: "province",
@@ -29,7 +29,7 @@ export const destinationsColumns = [
     renderCell: (params) => {
       return <div>{params.row.province.name}</div>;
     },
-    renderHeader: () => <span>Thuộc tỉnh</span>,
+    renderHeader: () => <span>TỈNH</span>,
   },
   {
     field: "comments",
@@ -39,7 +39,7 @@ export const destinationsColumns = [
     renderCell: (params) => {
       return <div>{params.row.comments.length}</div>;
     },
-    renderHeader: () => <span>Lượt đánh giá</span>,
+    renderHeader: () => <span>ĐÁNH GIÁ</span>,
   },
   {
     field: "status",
@@ -64,6 +64,6 @@ export const destinationsColumns = [
         />
       );
     },
-    renderHeader: () => <span>Trạng thái</span>,
+    renderHeader: () => <span>TRẠNG THÁI</span>,
   },
 ];

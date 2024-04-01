@@ -64,7 +64,7 @@ const SideBar = () => {
         <div className="user_container">
           <div className="left">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa3bFIMl8a3khsqlib3IMlYzC_jEi0ul-b_Q&usqp=CAU  "
+              src="https://imgs2.dab3games.com/among-us-2-online355.png"
               className="user_image"
               alt="Profile"
             ></img>
