@@ -39,71 +39,9 @@ const AccountProfilePage = () => {
     },
   });
 
-  // const triggerPhone = () => {
-  //   setPhoneVisibility(!phoneVisibility);
-  // };
-
-  // function formatPhoneNumber(phoneNumber) {
-  //   // Replace leading "+84" with "0" (if present)
-  //   phoneNumber = phoneNumber.replace(/^\+84/, "0");
-
-  //   let part1, part2, part3;
-  //   switch (phoneNumber.length) {
-  //     case 9:
-  //       part1 = phoneNumber.slice(0, 3);
-  //       part2 = phoneNumber.slice(3, 6);
-  //       part3 = phoneNumber.slice(6);
-  //       break;
-  //     case 10:
-  //       part1 = phoneNumber.slice(0, 4);
-  //       part2 = phoneNumber.slice(4, 7);
-  //       part3 = phoneNumber.slice(7);
-  //       break;
-  //     case 11:
-  //       part1 = phoneNumber.slice(0, 4); // Handle potential country code (adjust as needed)
-  //       part2 = phoneNumber.slice(4, 7);
-  //       part3 = phoneNumber.slice(7);
-  //       break;
-  //     default:
-  //       // Handle invalid lengths (optional)
-  //       console.warn(`Invalid phone number length: ${phoneNumber}`);
-  //       return phoneNumber;
-  //   }
-
-  //   // Combine parts with spaces
-  //   return `${part1} ${part2} ${part3}`;
-  // }
-
-  // function formatPhoneNumberCen(phoneNumber) {
-  //   // Replace leading "+84" with "0" (if present)
-  //   phoneNumber = phoneNumber.replace(/^\+84/, "0");
-
-  //   let part1, part2;
-  //   switch (phoneNumber.length) {
-  //     case 9:
-  //       part1 = "*".repeat(phoneNumber.length - 3);
-  //       part2 = phoneNumber.slice(6);
-  //       break;
-  //     case 10:
-  //       part1 = "*".repeat(phoneNumber.length - 3);
-  //       part2 = phoneNumber.slice(7);
-  //       break;
-  //     case 11:
-  //       part1 = "*".repeat(phoneNumber.length - 3);
-  //       part2 = phoneNumber.slice(7);
-  //       break;
-  //     default:
-  //       // Handle invalid lengths (optional)
-  //       return phoneNumber;
-  //   }
-
-  //   // Combine parts with spaces
-  //   return `${part1}${part2}`;
-  // }
-
   function formatPhoneNumberCen(phoneNumber) {
     // Replace leading "+84" with "0" (if present)
-    phoneNumber = phoneNumber.replace(/^\+84/, "0"); // Replace leading "+84" with "0"
+    phoneNumber = phoneNumber.replace(/^\84/, "0"); // Replace leading "+84" with "0"
 
     let formattedParts;
     switch (phoneNumber.length) {
@@ -148,7 +86,7 @@ const AccountProfilePage = () => {
       // setPhone(formatPhoneNumber(data["accounts"]["nodes"][0]["phone"]));
       // setPhoneHide(formatPhoneNumberCen(data["accounts"]["nodes"][0]["phone"]));
       setPhone(formatPhoneNumberCen(data["accounts"]["nodes"][0]["phone"]));
-      let avt = data["accounts"]["nodes"][0]["avatarUrl"];
+      let avt = data["accounts"]["nodes"][0]["avatarPath"];
       let subAvt =
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
       setAvatarUrl(avt != null ? avt : subAvt);
@@ -157,7 +95,7 @@ const AccountProfilePage = () => {
       setIsMale(gender === true ? "Nam" : "Nữ");
       let gmail = data["accounts"]["nodes"][0]["email"];
       setEmail(gmail !== null ? gmail : "Không có");
-      setPrestigeScore(data["accounts"]["nodes"][0]["prestigeScore"]);
+      setPrestigeScore(data["accounts"]["nodes"][0]["prestigePoint"]);
 
       let res = data["accounts"]["nodes"][0]["plans"].map((node, index) => {
         const { __typename, ...rest } = node;
@@ -175,7 +113,7 @@ const AccountProfilePage = () => {
           <RestartAltIcon
             sx={{
               fontSize: 80,
-              color: "#2ECC71",
+              color: "#2c3d50",
             }}
           />
         </div>
@@ -230,29 +168,6 @@ const AccountProfilePage = () => {
                   <div className="left">
                     <div className="detailItem">
                       <span className="itemKey">Số điện thoại:</span>
-                      {/* {phoneVisibility === false ? (
-                    <span className="itemValue">
-                      {phoneHide}
-                      <IconButton
-                        className="mapBtn"
-                        color="info"
-                        onClick={triggerPhone}
-                      >
-                        <VisibilityOffIcon />
-                      </IconButton>
-                    </span>
-                  ) : (
-                    <span className="itemValue">
-                      {phone}
-                      <IconButton
-                        className="mapBtn"
-                        color="info"
-                        onClick={triggerPhone}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
-                    </span>
-                  )} */}
                       <span className="itemValue">{phone}</span>
                     </div>
                     <div className="detailItem">

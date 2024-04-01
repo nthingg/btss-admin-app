@@ -6,6 +6,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useMutation, useQuery } from "@apollo/client";
 import { Alert, Snackbar, TextField } from "@mui/material";
 import {
+  CANCEL_PLAN_SIMULATOR,
   CHANGE_JOIN_METHOD_SIMULATOR,
   CONFIRM_PLAN_SIMULATOR,
   CREATE_PLAN_SIMULATOR,
@@ -89,6 +90,10 @@ const EmulatorPage = () => {
 
   const [rqAuth, { data: dataRqAuth, error: errorRqAuth }] = useMutation(
     REQUEST_AUTH_SIMULATOR
+  );
+
+  const [cancel, { data: dataCancel, error: errorCancel }] = useMutation(
+    CANCEL_PLAN_SIMULATOR
   );
 
   const {
@@ -385,6 +390,38 @@ const EmulatorPage = () => {
     }
   };
 
+  const handleCancelPlan = async (dto, count, acc) => {
+    try {
+      const { data } = await cancel({
+        variables: {
+          id: dto.id,
+        },
+      });
+      const response = {
+        userName: acc.name,
+        action: "Hủy kế hoạch",
+        detail: `[${acc.name}] hủy kế hoạch [${dto.planName}]`,
+        status: true,
+        id: count,
+      };
+      return response;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClick();
+      localStorage.removeItem("errorMsg");
+      const response = {
+        userName: acc.name,
+        action: "Hủy kế hoạch",
+        detail: `${msg}`,
+        status: false,
+        id: count,
+      };
+      return response;
+    }
+  };
+
   const simulateJoinAndChangeMethodPlan = async () => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
     // console.log(loggedAcc);
@@ -417,60 +454,77 @@ const EmulatorPage = () => {
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
-          const joinData = {
-            companions: null,
-            planId: currentPlans[j].id,
-            planName: currentPlans[j].name,
-          };
-          let currentJoinMethod = "NONE";
-          if (currentPlans[j].joinMethod === "NONE") {
-            if (loggedAcc[i].id !== 6 && loggedAcc[i].id !== 7) {
-              currentJoinMethod = "INVITE";
-            } else {
+
+          if (loggedAcc[i].id !== 10) {
+            const joinData = {
+              companions: null,
+              planId: currentPlans[j].id,
+              planName: currentPlans[j].name,
+            };
+            let currentJoinMethod = "NONE";
+            if (currentPlans[j].joinMethod === "NONE") {
+              if (loggedAcc[i].id !== 6 && loggedAcc[i].id !== 7) {
+                currentJoinMethod = "INVITE";
+              } else {
+                currentJoinMethod = "SCAN";
+              }
+            } else if (currentPlans[j].joinMethod === "INVITE") {
               currentJoinMethod = "SCAN";
+            } else {
+              currentJoinMethod = "INVITE";
             }
-          } else if (currentPlans[j].joinMethod === "INVITE") {
-            currentJoinMethod = "SCAN";
-          } else {
-            currentJoinMethod = "INVITE";
-          }
 
-          const changeData = {
-            joinMethod: currentJoinMethod,
-            planId: currentPlans[j].id,
-            planName: currentPlans[j].name,
-          };
-          log += `[Tham gia kế hoạch] ${loggedAcc[i].name} \n`;
-          const resJoin = await handleJoinPlan(joinData, count, loggedAcc[i]);
-          count++;
-          log += `[Thay đổi phương thức tham gia] ${loggedAcc[i].name} \n`;
-          const resChange = await handleChangeJoinMethod(
-            changeData,
-            count,
-            loggedAcc[i]
-          );
-          response.push(resJoin);
-          response.push(resChange);
+            const changeData = {
+              joinMethod: currentJoinMethod,
+              planId: currentPlans[j].id,
+              planName: currentPlans[j].name,
+            };
+            log += `[Tham gia kế hoạch] ${loggedAcc[i].name} \n`;
+            const resJoin = await handleJoinPlan(joinData, count, loggedAcc[i]);
+            count++;
+            log += `[Thay đổi phương thức tham gia] ${loggedAcc[i].name} \n`;
+            const resChange = await handleChangeJoinMethod(
+              changeData,
+              count,
+              loggedAcc[i]
+            );
+            response.push(resJoin);
+            response.push(resChange);
 
-          if (currentJoinMethod === "INVITE") {
-            for (let index = 0; index < loggedAcc?.length; index++) {
-              count++;
-              if (loggedAcc[index].id !== loggedAcc[i].id) {
-                const inviteData = {
-                  accountId: loggedAcc[index].id,
-                  planId: currentPlans[j].id,
-                  planName: currentPlans[j].name,
-                };
-                log += `[Mời thành viên khác] ${loggedAcc[i].name} \n`;
-                const resInvite = await handleInvitePlan(
-                  inviteData,
-                  count,
-                  loggedAcc[i],
-                  loggedAcc[index]
-                );
-                response.push(resInvite);
+            if (currentJoinMethod === "INVITE") {
+              for (let index = 0; index < loggedAcc?.length; index++) {
+                count++;
+                if (loggedAcc[index].id !== loggedAcc[i].id) {
+                  const inviteData = {
+                    accountId: loggedAcc[index].id,
+                    planId: currentPlans[j].id,
+                    planName: currentPlans[j].name,
+                  };
+                  log += `[Mời thành viên khác] ${loggedAcc[i].name} \n`;
+                  const resInvite = await handleInvitePlan(
+                    inviteData,
+                    count,
+                    loggedAcc[i],
+                    loggedAcc[index]
+                  );
+                  response.push(resInvite);
+                }
               }
             }
+          } else {
+            const cancelData = {
+              id: currentPlans[j].id,
+              planName: currentPlans[j].name,
+            };
+
+            log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
+            const resCancel = await handleCancelPlan(
+              cancelData,
+              count,
+              loggedAcc[i]
+            );
+
+            response.push(resCancel);
           }
 
           setLoginMsg(log);
@@ -488,6 +542,10 @@ const EmulatorPage = () => {
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
+      if (loggedAcc[i].id === 10) {
+        continue;
+      }
+
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
@@ -508,45 +566,59 @@ const EmulatorPage = () => {
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
-          let setThree = false;
-          for (let k = 0; k < loggedAcc?.length; k++) {
-            if (loggedAcc[k].id !== loggedAcc[i].id) {
-              count++;
-              log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-              localStorage.setItem("userToken", loggedAcc[k].token);
-              let tempCompanion = null;
-              let tempWeight = 1;
-              if (
-                loggedAcc[i].id !== 44 &&
-                loggedAcc[i].id !== 45 &&
-                loggedAcc[i].id !== 46
-              ) {
-                if (!setThree) {
-                  tempCompanion = [companionData[0], companionData[1]];
-                  tempWeight = 3;
-                  setThree = true;
-                } else {
-                  tempCompanion = [companionData[0]];
-                  tempWeight = 2;
+          if (loggedAcc[i].id !== 6) {
+            let setThree = false;
+            for (let k = 0; k < loggedAcc?.length; k++) {
+              if (loggedAcc[k].id !== loggedAcc[i].id) {
+                count++;
+                log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                localStorage.setItem("userToken", loggedAcc[k].token);
+                let tempCompanion = null;
+                let tempWeight = 1;
+                if (loggedAcc[i].id !== 7 && loggedAcc[i].id !== 8) {
+                  if (!setThree) {
+                    tempCompanion = [companionData[0], companionData[1]];
+                    tempWeight = 3;
+                    setThree = true;
+                  } else {
+                    tempCompanion = [companionData[0]];
+                    tempWeight = 2;
+                  }
                 }
+                const joinData = {
+                  companions: tempCompanion,
+                  planId: currentPlans[j].id,
+                  weight: tempWeight,
+                  planName: currentPlans[j].name,
+                };
+                log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                const resJoin = await handleJoinPlan(
+                  joinData,
+                  count,
+                  loggedAcc[k]
+                );
+                response.push(resJoin);
               }
-              const joinData = {
-                companions: tempCompanion,
-                planId: currentPlans[j].id,
-                weight: tempWeight,
-                planName: currentPlans[j].name,
-              };
-              log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-              const resJoin = await handleJoinPlan(
-                joinData,
-                count,
-                loggedAcc[k]
-              );
-              response.push(resJoin);
-              setLoginMsg(log);
-              setResponseMsg(response);
             }
+          } else {
+            const cancelData = {
+              id: currentPlans[j].id,
+              planName: currentPlans[j].name,
+            };
+            localStorage.setItem("userToken", loggedAcc[i].token);
+            log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+            log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
+            const resCancel = await handleCancelPlan(
+              cancelData,
+              count,
+              loggedAcc[i]
+            );
+
+            response.push(resCancel);
           }
+
+          setLoginMsg(log);
+          setResponseMsg(response);
         }
       }
     }
@@ -592,6 +664,10 @@ const EmulatorPage = () => {
     let count = 0;
     let log = "";
     for (let i = 0; i < loggedAcc?.length; i++) {
+      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
+        continue;
+      }
+
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
@@ -903,40 +979,6 @@ const EmulatorPage = () => {
                 name="numberJoin"
                 onChange={(e) => {
                   setJoinNum(e.target.value);
-                }}
-                sx={{
-                  width: "15%",
-                  "& label.Mui-focused": {
-                    color: "black",
-                  },
-                  "& .MuiInput-underline:after": {
-                    borderBottomColor: "black",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "black",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "black",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "black",
-                    },
-                  },
-                }}
-              />
-              <TextField
-                style={
-                  planNumVisible ? { display: "block" } : { display: "none" }
-                }
-                id="outlined-disabled"
-                className="basic-text ml-2"
-                type="text"
-                placeholder="Nhập số lượng kế hoạch"
-                size="small"
-                name="numberJoin"
-                onChange={(e) => {
-                  setPlanNum(e.target.value);
                 }}
                 sx={{
                   width: "15%",

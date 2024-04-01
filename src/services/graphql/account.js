@@ -36,9 +36,9 @@ export const LOAD_DETAIL_ACCOUNT = gql`
       nodes {
         id
         name
-        prestigeScore
+        prestigePoint
         isMale
-        avatarUrl
+        avatarPath
         phone
         email
         isActive
@@ -51,9 +51,9 @@ export const LOAD_DETAIL_ACCOUNT = gql`
           destination {
             name
           }
-          departAt
+          departDate
           startDate
-          maxMember
+          maxMemberCount
           memberCount
           endDate
           status

@@ -17,7 +17,7 @@ export const planOrdersColumn = [
     renderCell: (params) => {
       return <div>{params.row.id.toString().padStart(9, "0")}</div>;
     },
-    renderHeader: () => <span>Mã đơn</span>,
+    renderHeader: () => <span>MÃ ĐƠN</span>,
   },
   {
     field: "createdAt",
@@ -39,7 +39,7 @@ export const planOrdersColumn = [
         </div>
       );
     },
-    renderHeader: () => <span>Ngày đặt</span>,
+    renderHeader: () => <span>NGÀY ĐẶT</span>,
   },
   {
     field: "status",
@@ -65,7 +65,7 @@ export const planOrdersColumn = [
           break;
       }
     },
-    renderHeader: () => <span>Trạng thái</span>,
+    renderHeader: () => <span>TRẠNG THÁI</span>,
   },
   {
     field: "type",
@@ -85,7 +85,7 @@ export const planOrdersColumn = [
           break;
       }
     },
-    renderHeader: () => <span>Loại đơn</span>,
+    renderHeader: () => <span>LOẠI ĐƠN</span>,
   },
   {
     field: "total",
@@ -97,6 +97,6 @@ export const planOrdersColumn = [
       const formattedPrice = amount.toLocaleString("vi-VN") + "đ";
       return <div className="prodPrice">{formattedPrice}</div>;
     },
-    renderHeader: () => <span>Tổng</span>,
+    renderHeader: () => <span>TỔNG</span>,
   },
 ];

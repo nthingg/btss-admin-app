@@ -48,7 +48,7 @@ export const accountPlansColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.departAt);
+      const date = new Date(params.row.departDate);
 
       const formattedDateTime = date.toLocaleDateString("vi-VN", {
         timeZone: "UTC",

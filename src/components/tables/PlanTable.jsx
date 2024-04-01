@@ -118,7 +118,7 @@ const PlanTable = ({ plans, accountPlans }) => {
             sx={{
               height: 320,
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: "#2ECC71",
+                backgroundColor: "#2C3E50",
                 color: "white",
                 fontWeight: "bold",
               },

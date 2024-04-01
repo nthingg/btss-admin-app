@@ -35,6 +35,14 @@ export const JOIN_PLAN_SIMULATOR = gql`
   }
 `;
 
+export const CANCEL_PLAN_SIMULATOR = gql`
+  mutation cancelPlanSimulator($id: Int!) {
+    cancelPlan(planId: $id) {
+      id
+    }
+  }
+`;
+
 export const LOAD_PLANS_SIMULATOR = gql`
   query LoadPlans($id: Int!) {
     plans(
