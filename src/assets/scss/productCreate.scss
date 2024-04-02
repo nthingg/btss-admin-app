@@ -12,7 +12,7 @@
     .destination-add-cont {
         padding: 40px 40px 40px 40px;
         height: fit-content;
-        min-height: 720px;
+        min-height: 640px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
         max-width: 91%; /* Adjust as needed */
@@ -25,9 +25,11 @@
         .destination-create {
             display: flex;
             justify-content: space-around;
+            height: fit-content;
         }
 
         .image_container {
+            width: 500px;
             display: flex;
             justify-content: center;
             flex-direction: column;
@@ -68,8 +70,57 @@
             background: #1c2833;
         }
 
+        .btn-group {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+
+            span {
+                margin-left: 12px;
+            }
+
+            .link {
+                transition: 0.4s;
+                border: none;
+                cursor: pointer;
+                width: 160px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 0 10px 0;
+            }
+
+            .reset {
+                background-color: #f8f9f9;
+                color: #2c3d50;
+                margin-right: 30px;
+                border: 2px solid #2c3d50;
+            }
+
+            .confirm {
+                background-color: #2c3d50;
+                color: white;
+            }
+
+            .confirm:hover {
+                background-color: #1c2833;
+            }
+
+            .reset:hover {
+                background-color: #2c3d50;
+                color: white;
+                border: 2px solid #2c3d50;
+            }
+        }
+
         .details {
             display: flex;
+            .description {
+                height: 200px !important;
+            }
 
             .detailItem {
                 margin-bottom: 20px;
@@ -79,6 +130,9 @@
                 padding: 0px 0 10px 10px;
                 margin: 0px 20px 20px 20px;
                 height: 70px;
+                .address-cont {
+                    display: flex;
+                }
 
                 .itemKey {
                     width: 180px;
@@ -92,7 +146,7 @@
                 }
 
                 .textarea {
-                    width: 640px;
+                    width: 690px;
                 }
 
                 .itemValue {
