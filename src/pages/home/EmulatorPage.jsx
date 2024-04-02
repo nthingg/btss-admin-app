@@ -20,6 +20,7 @@ import {
   REQUEST_OTP_SIMULATOR,
   RESET_TIME_SIMULATOR,
   SET_TIME_SIMULATOR,
+  VERIFY_PLAN_SIMULATOR,
 } from "../../services/graphql/simulator";
 import { planData } from "../../assets/constants/plans";
 import { companionData } from "../../assets/constants/companions";
@@ -103,6 +104,10 @@ const EmulatorPage = () => {
 
   const [cancel, { data: dataCancel, error: errorCancel }] = useMutation(
     CANCEL_PLAN_SIMULATOR
+  );
+
+  const [checkIn, { data: dataCheckIn, error: errorCheckIn }] = useMutation(
+    VERIFY_PLAN_SIMULATOR
   );
 
   const {
@@ -946,11 +951,14 @@ const EmulatorPage = () => {
     }
   };
 
-  const handleVerifyPlan = async (planId, count, acc, planName) => {
+  const handleVerifyPlan = async (dto, count, acc, planName) => {
     try {
-      const { data } = await planConfirm({
+      const { data } = await checkIn({
         variables: {
-          dto: planId,
+          dto: {
+            coordinate: dto.coordinate,
+            planId: dto.planId,
+          },
         },
       });
       const response = {
@@ -1017,8 +1025,14 @@ const EmulatorPage = () => {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
           log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
+
+          const verifyData = {
+            planId: currentPlans[j].id,
+            coordinate: [105.04567995200371, 10.573465807537024],
+          };
+
           const res = await handleVerifyPlan(
-            currentPlans[j].id,
+            verifyData,
             count,
             loggedAcc[i],
             currentPlans[j].name
@@ -1207,6 +1221,8 @@ const EmulatorPage = () => {
                   if (loadingState) {
                     await MassLogin();
                   }
+
+                  console.log(accounts);
 
                   if (selectedSimulator === 1) {
                     simulateCreatePlans();

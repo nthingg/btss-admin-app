@@ -12,6 +12,7 @@ import PlanPage from "./pages/plan/PlanPage";
 import PlanDetailPage from "./pages/plan/PlanDetailPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./index.css";
+import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 
 const App = () => {
   const role = localStorage.getItem("role");
@@ -39,6 +40,7 @@ const App = () => {
                 path=":destinationId"
                 element={<DestinationDetailPage />}
               />
+              <Route path="add" element={<DestinationDetailPage />} />
             </Route>
             <Route path="plans">
               <Route
@@ -60,10 +62,10 @@ const App = () => {
               path="emulator"
               element={token ? <EmulatorPage /> : <Navigate to="/login" />}
             ></Route>
-            {/* <Route
-              path="test"
-              element={token ? <Test /> : <Navigate to="/login" />}
-            ></Route> */}
+            <Route
+              path="configuration"
+              element={token ? <ConfigurationPage /> : <Navigate to="/login" />}
+            ></Route>
           </Routes>
         </main>
       </div>

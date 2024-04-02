@@ -7,6 +7,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MapIcon from "@mui/icons-material/Map";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -56,6 +57,12 @@ const SideBar = () => {
             <li>
               <TerminalIcon className="icon" />
               <span>Giả lập</span>
+            </li>
+          </NavLink>
+          <NavLink to="/configuration" style={{ textDecoration: "none" }}>
+            <li>
+              <SettingsApplicationsIcon className="icon" />
+              <span>Hệ thống</span>
             </li>
           </NavLink>
         </ul>

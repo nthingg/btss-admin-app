@@ -17,12 +17,14 @@ import GolfCourseIcon from "@mui/icons-material/GolfCourse";
 import ForestIcon from "@mui/icons-material/Forest";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RowingIcon from "@mui/icons-material/Rowing";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   LOAD_DESTINATIONS,
   LOAD_DESTINATIONS_FILTER,
 } from "../../services/graphql/destination";
 import { BikeScooter } from "@mui/icons-material";
 import Slider from "react-slick";
+import { Link } from "react-router-dom";
 
 const DestinationPage = () => {
   const topoType = [
@@ -228,11 +230,15 @@ const DestinationPage = () => {
           </button>
         </div>
         <div className="right">
+          <Link to="/destination/add" className="link">
+            <AddCircleIcon />
+            <span>Thêm địa điểm</span>
+          </Link>
           <button className="link">
             <FilterAltIcon />
           </button>
           <button className="link">
-            <CloudDownloadIcon /> <span>Xuất file Excel</span>
+            <CloudDownloadIcon />
           </button>
           <button
             className="link"

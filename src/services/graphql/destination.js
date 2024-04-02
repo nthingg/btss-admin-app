@@ -93,3 +93,22 @@ export const LOAD_DESTINATIONS_FILTER = gql`
     }
   }
 `;
+
+export const ADD_DESTINATION = gql`
+  mutation createDestination($dto: DestinationCreateInput!) {
+    createDestination(dto: $dto) {
+      id
+    }
+  }
+`;
+
+export const LOAD_PROVINCES = gql`
+  {
+    provinces(first: 100) {
+      nodes {
+        id
+        name
+      }
+    }
+  }
+`;

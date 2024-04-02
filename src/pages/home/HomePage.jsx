@@ -284,8 +284,8 @@ const HomePage = () => {
                   <p>{veri}</p>
                 </div>
                 <div className="right">
-                  <div className="btn cancel">
-                    <CancelOutlinedIcon sx={{ color: "white" }} />
+                  <div className="btn info">
+                    <InfoIcon sx={{ color: "white" }} />
                   </div>
                 </div>
               </div>

@@ -166,7 +166,9 @@ export const RESET_TIME_SIMULATOR = gql`
 `;
 
 export const VERIFY_PLAN_SIMULATOR = gql`
-  mutation setTime($time: DateTime!) {
-    setSystemDateTime(dateTime: $time)
+  mutation checkinPlanSimulator($dto: PlanVerifyInput!) {
+    checkinPlan(dto: $dto) {
+      id
+    }
   }
 `;
