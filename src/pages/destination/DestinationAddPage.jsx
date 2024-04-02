@@ -13,6 +13,7 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import MapIcon from "@mui/icons-material/Map";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -23,6 +24,7 @@ import {
   ImageList,
   ImageListItem,
   InputAdornment,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import Select from "react-select";
@@ -66,6 +68,8 @@ const DestinationAddPage = () => {
     { value: "WATERFALL", label: "Thác" },
   ];
 
+  const [vertical, setVertical] = useState("top");
+  const [horizontal, setHorizontal] = useState("right");
   const [files, setFiles] = useState([]);
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
@@ -76,6 +80,16 @@ const DestinationAddPage = () => {
   const [provinceId, setProvinceId] = useState(0);
   const [topo, setTopo] = useState("");
   const [open, setOpen] = useState(false);
+  const [errorMsg, setErrMsg] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleClick = () => {
+    setSnackbarOpen(true);
+  };
+
+  const handleCloseSnack = () => {
+    setSnackbarOpen(false);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -105,10 +119,10 @@ const DestinationAddPage = () => {
 
   const handleConfirmClick = async () => {
     let imagePath = [];
-    // for (let index = 0; index < files.length; index++) {
-    //   const imgName = await addPosts(files[index]);
-    //   imagePath.push(imgName);
-    // }
+    for (let index = 0; index < files.length; index++) {
+      const imgName = await addPosts(files[index]);
+      imagePath.push(imgName);
+    }
 
     const loc = JSON.parse(localStorage.getItem("loc"));
     const address = localStorage.getItem("address");
@@ -132,7 +146,7 @@ const DestinationAddPage = () => {
     console.log(description);
     console.log(provinceId);
 
-    const dto = {
+    const dataDestination = {
       activities: acts,
       address: address,
       coordinate: [loc.lng, loc.lat],
@@ -143,6 +157,21 @@ const DestinationAddPage = () => {
       seasons: seas,
       topographic: topo,
     };
+
+    try {
+      const { data } = await add({
+        variables: {
+          dto: dataDestination,
+        },
+      });
+      navigate("/destinations");
+    } catch {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      setErrMsg(msg);
+      handleClick();
+      localStorage.removeItem("errorMsg");
+    }
   };
 
   const TOKEN =
@@ -491,6 +520,22 @@ const DestinationAddPage = () => {
           </button>
         </div>
       </div>
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackbarOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {errorMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
