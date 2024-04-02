@@ -137,14 +137,14 @@ const DestinationAddPage = () => {
       seas.push(seasons[index].value);
     }
 
-    console.log(loc);
-    console.log(address);
-    console.log(name);
-    console.log(acts);
-    console.log(topo);
-    console.log(seas);
-    console.log(description);
-    console.log(provinceId);
+    // console.log(loc);
+    // console.log(address);
+    // console.log(name);
+    // console.log(acts);
+    // console.log(topo);
+    // console.log(seas);
+    // console.log(description);
+    // console.log(provinceId);
 
     const dataDestination = {
       activities: acts,
@@ -270,6 +270,12 @@ const DestinationAddPage = () => {
                   type="file"
                   id="file"
                   onChange={(e) => {
+                    if (files.length === 5) {
+                      setErrMsg("Giới hạn hình ảnh của địa điểm là 5");
+                      handleClick();
+                      localStorage.removeItem("errorMsg");
+                      return;
+                    }
                     let res = files;
                     res.push(e.target.files[0]);
                     setFiles(res);
@@ -504,7 +510,12 @@ const DestinationAddPage = () => {
           </div>
         </div>
         <div className="btn-group">
-          <button className="link reset" onClick={async () => {}}>
+          <button
+            className="link reset"
+            onClick={async () => {
+              setFiles([]);
+            }}
+          >
             <RotateLeftIcon />
             <span>Đặt lại</span>
           </button>
