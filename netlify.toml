@@ -1,3 +1,10 @@
+[build]
+  base = "admin/"
+
+  publish = "build-output/"
+
+  command = "echo 'default context'"
+
 [[redirects]]
   from = "admin/*"
   to = "admin/"
