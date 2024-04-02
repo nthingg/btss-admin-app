@@ -13,6 +13,7 @@ import PlanDetailPage from "./pages/plan/PlanDetailPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./index.css";
 import ConfigurationPage from "./pages/configuration/ConfigurationPage";
+import DestinationAddPage from "./pages/destination/DestinationAddPage";
 
 const App = () => {
   const role = localStorage.getItem("role");
@@ -40,7 +41,7 @@ const App = () => {
                 path=":destinationId"
                 element={<DestinationDetailPage />}
               />
-              <Route path="add" element={<DestinationDetailPage />} />
+              <Route path="add" element={<DestinationAddPage />} />
             </Route>
             <Route path="plans">
               <Route

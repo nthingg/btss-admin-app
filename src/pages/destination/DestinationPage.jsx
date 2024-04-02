@@ -230,7 +230,7 @@ const DestinationPage = () => {
           </button>
         </div>
         <div className="right">
-          <Link to="/destination/add" className="link">
+          <Link to="/destinations/add" className="link">
             <AddCircleIcon />
             <span>Thêm địa điểm</span>
           </Link>

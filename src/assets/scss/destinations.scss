@@ -5,6 +5,13 @@
     height: fit-content;
     min-height: 100vh;
 
+    .link {
+        span {
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    }
+
     p {
         padding-left: 30px;
     }

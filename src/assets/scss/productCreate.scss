@@ -1,0 +1,104 @@
+.edit {
+    background-color: #f8f9f9;
+    padding: 20px 0 0 0;
+    height: fit-content;
+    min-height: 100vh;
+    color: #2c3d50;
+
+    .navigation {
+        margin-left: 30px;
+    }
+
+    .destination-add-cont {
+        padding: 40px 40px 40px 40px;
+        height: fit-content;
+        min-height: 720px;
+        background-color: white;
+        /* Optional: Add a max-width to limit the width of the container */
+        max-width: 91%; /* Adjust as needed */
+        margin: 0 auto;
+        box-shadow:
+            0 4px 8px 0 rgba(0, 0, 0, 0.1),
+            0 6px 20px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+
+        .destination-create {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .image_container {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+
+            img {
+                width: 400px;
+                height: 200px;
+                border-radius: 10px;
+                object-fit: cover;
+            }
+        }
+
+        .imageAdd {
+            background: #2c3d50;
+            color: white;
+            margin-top: 20px;
+            width: 150px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.4s;
+
+            label {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            span {
+                margin-left: 10px;
+                font-weight: 600;
+            }
+        }
+
+        .imageAdd:hover {
+            background: #1c2833;
+        }
+
+        .details {
+            display: flex;
+
+            .detailItem {
+                margin-bottom: 20px;
+                font-size: 16px;
+                display: flex;
+                flex-direction: column;
+                padding: 0px 0 10px 10px;
+                margin: 0px 20px 20px 20px;
+                height: 70px;
+
+                .itemKey {
+                    width: 180px;
+                    font-size: 18px;
+                    margin-bottom: 12px;
+                    font-weight: 600;
+                }
+
+                .basic-single {
+                    width: 320px;
+                }
+
+                .textarea {
+                    width: 640px;
+                }
+
+                .itemValue {
+                    font-weight: 300;
+                }
+            }
+        }
+    }
+}

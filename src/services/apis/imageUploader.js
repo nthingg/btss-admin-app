@@ -21,7 +21,7 @@ export const addPosts = async (file) => {
     const data = await response.json();
     console.log(data.fileName);
     // return `https://btss-uploads.s3.ap-southeast-2.amazonaws.com/${data.fileName}`; // Return the filename
-    return `https://d38ozmgi8b70tu.cloudfront.net/${data.fileName}`;
+    return data.fileName;
   } catch (err) {
     console.error("Error adding post:", err);
   }
