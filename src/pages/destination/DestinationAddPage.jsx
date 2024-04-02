@@ -6,7 +6,12 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
-import { InputAdornment, TextField } from "@mui/material";
+import {
+  ImageList,
+  ImageListItem,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import Select from "react-select";
 import { addPosts } from "../../services/apis/imageUploader";
 import { useNavigate } from "react-router-dom";
@@ -106,6 +111,21 @@ const DestinationAddPage = () => {
         <div className="destination-create">
           <div className="left">
             <div className="image_container">
+              <ImageList
+                sx={{ width: 500, height: 450 }}
+                cols={3}
+                rowHeight={164}
+              >
+                {files.map((file) => (
+                  <ImageListItem key={file}>
+                    <img
+                      src={`${URL.createObjectURL(file)}`}
+                      srcSet={`${URL.createObjectURL(file)}`}
+                      alt=""
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
               <img
                 src={
                   files[0]
@@ -122,7 +142,13 @@ const DestinationAddPage = () => {
                 <input
                   type="file"
                   id="file"
-                  onChange={(e) => setFiles([e.target.files[0]])}
+                  onChange={(e) => {
+                    let res = files;
+                    res.push(e.target.files[0]);
+                    console.log(e.target.files[0]);
+                    console.log(res);
+                    setFiles(res);
+                  }}
                   style={{ display: "none" }}
                 />
               </div>
