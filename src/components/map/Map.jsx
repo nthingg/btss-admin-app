@@ -3,8 +3,6 @@ import PropTypes from "prop-types";
 import PointerIcon from "../../assets/images/map-marker-512.png";
 import Map, { Marker, Source, Layer } from "react-map-gl";
 import { useState, useEffect } from "react";
-import { FeatureCollection } from "geojson";
-import { CircleLayer } from "react-map-gl";
 import { regionData } from "../../services/location/region";
 import * as turf from "@turf/turf";
 

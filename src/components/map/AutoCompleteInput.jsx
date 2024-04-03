@@ -25,8 +25,6 @@ export default function AutoCompleteInput({
   const handleChange = (event) => {
     handleManualInputChange(event, "streetAndNumber");
     handleInputChange(event.target.value);
-
-    localStorage.setItem("address", event.target.value);
   };
 
   const handleInputChange = async (query) => {
@@ -81,6 +79,7 @@ export default function AutoCompleteInput({
     localStorage.setItem("loc", JSON.stringify(loc));
 
     setAddress(address);
+    localStorage.setItem("address", address.streetAndNumber);
     setSuggestions([]);
   };
 

@@ -164,7 +164,7 @@ const DestinationAddPage = () => {
         },
       });
       navigate("/destinations");
-    } catch {
+    } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
       setErrMsg(msg);
@@ -208,7 +208,7 @@ const DestinationAddPage = () => {
               </Link>
             </div>
             <div className="return-title">
-              <div className="return-header">Thông tin chi tiết địa điểm</div>
+              <div className="return-header">Thêm thông tin địa điểm</div>
               <div className="return-body">
                 <p>Danh sách địa điểm</p>
                 <ArrowForwardIosIcon />
