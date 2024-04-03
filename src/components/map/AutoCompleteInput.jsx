@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import getLocations from "../../services/apis/getLocations";
 import { TextField } from "@mui/material";
+import * as turf from "@turf/turf";
+import { regionData } from "../../services/location/region";
 
 AutoCompleteInput.propTypes = {
   handleManualInputChange: PropTypes.func.isRequired,
@@ -28,8 +30,29 @@ export default function AutoCompleteInput({
   };
 
   const handleInputChange = async (query) => {
-    const suggesions = await getLocations(query, TOKEN);
-    setSuggestions(suggesions);
+    const suggestions = await getLocations(query, TOKEN);
+
+    let res = [];
+
+    for (let index = 0; index < suggestions.length; index++) {
+      let points = turf.points([
+        [suggestions[index].center[0], suggestions[index].center[1]],
+      ]);
+
+      let searchWithin = turf.polygon(
+        regionData.features[0].geometry.coordinates[0]
+      );
+
+      var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
+
+      if (ptsWithin.features.length > 0) {
+        res.push(suggestions[index]);
+      }
+    }
+
+    console.log(res);
+
+    setSuggestions(res);
   };
 
   const handleSuggestionClick = (suggestion) => {

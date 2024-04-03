@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { FeatureCollection } from "geojson";
 import { CircleLayer } from "react-map-gl";
 import { regionData } from "../../services/location/region";
+import * as turf from "@turf/turf";
 
 const TOKEN =
   "pk.eyJ1IjoicGhhbmR1eSIsImEiOiJjbGswaDQzNjgwbGJlM2Z0NXd2c2V0eTgxIn0.mu5cOmm7meqqmT7eicLbKA";
@@ -56,38 +57,71 @@ function CustomMap({ longitude, latitude, updateCoordinates }) {
   }, [latitude, longitude]);
 
   const handleMarkerDrag = (event) => {
-    const latitude = event.lngLat.lat;
-    const longitude = event.lngLat.lng;
+    const lat = event.lngLat.lat;
+    const lng = event.lngLat.lng;
 
-    setMarker({ latitude, longitude });
+    let points = turf.points([[lng, lat]]);
 
-    console.log(longitude, latitude);
-    console.log(longitude, latitude);
-    const loc = {
-      lng: longitude,
-      lat: latitude,
-    };
+    let searchWithin = turf.polygon(
+      regionData.features[0].geometry.coordinates[0]
+    );
 
-    localStorage.setItem("loc", JSON.stringify(loc));
+    var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
+    console.log(ptsWithin);
 
-    updateCoordinates(latitude, longitude);
+    if (ptsWithin.features.length > 0) {
+      console.log(lat);
+      console.log(lng);
+
+      setMarker({ latitude: lat, longitude: lng });
+
+      const loc = {
+        lng: lng,
+        lat: lat,
+      };
+
+      localStorage.setItem("loc", JSON.stringify(loc));
+
+      updateCoordinates(lat, lng);
+    } else {
+      setMarker({ latitude, longitude });
+
+      const loc = {
+        lng: longitude,
+        lat: latitude,
+      };
+
+      localStorage.setItem("loc", JSON.stringify(loc));
+
+      updateCoordinates(latitude, longitude);
+    }
   };
 
   const handleClick = (e) => {
     const latitude = e.lngLat.lat;
     const longitude = e.lngLat.lng;
 
-    setMarker({ latitude, longitude });
+    let points = turf.points([[longitude, latitude]]);
 
-    console.log(longitude, latitude);
-    const loc = {
-      lng: longitude,
-      lat: latitude,
-    };
+    let searchWithin = turf.polygon(
+      regionData.features[0].geometry.coordinates[0]
+    );
 
-    localStorage.setItem("loc", JSON.stringify(loc));
+    var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
 
-    updateCoordinates(latitude, longitude);
+    if (ptsWithin.features.length > 0) {
+      setMarker({ latitude, longitude });
+
+      console.log(longitude, latitude);
+      const loc = {
+        lng: longitude,
+        lat: latitude,
+      };
+
+      localStorage.setItem("loc", JSON.stringify(loc));
+
+      updateCoordinates(latitude, longitude);
+    }
   };
 
   return (
