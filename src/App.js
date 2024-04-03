@@ -16,7 +16,6 @@ import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 import DestinationAddPage from "./pages/destination/DestinationAddPage";
 
 const App = () => {
-  const role = localStorage.getItem("role");
   const token = localStorage.getItem("adminToken");
 
   return (

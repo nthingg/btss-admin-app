@@ -125,7 +125,6 @@ const PlanTable = ({ plans, accountPlans }) => {
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
-              boxShadow: 0.4,
             }}
           />
         </div>

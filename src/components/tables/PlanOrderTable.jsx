@@ -25,7 +25,6 @@ const PlanOrderTable = ({ orders }) => {
           ".MuiTablePagination-displayedRows": {
             display: "none",
           },
-          boxShadow: 2,
         }}
       />
     </div>

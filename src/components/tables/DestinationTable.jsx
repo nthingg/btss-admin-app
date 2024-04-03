@@ -115,7 +115,6 @@ const DestinationTable = ({ destinations }) => {
           "& .MuiDataGrid-columnHeader--withRightBorder": {
             borderRightWidth: "2px",
           },
-          boxShadow: 2,
         }}
       />
     </div>

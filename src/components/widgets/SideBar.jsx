@@ -12,8 +12,6 @@ import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 const SideBar = () => {
   const navigate = useNavigate();
 
-  const role = localStorage.getItem("role");
-
   function logout() {
     localStorage.removeItem("adminToken");
     navigate("/");
@@ -75,18 +73,10 @@ const SideBar = () => {
               className="user_image"
               alt="Profile"
             ></img>
-            {(role === "STAFF" || role === "SUPPLIER") && (
-              <div className="user_info">
-                <span className="name">Supplier</span>
-                <span className="role">Greenwheels supplier</span>
-              </div>
-            )}
-            {role === "ADMIN" && (
-              <div className="user_info">
-                <span className="name">Administrator</span>
-                <span className="role">BTSS Admin</span>
-              </div>
-            )}
+            <div className="user_info">
+              <span className="name">Administrator</span>
+              <span className="role">BTSS Admin</span>
+            </div>
             <button
               className="user_logout"
               type="button"
