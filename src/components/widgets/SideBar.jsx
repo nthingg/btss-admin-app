@@ -15,7 +15,7 @@ const SideBar = () => {
   const role = localStorage.getItem("role");
 
   function logout() {
-    localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
     navigate("/");
     navigate(0);
   }
@@ -91,7 +91,7 @@ const SideBar = () => {
               className="user_logout"
               type="button"
               onClick={(e) => {
-                localStorage.removeItem("token");
+                localStorage.removeItem("adminToken");
                 navigate("/");
                 navigate(0);
               }}
