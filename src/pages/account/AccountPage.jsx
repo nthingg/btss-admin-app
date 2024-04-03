@@ -140,7 +140,6 @@ const AccountPage = () => {
               <span>Thêm dịch vụ</span>
             </Link> */}
           <button className="link">
-            <span>Tải xuống file Excel</span>
             <CloudDownloadIcon />
           </button>
           <button className="link">

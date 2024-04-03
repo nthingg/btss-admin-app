@@ -175,7 +175,6 @@ const PlanPage = () => {
         </div>
         <div className="right">
           <button className="link">
-            <span>Tải xuống file Excel</span>
             <CloudDownloadIcon />
           </button>
           <button className="link">
