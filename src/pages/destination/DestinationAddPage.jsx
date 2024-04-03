@@ -23,7 +23,6 @@ import {
   IconButton,
   ImageList,
   ImageListItem,
-  InputAdornment,
   Snackbar,
   TextField,
 } from "@mui/material";

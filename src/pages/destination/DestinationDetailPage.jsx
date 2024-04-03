@@ -2,6 +2,7 @@ import "../../assets/scss/destinations.scss";
 import "../../assets/scss/shared.scss";
 import "../../assets/scss/loading.scss";
 import EditIcon from "@mui/icons-material/Edit";
+import StaticMap from "../../components/map/StaticMap";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
@@ -469,20 +470,20 @@ const DestinationDetailPage = () => {
             }}
             maxWidth={false}
           >
-            <DialogTitle backgroundColor={"#239b56"} color={"white"}>
+            <DialogTitle
+              backgroundColor={"#2c3d50"}
+              color={"white"}
+              fontWeight={600}
+            >
               Bản đồ
             </DialogTitle>
-            <DialogContent style={{ width: 1000 }}>
+            <DialogContent style={{ width: 1000, height: 600 }}>
               <DialogContentText style={{ padding: "20px 0 10px 0" }}>
                 Chi tiết địa điểm đến:
               </DialogContentText>
-              {/* <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={position}
-            zoom={15}
-          >
-            <MarkerF position={position} />
-          </GoogleMap> */}
+              {position.lng && position.lat && (
+                <StaticMap longitude={position.lng} latitude={position.lat} />
+              )}
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Đóng</Button>

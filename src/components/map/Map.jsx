@@ -1,10 +1,11 @@
 import "../../assets/scss/map.scss";
 import PropTypes from "prop-types";
 import PointerIcon from "../../assets/images/map-marker-512.png";
-import Map, { Marker } from "react-map-gl";
+import Map, { Marker, Source, Layer } from "react-map-gl";
 import { useState, useEffect } from "react";
 import { FeatureCollection } from "geojson";
 import { CircleLayer } from "react-map-gl";
+import { regionData } from "../../services/location/region";
 
 const TOKEN =
   "pk.eyJ1IjoicGhhbmR1eSIsImEiOiJjbGswaDQzNjgwbGJlM2Z0NXd2c2V0eTgxIn0.mu5cOmm7meqqmT7eicLbKA";
@@ -13,6 +14,17 @@ CustomMap.propTypes = {
   longitude: PropTypes.number.isRequired,
   latitude: PropTypes.number.isRequired,
   updateCoordinates: PropTypes.func.isRequired,
+};
+
+const geojson = regionData;
+
+const layerStyle = {
+  id: "point",
+  type: "line",
+  paint: {
+    "line-color": "#000",
+    "line-width": 2,
+  },
 };
 
 function CustomMap({ longitude, latitude, updateCoordinates }) {
@@ -89,6 +101,9 @@ function CustomMap({ longitude, latitude, updateCoordinates }) {
         }}
         onClick={handleClick}
       >
+        <Source id="my-data" type="geojson" data={geojson}>
+          <Layer {...layerStyle} />
+        </Source>
         <Marker
           latitude={marker.latitude}
           longitude={marker.longitude}
