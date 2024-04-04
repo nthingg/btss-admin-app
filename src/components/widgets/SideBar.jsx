@@ -21,6 +21,13 @@ const SideBar = () => {
   return (
     <div className="sidebar">
       <div className="top">
+        <div className="img-cont">
+          <img
+            src="https://btss-uploads.s3.ap-southeast-2.amazonaws.com/logo.png"
+            className="user_image"
+            alt="Profile"
+          ></img>
+        </div>
         <Link to="/" style={{ textDecoration: "none" }}>
           <span className="logo">BTSS</span>
         </Link>

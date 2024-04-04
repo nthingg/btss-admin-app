@@ -1,7 +1,8 @@
-const date = new Date();
-const eightDaysLater = new Date(date.getTime() + 27 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
-const nineDaysLater = new Date(date.getTime() + 28 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
-const tenDaysLater = new Date(date.getTime() + 29 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
+const now = new Date();
+now.setHours(8, 0, 0, 0);
+const eightDaysLater = new Date(now.getTime() + 27 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
+const nineDaysLater = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
+const tenDaysLater = new Date(now.getTime() + 29 * 24 * 60 * 60 * 1000); // Add 3 days in milliseconds
 
 export const planData = [
   {
@@ -13,7 +14,7 @@ export const planData = [
     departureAddress: "Đ. D1, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh", //done
     name: "test-plan-", //done
     note: "", //done
-    periodCount: 10, //done
+    periodCount: 11, //done
     savedProviderIds: [6, 7],
     schedule: [
       //done
@@ -103,6 +104,31 @@ export const planData = [
             isStarred: false,
             description: "Check-out và đi về",
             shortDescription: "Trả phòng và kết thúc chuyến đi.",
+          },
+        ],
+      },
+      {
+        events: [
+          {
+            type: "CHECKIN",
+            duration: "00:30:00",
+            isStarred: false,
+            description: "Check-in và nhận phòng",
+            shortDescription: "Check-in Nhà nghỉ Thiên Định.",
+          },
+          {
+            type: "EAT",
+            duration: "01:00:00",
+            isStarred: true,
+            description: "Dùng bữa tại nhà hàng",
+            shortDescription: "Dùng bữa tại nhà hàng 3*.",
+          },
+          {
+            type: "VISIT",
+            duration: "01:00:00",
+            isStarred: false,
+            description: "Tham quan, giải trí",
+            shortDescription: "Đến bìa rừng Trà Sư và di chuyển.",
           },
         ],
       },

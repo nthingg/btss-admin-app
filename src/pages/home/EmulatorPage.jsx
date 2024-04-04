@@ -40,9 +40,11 @@ const EmulatorPage = () => {
   const [joinId, setJoinId] = useState(0);
   const [joinNum, setJoinNum] = useState(0);
   const [planNum, setPlanNum] = useState(0);
+  const [registerNum, setRegisterNum] = useState(0);
   const [dateVisible, setDateVisible] = useState(false);
   const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
+  const [registerVisible, setRegisterVisible] = useState(false);
 
   const emulatorOptions = [
     {
@@ -156,6 +158,76 @@ const EmulatorPage = () => {
     ORDER_CREATE_SIMULATOR
   );
 
+  useEffect(() => {
+    if (
+      !loading &&
+      !error &&
+      data &&
+      data["accounts"] &&
+      data["accounts"]["nodes"]
+    ) {
+      let res = data["accounts"]["nodes"].map((account) => {
+        const { __typename, ...rest } = account;
+        return { ...rest, token: "" };
+      });
+      console.log(res);
+      setAccounts(res);
+    }
+  }, [data, loading, error]);
+
+  const handlingAuth = async (travelerPhone) => {
+    try {
+      const { data: dataRqOTP } = await rqOTP({
+        variables: {
+          dto: {
+            channel: "VONAGE",
+            phone: travelerPhone,
+          },
+        },
+      });
+      if (dataRqOTP) {
+        const { data: dataRqAuth } = await rqAuth({
+          variables: {
+            dto: {
+              channel: "VONAGE",
+              deviceToken: "test123",
+              otp: "123123",
+              phone: travelerPhone,
+            },
+          },
+        });
+
+        for (let i = 0; i < accounts.length; i++) {
+          if (accounts[i].phone === travelerPhone) {
+            accounts[i].token =
+              dataRqAuth["travelerRequestAuthorize"]["accessToken"];
+            if (accounts[i].phone === accounts[accounts.length - 1].phone) {
+              setLoading(false);
+            }
+            break;
+          }
+        }
+        setAccounts(accounts);
+        localStorage.setItem("loggedAcc", JSON.stringify(accounts));
+      } else {
+        setErrMsg("Đăng nhập không thành công");
+        handleClick();
+      }
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      setErrMsg(msg);
+      handleClick();
+      localStorage.removeItem("errorMsg");
+    }
+  };
+
+  const MassLogin = async () => {
+    for (let i = 0; i < accounts?.length; i++) {
+      await handlingAuth(accounts[i].phone);
+    }
+  };
+
   const handleCreatePlan = async (plan, count, acc) => {
     try {
       const { data } = await create({
@@ -204,101 +276,23 @@ const EmulatorPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !loading &&
-      !error &&
-      data &&
-      data["accounts"] &&
-      data["accounts"]["nodes"]
-    ) {
-      let res = data["accounts"]["nodes"].map((account) => {
-        const { __typename, ...rest } = account;
-        return { ...rest, token: "" };
-      });
-      console.log(res);
-      setAccounts(res);
-    }
-  }, [data, loading, error]);
-
-  const handlingAuth = async (travelerPhone) => {
-    try {
-      const { data: dataRqOTP } = await rqOTP({
-        variables: {
-          dto: {
-            channel: "VONAGE",
-            phone: travelerPhone,
-          },
-        },
-      });
-      console.log(dataRqOTP);
-      if (dataRqOTP) {
-        const { data: dataRqAuth } = await rqAuth({
-          variables: {
-            dto: {
-              channel: "VONAGE",
-              deviceToken: "test123",
-              otp: "123123",
-              phone: travelerPhone,
-            },
-          },
-        });
-
-        for (let i = 0; i < accounts.length; i++) {
-          if (accounts[i].phone === travelerPhone) {
-            accounts[i].token =
-              dataRqAuth["travelerRequestAuthorize"]["accessToken"];
-            if (accounts[i].phone === accounts[accounts.length - 1].phone) {
-              setLoading(false);
-            }
-            break;
-          }
-        }
-        setAccounts(accounts);
-        localStorage.setItem("loggedAcc", JSON.stringify(accounts));
-      } else {
-        setErrMsg("Đăng nhập không thành công");
-        handleClick();
-      }
-    } catch (error) {
-      console.log(error);
-      const msg = localStorage.getItem("errorMsg");
-      setErrMsg(msg);
-      handleClick();
-      localStorage.removeItem("errorMsg");
-    }
-  };
-
-  const MassLogin = async () => {
-    for (let i = 0; i < accounts?.length; i++) {
-      await handlingAuth(accounts[i].phone);
-    }
-  };
-
-  const simulateCreatePlans = async () => {
+  const simulateCreatePlans = async (planNum) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
-    for (let i = 0; i < loggedAcc?.length; i++) {
+    for (let i = 0; i < planNum; i++) {
       localStorage.setItem("userToken", loggedAcc[i].token);
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-      for (let j = 0; j < 10; j++) {
-        count++;
-        const res = await handleCreatePlan(planData[0], count, loggedAcc[i]);
-        response.push(res);
-        setResponseMsg(response);
-        log += `[Tạo kế hoạch] ${loggedAcc[i].name} \n`;
-        setLoginMsg(log);
-      }
+      count++;
+      const res = await handleCreatePlan(planData[0], count, loggedAcc[i]);
+      response.push(res);
+      setResponseMsg(response);
+      log += `[Tạo kế hoạch] ${loggedAcc[i].name} \n`;
+      setLoginMsg(log);
     }
-    // for (let i = 0; i < 2; i++) {
-    //   localStorage.setItem("userToken", loggedAcc[0].token);
-    //   const res = await handleCreatePlan(planData[0], 1, loggedAcc[i]);
-    //   response.push(res);
-    // }
     localStorage.setItem("checkIsUserCall", "no");
   };
 
@@ -1108,6 +1102,42 @@ const EmulatorPage = () => {
                   },
                 })}
               />
+              {/* plan num */}
+              <TextField
+                style={
+                  planNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="text"
+                placeholder="Nhập số lượng kế hoạch"
+                size="small"
+                name="numberPlan"
+                onChange={(e) => {
+                  setPlanNum(e.target.value);
+                }}
+                sx={{
+                  width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              {/* id plan */}
               <TextField
                 style={
                   idInputVisible ? { display: "block" } : { display: "none" }
@@ -1142,6 +1172,7 @@ const EmulatorPage = () => {
                   },
                 }}
               />
+              {/* join num */}
               <TextField
                 style={
                   idInputVisible ? { display: "block" } : { display: "none" }
@@ -1176,6 +1207,7 @@ const EmulatorPage = () => {
                   },
                 }}
               />
+              {/* date  */}
               <TextField
                 id="outlined-disabled"
                 style={dateVisible ? { display: "block" } : { display: "none" }}
@@ -1222,10 +1254,23 @@ const EmulatorPage = () => {
                     await MassLogin();
                   }
 
-                  console.log(accounts);
-
                   if (selectedSimulator === 1) {
-                    simulateCreatePlans();
+                    if (planNum > 50) {
+                      const msg = `Giới hạn tạo 50 kế hoạch giả lập`;
+                      setErrMsg(msg);
+                      handleClick();
+                      return;
+                    }
+                    try {
+                      let num = parseInt(planNum, 10);
+
+                      simulateCreatePlans(num);
+                    } catch (error) {
+                      console.log(error);
+                      const msg = `Vui lòng nhập đúng định dạng số`;
+                      setErrMsg(msg);
+                      handleClick();
+                    }
                   } else if (selectedSimulator === 2) {
                     simulateJoinAndChangeMethodPlan();
                   } else if (selectedSimulator === 3) {
