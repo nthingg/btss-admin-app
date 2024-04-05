@@ -281,7 +281,9 @@ const PlanDetailPage = () => {
                     <div className="detailItem">
                       <span className="itemKey">Trưởng nhóm:</span>
                       <span className="itemValue">
-                        <a href={`/plans/traveler-info/${plan?.account.id}`}>
+                        <a
+                          href={`/plans/${plan?.id}/account/${plan?.account.id}`}
+                        >
                           {plan?.account.name}
                         </a>
                       </span>

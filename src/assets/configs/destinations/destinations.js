@@ -11,7 +11,7 @@ export const destinationsColumns = [
     align: "center",
     headerAlign: "center",
     // renderCell: (params) => params.rowIndex + 1,
-    renderHeader: () => <span>STT</span>,
+    renderHeader: () => <span>#</span>,
   },
   {
     field: "name",

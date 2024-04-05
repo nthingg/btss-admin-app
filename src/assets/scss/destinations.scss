@@ -38,7 +38,7 @@
     background-color: #f8f9f9;
     height: fit-content;
     min-height: 100vh;
-    padding: 20px 30px 40px 30px;
+    padding: 20px 30px 0 30px;
 
     .period-container {
         display: flex;
@@ -81,7 +81,7 @@
         padding: 10px 10px 30px 10px;
 
         .prodTitle {
-            padding: 20px 20px 0 40px;
+            padding: 20px 0 0 40px;
             width: 100%;
             font-size: 38px;
             font-weight: 600;

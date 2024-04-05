@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const LOAD_ACCOUNTS_FILTER = gql`
   query LoadAccounts($role: [Role!]) {
-    accounts(first: 100, order: { id: ASC }, where: { role: { in: $role } }) {
+    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } }) {
       nodes {
         id
         name

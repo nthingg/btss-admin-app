@@ -63,7 +63,7 @@ export const LOAD_DESTINATIONS_FILTER = gql`
   query LoadDestinations($topo: [Topographic!]) {
     destinations(
       first: 100
-      order: { id: ASC }
+      order: { id: DESC }
       where: { topographic: { in: $topo } }
     ) {
       nodes {

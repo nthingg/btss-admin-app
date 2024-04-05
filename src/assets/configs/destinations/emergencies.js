@@ -5,7 +5,7 @@ export const emergenciesColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.id}</div>;
+      return <div>{params.row.index}</div>;
     },
     renderHeader: () => <span>#</span>,
   },

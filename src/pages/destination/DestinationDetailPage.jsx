@@ -46,6 +46,7 @@ const DestinationDetailPage = () => {
           }
           type: { eq: EMERGENCY }
         }
+        order: { id: DESC }
       ) {
         nodes {
           id
@@ -205,13 +206,16 @@ const DestinationDetailPage = () => {
             where: {
               coordinate: {
                 distance: {
-                  geometry: { type: Point, coordinates: [${data["destinations"]["nodes"][0].coordinate.coordinates[0]}, ${data["destinations"]["nodes"][0].coordinate.coordinates[1]}], crs: 4326 }
-                  buffer: 0.09138622285234489
-                  eq: 0
+                  lte: 10000, 
+                  geometry:{
+                    type: Point,
+                    coordinates: [${data["destinations"]["nodes"][0].coordinate.coordinates[0]}, ${data["destinations"]["nodes"][0].coordinate.coordinates[1]}]
+                  }
                 }
               }
               type: { eq: EMERGENCY }
             }
+            order: {id: DESC}
           ) {
             nodes {
               id

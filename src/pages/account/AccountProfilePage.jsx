@@ -15,7 +15,7 @@ import PlanTable from "../../components/tables/PlanTable";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const AccountProfilePage = () => {
-  const { travelerId } = useParams();
+  const { planId, accountId } = useParams();
   const [traveler, setTraveler] = useState(null);
   const [plans, setPlans] = useState([]);
   const [phone, setPhone] = useState("");
@@ -35,7 +35,7 @@ const AccountProfilePage = () => {
 
   const { error, loading, data, refetch } = useQuery(LOAD_DETAIL_ACCOUNT, {
     variables: {
-      id: parseInt(travelerId, 10),
+      id: parseInt(accountId, 10),
     },
   });
 
@@ -124,7 +124,7 @@ const AccountProfilePage = () => {
             <div className="navigation">
               <div className="left">
                 <div className="return-btn">
-                  <Link to="/plans" className="navigateButton">
+                  <Link to={`/plans/${planId}`} className="navigateButton">
                     <ArrowCircleLeftIcon />
                     <p>Trở về</p>
                   </Link>
@@ -148,7 +148,11 @@ const AccountProfilePage = () => {
             <div className="top">
               <div className="profile-header">
                 <div className="profile-name">
-                  <img className="cellImg" src={avatarUrl} alt="avatar" />
+                  <img
+                    className="cellImg"
+                    src={`https://d38ozmgi8b70tu.cloudfront.net${avatarUrl}`}
+                    alt="avatar"
+                  />
                   <p>{name}</p>
                 </div>
                 <div className="profile-status">

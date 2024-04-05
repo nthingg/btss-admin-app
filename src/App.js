@@ -48,9 +48,10 @@ const App = () => {
                 element={token ? <PlanPage /> : <Navigate to="/login" />}
               />
               <Route path=":planId" element={<PlanDetailPage />} />
-              <Route path="traveler-info">
-                <Route path=":travelerId" element={<AccountProfilePage />} />
-              </Route>
+              <Route
+                path=":planId/account/:accountId"
+                element={<AccountProfilePage />}
+              />
             </Route>
             <Route path="accounts">
               <Route
