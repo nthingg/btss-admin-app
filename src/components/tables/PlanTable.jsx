@@ -42,17 +42,6 @@ const PlanTable = ({ plans, accountPlans }) => {
                 <VisibilityIcon />
               </IconButton>
             );
-          case "CANCELED":
-            return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
-                }}
-              >
-                <VisibilityIcon />
-              </IconButton>
-            );
           case "VERIFIED":
             return (
               <IconButton
