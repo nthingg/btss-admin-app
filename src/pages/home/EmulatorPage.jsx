@@ -40,17 +40,23 @@ const EmulatorPage = () => {
   const [ini, setIni] = useState(true);
   const [selectedSimulator, setSelectedSimulator] = useState(0);
   const [idInputVisible, setIdInputVisible] = useState(false);
-  const [joinId, setJoinId] = useState(0);
+  const [joinId, setJoinId] = useState(1);
   const [joinNum, setJoinNum] = useState(1);
   const [planNum, setPlanNum] = useState(1);
   const [registerNum, setRegisterNum] = useState(1);
   const [massPlanJoinNum, setMassPlanJoinNum] = useState(1);
   const [massTravelerJoinNum, setMassTravelerJoinNum] = useState(1);
+  const [planReadyNum, setPlanReadyNum] = useState(1);
+  const [planOrderNum, setPlanOrderNum] = useState(1);
+  const [planVerifyNum, setPlanVerifyNum] = useState(1);
   const [dateVisible, setDateVisible] = useState(false);
   const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
   const [registerVisible, setRegisterVisible] = useState(false);
   const [massJoinVisible, setMassJoinVisible] = useState(false);
+  const [readyNumVisible, setReadyNumVisible] = useState(false);
+  const [orderNumVisible, setOrderNumVisible] = useState(false);
+  const [verifyNumVisible, setVerifyNumVisible] = useState(false);
 
   const emulatorOptions = [
     {
@@ -814,23 +820,21 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateConfirmPlan = async () => {
+  const simulateConfirmPlan = async (readyNum) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     let response = [];
     let count = 0;
     let log = "";
+    let limitReady = 1;
     for (let i = 0; i < loggedAcc?.length; i++) {
-      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
-        continue;
-      }
-
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
       try {
         const { data } = await refetchLoadPlans({
           id: loggedAcc[i].id, // Always refetches a new list
+          status: "REGISTERING",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -847,6 +851,9 @@ const EmulatorPage = () => {
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
+          if (limitReady > readyNum) {
+            break;
+          }
           count++;
           log += `[Chốt kế hoạch] ${loggedAcc[i].name} \n`;
           const res = await handleConfirmMember(
@@ -858,6 +865,7 @@ const EmulatorPage = () => {
           response.push(res);
           setLoginMsg(log);
           setResponseMsg(response);
+          limitReady++;
         }
       }
     }
@@ -903,24 +911,22 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateOrderPlan = async () => {
+  const simulateOrderPlan = async (orderNum) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let log = "";
+    let limitOrder = 1;
     for (let i = 0; i < loggedAcc?.length; i++) {
-      if (loggedAcc[i].id === 6 || loggedAcc[i].id === 10) {
-        continue;
-      }
-
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
       try {
         const { data } = await refetchLoadPlans({
-          id: loggedAcc[i].id, // Always refetches a new list
+          id: loggedAcc[i].id, // Always refetches a new list,
+          status: "READY",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -937,6 +943,9 @@ const EmulatorPage = () => {
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
+          if (limitOrder > orderNum) {
+            break;
+          }
           let temp = [];
           if (loggedAcc[i].id === 7) {
             temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
@@ -975,6 +984,7 @@ const EmulatorPage = () => {
             setResponseMsg(response);
             setLoginMsg(log);
           }
+          limitOrder++;
         }
       }
     }
@@ -989,20 +999,15 @@ const EmulatorPage = () => {
     let response = [];
     let count = 0;
     let log = "";
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < numJoin; i++) {
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
       count++;
       localStorage.setItem("userToken", loggedAcc[i].token);
 
-      let comp = [];
-      for (let index = 0; index < numJoin; index++) {
-        comp.push(companionData[index]);
-      }
-
       const joinData = {
-        companions: comp,
-        planId: parseInt(joinId, 10),
-        weight: numJoin,
+        companions: null,
+        planId: parseInt(currentPlan.id, 10),
+        weight: 1,
         planName: currentPlan.name,
       };
 
@@ -1126,27 +1131,21 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateVerifyPlan = async () => {
+  const simulateVerifyPlan = async (verifyNum) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     let response = [];
     let count = 0;
     let log = "";
+    let limitVerify = 1;
     for (let i = 0; i < loggedAcc?.length; i++) {
-      if (
-        loggedAcc[i].id === 6 ||
-        loggedAcc[i].id === 10 ||
-        loggedAcc[i].id === 9
-      ) {
-        continue;
-      }
-
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
       try {
         const { data } = await refetchLoadPlans({
-          id: loggedAcc[i].id, // Always refetches a new list
+          id: loggedAcc[i].id, // Always refetches a new list,
+          status: "READY",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -1159,10 +1158,15 @@ const EmulatorPage = () => {
 
       localStorage.setItem("checkIsUserCall", "yes");
       localStorage.setItem("userToken", loggedAcc[i].token);
+
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
+          if (limitVerify > verifyNum) {
+            break;
+          }
+
           count++;
           log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
 
@@ -1180,6 +1184,7 @@ const EmulatorPage = () => {
           response.push(res);
           setLoginMsg(log);
           setResponseMsg(response);
+          limitVerify++;
         }
       }
     }
@@ -1216,50 +1221,109 @@ const EmulatorPage = () => {
                   if (e != null) {
                     setSelectedSimulator(e.value);
                     setSelectLoading(false);
+                    //reset value
+                    setJoinId(1);
+                    setJoinNum(1);
+                    setPlanNum(1);
+                    setRegisterNum(1);
+                    setMassPlanJoinNum(1);
+                    setMassTravelerJoinNum(1);
+                    setPlanReadyNum(1);
+                    setPlanOrderNum(1);
+                    setPlanVerifyNum(1);
+                    //
                     if (e.value === 0) {
                       setIdInputVisible(true);
                       setDateVisible(false);
                       setRegisterVisible(false);
                       setPlanNumVisible(false);
+                      setReadyNumVisible(false);
                       setMassJoinVisible(false);
+                      setVerifyNumVisible(false);
+                      setOrderNumVisible(false);
                     } else if (e.value === 1) {
                       setPlanNumVisible(true);
                       setIdInputVisible(false);
                       setDateVisible(false);
+                      setReadyNumVisible(false);
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
+                      setVerifyNumVisible(false);
+                      setOrderNumVisible(false);
                     } else if (e.value === 2) {
                       setRegisterVisible(true);
                       setIdInputVisible(false);
                       setDateVisible(false);
+                      setReadyNumVisible(false);
                       setPlanNumVisible(false);
                       setMassJoinVisible(false);
+                      setOrderNumVisible(false);
+                      setVerifyNumVisible(false);
                     } else if (e.value === 3) {
                       setMassJoinVisible(true);
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setPlanNumVisible(false);
+                      setReadyNumVisible(false);
+                      setRegisterVisible(false);
+                      setVerifyNumVisible(false);
+                      setOrderNumVisible(false);
+                    } else if (e.value === 4) {
+                      setReadyNumVisible(true);
+                      setMassJoinVisible(false);
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setPlanNumVisible(false);
+                      setRegisterVisible(false);
+                      setVerifyNumVisible(false);
+                      setOrderNumVisible(false);
+                    } else if (e.value === 5) {
+                      setOrderNumVisible(true);
+                      setReadyNumVisible(false);
+                      setVerifyNumVisible(false);
+                      setMassJoinVisible(false);
                       setIdInputVisible(false);
                       setDateVisible(false);
                       setPlanNumVisible(false);
                       setRegisterVisible(false);
                     } else if (e.value === 6) {
                       setDateVisible(true);
+                      setVerifyNumVisible(false);
+                      setReadyNumVisible(false);
                       setIdInputVisible(false);
                       setPlanNumVisible(false);
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
+                      setOrderNumVisible(false);
+                    } else if (e.value === 8) {
+                      setVerifyNumVisible(true);
+                      setDateVisible(false);
+                      setReadyNumVisible(false);
+                      setIdInputVisible(false);
+                      setPlanNumVisible(false);
+                      setRegisterVisible(false);
+                      setMassJoinVisible(false);
+                      setOrderNumVisible(false);
                     } else {
                       setIdInputVisible(false);
+                      setVerifyNumVisible(false);
+                      setReadyNumVisible(false);
                       setDateVisible(false);
                       setPlanNumVisible(false);
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
+                      setOrderNumVisible(false);
                     }
                   } else {
                     setSelectLoading(true);
+                    setVerifyNumVisible(false);
                     setIdInputVisible(false);
+                    setReadyNumVisible(false);
                     setDateVisible(false);
                     setRegisterVisible(false);
                     setPlanNumVisible(false);
                     setMassJoinVisible(false);
+                    setOrderNumVisible(false);
                   }
                 }}
                 theme={(theme) => ({
@@ -1324,12 +1388,23 @@ const EmulatorPage = () => {
                 }
                 id="outlined-disabled"
                 className="basic-text ml-2"
-                type="text"
+                type="number"
+                value={joinId}
+                InputProps={{ inputProps: { min: 1 } }}
                 placeholder="Nhập ID"
                 size="small"
                 name="id"
                 onChange={(e) => {
-                  setJoinId(e.target.value);
+                  if (!e.target.value) {
+                    setJoinId("");
+                    setSelectLoading(true);
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setJoinId(1);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) > 0) {
+                    setJoinId(e.target.value);
+                    setSelectLoading(false);
+                  }
                 }}
                 fullWidth
                 sx={{
@@ -1360,12 +1435,23 @@ const EmulatorPage = () => {
                 }
                 id="outlined-disabled"
                 className="basic-text ml-2"
-                type="text"
+                type="number"
+                value={joinNum}
+                InputProps={{ inputProps: { min: 1 } }}
                 placeholder="Số lượng phượt thủ tham gia"
                 size="small"
                 name="numberJoin"
                 onChange={(e) => {
-                  setJoinNum(e.target.value);
+                  if (!e.target.value) {
+                    setJoinNum("");
+                    setSelectLoading(true);
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setJoinNum(1);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) > 0) {
+                    setJoinNum(e.target.value);
+                    setSelectLoading(false);
+                  }
                 }}
                 fullWidth
                 sx={{
@@ -1535,6 +1621,158 @@ const EmulatorPage = () => {
                   },
                 }}
               />
+              {/* number of plan ready */}
+              <TextField
+                style={
+                  readyNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={planReadyNum}
+                placeholder="Số lượng kế hoạch được chốt"
+                size="small"
+                name="numReady"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setPlanReadyNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setPlanReadyNum(1);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setPlanReadyNum(e.target.value);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+
+              {/* number of plan order */}
+              <TextField
+                style={
+                  orderNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={planOrderNum}
+                placeholder="Số lượng kế hoạch được được đặt dịch vụ"
+                size="small"
+                name="numOrder"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setPlanOrderNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setPlanOrderNum(1);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setPlanOrderNum(e.target.value);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+
+              {/* number of plan verify */}
+              <TextField
+                style={
+                  verifyNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={planVerifyNum}
+                placeholder="Số lượng kế hoạch được check-in"
+                size="small"
+                name="numVerify"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setPlanVerifyNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setPlanVerifyNum(1);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setPlanVerifyNum(e.target.value);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
 
               {/* date change system time */}
               <TextField
@@ -1599,10 +1837,10 @@ const EmulatorPage = () => {
                     return;
                   }
 
-                  // const loggedAcc = JSON.parse(
-                  //   localStorage.getItem("loggedAcc")
-                  // );
-                  // console.log(loggedAcc);
+                  const loggedAcc = JSON.parse(
+                    localStorage.getItem("loggedAcc")
+                  );
+                  console.log(loggedAcc);
 
                   if (selectedSimulator === 1) {
                     if (planNum > 50) {
@@ -1641,7 +1879,7 @@ const EmulatorPage = () => {
                       const { data } = await refetchRegistering();
                       const limitRegistering = data.plans.totalCount;
                       if (massPlanJoinNum > limitRegistering) {
-                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang chờ)`;
+                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                         setErrMsg(msg);
                         handleClick();
                         return;
@@ -1658,20 +1896,51 @@ const EmulatorPage = () => {
                       localStorage.removeItem("errorMsg");
                     }
                   } else if (selectedSimulator === 4) {
-                    simulateConfirmPlan();
-                  } else if (selectedSimulator === 5) {
-                    simulateOrderPlan();
-                  } else if (selectedSimulator === 0) {
                     try {
-                      if (joinNum < 0 && joinId < 0) {
-                        console.log(error);
-                        const msg = `Nhập số lớn hơn 0`;
+                      const { data } = await refetchRegistering();
+                      const limitRegistering = data.plans.totalCount;
+                      if (planReadyNum > limitRegistering) {
+                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                         setErrMsg(msg);
                         handleClick();
                         return;
                       }
-                      const num = parseInt(joinNum, 10);
 
+                      simulateConfirmPlan(planReadyNum);
+                    } catch (error) {
+                      console.log(error);
+                      const msg = localStorage.getItem("errorMsg");
+                      setErrMsg(msg);
+                      handleClick();
+                      localStorage.removeItem("errorMsg");
+                    }
+                  } else if (selectedSimulator === 5) {
+                    try {
+                      const { data } = await refetchReady();
+                      const limitReady = data.plans.totalCount;
+                      if (planOrderNum > limitReady) {
+                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
+                        setErrMsg(msg);
+                        handleClick();
+                        return;
+                      }
+
+                      simulateOrderPlan(planOrderNum);
+                    } catch (error) {
+                      console.log(error);
+                      const msg = localStorage.getItem("errorMsg");
+                      setErrMsg(msg);
+                      handleClick();
+                      localStorage.removeItem("errorMsg");
+                    }
+                  } else if (selectedSimulator === 0) {
+                    if (joinNum > 50) {
+                      const msg = `Giới hạn 50 phượt thủ giả lập`;
+                      setErrMsg(msg);
+                      handleClick();
+                      return;
+                    }
+                    try {
                       const { data } = await refetchLoadPlansById({
                         id: parseInt(joinId, 10), // Always refetches a new list
                       });
@@ -1681,13 +1950,14 @@ const EmulatorPage = () => {
                         setErrMsg(msg);
                         handleClick();
                       } else {
-                        simulateJoinPlanByID(plan, num);
+                        simulateJoinPlanByID(plan, joinNum);
                       }
                     } catch (error) {
                       console.log(error);
-                      const msg = `Vui lòng nhập đúng định dạng số`;
+                      const msg = localStorage.getItem("errorMsg");
                       setErrMsg(msg);
                       handleClick();
+                      localStorage.removeItem("errorMsg");
                     }
                   } else if (selectedSimulator === 6) {
                     let log = "";
@@ -1711,7 +1981,24 @@ const EmulatorPage = () => {
                     setResponseMsg(response);
                     setLoginMsg(log);
                   } else if (selectedSimulator === 8) {
-                    simulateVerifyPlan();
+                    try {
+                      const { data } = await refetchReady();
+                      const limitReady = data.plans.totalCount;
+                      if (planVerifyNum > limitReady) {
+                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
+                        setErrMsg(msg);
+                        handleClick();
+                        return;
+                      }
+
+                      simulateVerifyPlan(planVerifyNum);
+                    } catch (error) {
+                      console.log(error);
+                      const msg = localStorage.getItem("errorMsg");
+                      setErrMsg(msg);
+                      handleClick();
+                      localStorage.removeItem("errorMsg");
+                    }
                   }
                 }}
               >

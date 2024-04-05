@@ -12,8 +12,18 @@ export const plansColumns = [
     renderHeader: () => <span>#</span>,
   },
   {
+    field: "id",
+    width: 80,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      return <div>{params.row.id}</div>;
+    },
+    renderHeader: () => <span>ID</span>,
+  },
+  {
     field: "name",
-    width: 310,
+    width: 240,
     renderCell: (params) => {
       return <div>{params.row.name}</div>;
     },

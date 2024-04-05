@@ -172,7 +172,7 @@ export const RESET_TIME_SIMULATOR = gql`
 
 export const VERIFY_PLAN_SIMULATOR = gql`
   mutation checkinPlanSimulator($dto: PlanVerifyInput!) {
-    checkinPlan(dto: $dto) {
+    verifyPlan(dto: $dto) {
       id
     }
   }
