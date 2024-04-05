@@ -48,11 +48,11 @@ export const CANCEL_PLAN_SIMULATOR = gql`
 `;
 
 export const LOAD_PLANS_SIMULATOR = gql`
-  query LoadPlans($id: Int!) {
+  query LoadPlans($id: Int!, $status: PlanStatus) {
     plans(
-      first: 20
+      first: 100
       order: { id: DESC }
-      where: { account: { id: { eq: $id } } }
+      where: { account: { id: { eq: $id } }, status: { eq: $status } }
     ) {
       nodes {
         id
@@ -64,6 +64,7 @@ export const LOAD_PLANS_SIMULATOR = gql`
           id
           status
           account {
+            id
             name
           }
         }
@@ -173,6 +174,84 @@ export const VERIFY_PLAN_SIMULATOR = gql`
   mutation checkinPlanSimulator($dto: PlanVerifyInput!) {
     checkinPlan(dto: $dto) {
       id
+    }
+  }
+`;
+
+export const CHECK_NUMBERS_PENDING_PLANS = gql`
+  query {
+    plans(
+      where: {
+        account: { name: { startsWith: "test-account" } }
+        status: { eq: PENDING }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const CHECK_NUMBERS_REGISTERING_PLANS = gql`
+  query {
+    plans(
+      where: {
+        account: { name: { startsWith: "test-account" } }
+        status: { eq: REGISTERING }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const CHECK_NUMBERS_READY_PLANS = gql`
+  query {
+    plans(
+      where: {
+        account: { name: { startsWith: "test-account" } }
+        status: { eq: READY }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;

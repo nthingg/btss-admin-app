@@ -8,6 +8,9 @@ import { Alert, Snackbar, TextField } from "@mui/material";
 import {
   CANCEL_PLAN_SIMULATOR,
   CHANGE_JOIN_METHOD_SIMULATOR,
+  CHECK_NUMBERS_PENDING_PLANS,
+  CHECK_NUMBERS_READY_PLANS,
+  CHECK_NUMBERS_REGISTERING_PLANS,
   CONFIRM_PLAN_SIMULATOR,
   CREATE_PLAN_SIMULATOR,
   GEN_MEM_SIMULATOR,
@@ -38,13 +41,16 @@ const EmulatorPage = () => {
   const [selectedSimulator, setSelectedSimulator] = useState(0);
   const [idInputVisible, setIdInputVisible] = useState(false);
   const [joinId, setJoinId] = useState(0);
-  const [joinNum, setJoinNum] = useState(0);
-  const [planNum, setPlanNum] = useState(0);
-  const [registerNum, setRegisterNum] = useState(0);
+  const [joinNum, setJoinNum] = useState(1);
+  const [planNum, setPlanNum] = useState(1);
+  const [registerNum, setRegisterNum] = useState(1);
+  const [massPlanJoinNum, setMassPlanJoinNum] = useState(1);
+  const [massTravelerJoinNum, setMassTravelerJoinNum] = useState(1);
   const [dateVisible, setDateVisible] = useState(false);
   const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
   const [registerVisible, setRegisterVisible] = useState(false);
+  const [massJoinVisible, setMassJoinVisible] = useState(false);
 
   const emulatorOptions = [
     {
@@ -94,7 +100,12 @@ const EmulatorPage = () => {
     CONFIRM_PLAN_SIMULATOR
   );
 
-  const { error, loading, data, refetch } = useQuery(GEN_MEM_SIMULATOR);
+  const {
+    error,
+    loading,
+    data,
+    refetch: refetchAccounts,
+  } = useQuery(GEN_MEM_SIMULATOR);
 
   const [rqOTP, { data: dataRqOTP, error: errorRqOTP }] = useMutation(
     REQUEST_OTP_SIMULATOR
@@ -113,6 +124,27 @@ const EmulatorPage = () => {
   );
 
   const {
+    error: errorPending,
+    loading: loadingPending,
+    data: dataPending,
+    refetch: refetchPending,
+  } = useQuery(CHECK_NUMBERS_PENDING_PLANS);
+
+  const {
+    error: errorRegistering,
+    loading: loadingRegistering,
+    data: dataRegistering,
+    refetch: refetchRegistering,
+  } = useQuery(CHECK_NUMBERS_REGISTERING_PLANS);
+
+  const {
+    error: errorReady,
+    loading: loadingReady,
+    data: dataReady,
+    refetch: refetchReady,
+  } = useQuery(CHECK_NUMBERS_READY_PLANS);
+
+  const {
     error: errorLoadPlans,
     loading: loadingLoadPlans,
     data: dataLoadPlans,
@@ -120,6 +152,7 @@ const EmulatorPage = () => {
   } = useQuery(LOAD_PLANS_SIMULATOR, {
     variables: {
       id: 0,
+      status: "PENDING",
     },
   });
 
@@ -158,24 +191,7 @@ const EmulatorPage = () => {
     ORDER_CREATE_SIMULATOR
   );
 
-  useEffect(() => {
-    if (
-      !loading &&
-      !error &&
-      data &&
-      data["accounts"] &&
-      data["accounts"]["nodes"]
-    ) {
-      let res = data["accounts"]["nodes"].map((account) => {
-        const { __typename, ...rest } = account;
-        return { ...rest, token: "" };
-      });
-      console.log(res);
-      setAccounts(res);
-    }
-  }, [data, loading, error]);
-
-  const handlingAuth = async (travelerPhone) => {
+  const handlingAuth = async (travelerPhone, accs) => {
     try {
       const { data: dataRqOTP } = await rqOTP({
         variables: {
@@ -197,18 +213,15 @@ const EmulatorPage = () => {
           },
         });
 
-        for (let i = 0; i < accounts.length; i++) {
-          if (accounts[i].phone === travelerPhone) {
-            accounts[i].token =
+        for (let i = 0; i < accs.length; i++) {
+          if (accs[i].phone === travelerPhone) {
+            accs[i].token =
               dataRqAuth["travelerRequestAuthorize"]["accessToken"];
-            if (accounts[i].phone === accounts[accounts.length - 1].phone) {
-              setLoading(false);
-            }
             break;
           }
         }
-        setAccounts(accounts);
-        localStorage.setItem("loggedAcc", JSON.stringify(accounts));
+        setAccounts(accs);
+        localStorage.setItem("loggedAcc", JSON.stringify(accs));
       } else {
         setErrMsg("Đăng nhập không thành công");
         handleClick();
@@ -222,9 +235,9 @@ const EmulatorPage = () => {
     }
   };
 
-  const MassLogin = async () => {
-    for (let i = 0; i < accounts?.length; i++) {
-      await handlingAuth(accounts[i].phone);
+  const MassLogin = async (accs) => {
+    for (let i = 0; i < accs?.length; i++) {
+      await handlingAuth(accs[i].phone, accs);
     }
   };
 
@@ -323,7 +336,7 @@ const EmulatorPage = () => {
       const response = {
         userName: acc.name,
         action: "Tham gia kế hoạch",
-        detail: `${msg}`,
+        detail: `${msg} (kế hoạch [${dto.planName}])`,
         status: false,
         id: count,
       };
@@ -433,14 +446,13 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateJoinAndChangeMethodPlan = async () => {
+  const simulateJoinAndChangeMethodPlan = async (numberRegistering) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
-    // console.log(loggedAcc);
-    // return;
 
     let response = [];
     let count = 0;
     let log = "";
+    let limitRegister = 1;
     for (let i = 0; i < loggedAcc?.length; i++) {
       localStorage.setItem("checkIsUserCall", "no");
 
@@ -448,6 +460,7 @@ const EmulatorPage = () => {
       try {
         const { data } = await refetchLoadPlans({
           id: loggedAcc[i].id, // Always refetches a new list
+          status: "PENDING",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -466,7 +479,7 @@ const EmulatorPage = () => {
         for (let j = 0; j < currentPlans?.length; j++) {
           count++;
 
-          if (loggedAcc[i].id !== 10) {
+          if (limitRegister <= numberRegistering) {
             const joinData = {
               companions: null,
               planId: currentPlans[j].id,
@@ -474,7 +487,8 @@ const EmulatorPage = () => {
             };
             let currentJoinMethod = "NONE";
             if (currentPlans[j].joinMethod === "NONE") {
-              if (loggedAcc[i].id !== 6 && loggedAcc[i].id !== 7) {
+              let random = Math.floor(Math.random() * 2);
+              if (random !== 0) {
                 currentJoinMethod = "INVITE";
               } else {
                 currentJoinMethod = "SCAN";
@@ -503,15 +517,19 @@ const EmulatorPage = () => {
             response.push(resChange);
 
             if (currentJoinMethod === "INVITE") {
+              let countMax = 1;
               for (let index = 0; index < loggedAcc?.length; index++) {
                 count++;
+                if (countMax > 10) {
+                  break;
+                }
                 if (loggedAcc[index].id !== loggedAcc[i].id) {
                   const inviteData = {
                     accountId: loggedAcc[index].id,
                     planId: currentPlans[j].id,
                     planName: currentPlans[j].name,
                   };
-                  log += `[Mời thành viên khác] ${loggedAcc[i].name} \n`;
+                  log += `[Mời phượt thủ khác tham gia] ${loggedAcc[i].name} \n`;
                   const resInvite = await handleInvitePlan(
                     inviteData,
                     count,
@@ -519,22 +537,22 @@ const EmulatorPage = () => {
                     loggedAcc[index]
                   );
                   response.push(resInvite);
+                  countMax++;
                 }
               }
             }
+            limitRegister++;
           } else {
             const cancelData = {
               id: currentPlans[j].id,
               planName: currentPlans[j].name,
             };
-
             log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
             const resCancel = await handleCancelPlan(
               cancelData,
               count,
               loggedAcc[i]
             );
-
             response.push(resCancel);
           }
 
@@ -546,23 +564,21 @@ const EmulatorPage = () => {
     localStorage.setItem("checkIsUserCall", "no");
   };
 
-  const simulateMassJoinPlan = async () => {
+  const simulateMassJoinPlan = async (massPlan, massTraveler) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     let response = [];
     let count = 0;
     let log = "";
+    let limitMassJoin = 1;
     for (let i = 0; i < loggedAcc?.length; i++) {
-      if (loggedAcc[i].id === 10) {
-        continue;
-      }
-
       localStorage.setItem("checkIsUserCall", "no");
 
       let currentPlans = [];
       try {
         const { data } = await refetchLoadPlans({
           id: loggedAcc[i].id, // Always refetches a new list
+          status: "REGISTERING",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -577,41 +593,171 @@ const EmulatorPage = () => {
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
-          if (loggedAcc[i].id !== 6) {
-            let setThree = false;
-            for (let k = 0; k < loggedAcc?.length; k++) {
-              if (loggedAcc[k].id !== loggedAcc[i].id) {
-                count++;
-                log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                localStorage.setItem("userToken", loggedAcc[k].token);
-                let tempCompanion = null;
-                let tempWeight = 1;
-                if (loggedAcc[i].id !== 7 && loggedAcc[i].id !== 8) {
-                  if (!setThree) {
-                    tempCompanion = [companionData[0], companionData[1]];
-                    tempWeight = 3;
-                    setThree = true;
-                  } else {
-                    tempCompanion = [companionData[0]];
-                    tempWeight = 2;
+          if (limitMassJoin <= massPlan) {
+            if (currentPlans[j].joinMethod === "INVITE") {
+              const members = currentPlans[j].members.filter(
+                (mem) => mem.status === "INVITED"
+              );
+
+              if (members.length > massTraveler) {
+                let limitMember = 1;
+                for (let k = 0; k < loggedAcc.length; k++) {
+                  if (limitMember > massTraveler) {
+                    break;
+                  }
+
+                  if (loggedAcc[k].id !== loggedAcc[i].id) {
+                    const acc = members.find(
+                      (member) => member.account.id === loggedAcc[k].id
+                    );
+
+                    if (acc) {
+                      count++;
+                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                      localStorage.setItem("userToken", loggedAcc[k].token);
+
+                      const joinData = {
+                        companions: null,
+                        planId: currentPlans[j].id,
+                        weight: 1,
+                        planName: currentPlans[j].name,
+                      };
+                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                      const resJoin = await handleJoinPlan(
+                        joinData,
+                        count,
+                        loggedAcc[k]
+                      );
+                      response.push(resJoin);
+                      limitMember++;
+                    }
                   }
                 }
-                const joinData = {
-                  companions: tempCompanion,
-                  planId: currentPlans[j].id,
-                  weight: tempWeight,
-                  planName: currentPlans[j].name,
-                };
-                log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                const resJoin = await handleJoinPlan(
-                  joinData,
-                  count,
-                  loggedAcc[k]
-                );
-                response.push(resJoin);
+              } else {
+                if (members.length === 0) {
+                  let limitMember = 1;
+                  for (let k = 0; k < loggedAcc.length; k++) {
+                    if (limitMember > massTraveler) {
+                      break;
+                    }
+
+                    if (loggedAcc[k].id !== loggedAcc[i].id) {
+                      count++;
+                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                      localStorage.setItem("userToken", loggedAcc[k].token);
+
+                      const joinData = {
+                        companions: null,
+                        planId: currentPlans[j].id,
+                        weight: 1,
+                        planName: currentPlans[j].name,
+                      };
+                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                      const resJoin = await handleJoinPlan(
+                        joinData,
+                        count,
+                        loggedAcc[k]
+                      );
+                      response.push(resJoin);
+                      limitMember++;
+                    }
+                  }
+                } else {
+                  let limitMember = 1;
+                  let limitMemberRemain = 1;
+                  for (let k = 0; k < loggedAcc.length; k++) {
+                    if (limitMember > members.length) {
+                      break;
+                    }
+
+                    if (loggedAcc[k].id !== loggedAcc[i].id) {
+                      const acc = members.find(
+                        (member) => member.account.id === loggedAcc[k].id
+                      );
+
+                      if (acc) {
+                        count++;
+                        log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                        localStorage.setItem("userToken", loggedAcc[k].token);
+
+                        const joinData = {
+                          companions: null,
+                          planId: currentPlans[j].id,
+                          weight: 1,
+                          planName: currentPlans[j].name,
+                        };
+                        log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                        const resJoin = await handleJoinPlan(
+                          joinData,
+                          count,
+                          loggedAcc[k]
+                        );
+                        response.push(resJoin);
+                        limitMember++;
+                      }
+                    }
+                  }
+                  for (let k = 0; k < loggedAcc.length; k++) {
+                    if (limitMemberRemain > massTraveler - members.length) {
+                      break;
+                    }
+
+                    if (loggedAcc[k].id !== loggedAcc[i].id) {
+                      count++;
+                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                      localStorage.setItem("userToken", loggedAcc[k].token);
+
+                      const joinData = {
+                        companions: null,
+                        planId: currentPlans[j].id,
+                        weight: 1,
+                        planName: currentPlans[j].name,
+                      };
+                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                      const resJoin = await handleJoinPlan(
+                        joinData,
+                        count,
+                        loggedAcc[k]
+                      );
+                      response.push(resJoin);
+                      limitMemberRemain++;
+                    }
+                  }
+                }
+              }
+            } else {
+              let limitMember = 1;
+              for (let k = 0; k < loggedAcc.length; k++) {
+                if (limitMember > massTraveler) {
+                  break;
+                }
+
+                if (loggedAcc[k].id !== loggedAcc[i].id) {
+                  count++;
+                  log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                  localStorage.setItem("userToken", loggedAcc[k].token);
+
+                  const joinData = {
+                    companions: null,
+                    planId: currentPlans[j].id,
+                    weight: 1,
+                    planName: currentPlans[j].name,
+                  };
+                  log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                  const resJoin = await handleJoinPlan(
+                    joinData,
+                    count,
+                    loggedAcc[k]
+                  );
+                  response.push(resJoin);
+                  limitMember++;
+                }
               }
             }
+            limitMassJoin++;
+            console.log(limitMassJoin);
           } else {
+            console.log("im in");
             const cancelData = {
               id: currentPlans[j].id,
               planName: currentPlans[j].name,
@@ -1073,25 +1219,47 @@ const EmulatorPage = () => {
                     if (e.value === 0) {
                       setIdInputVisible(true);
                       setDateVisible(false);
+                      setRegisterVisible(false);
                       setPlanNumVisible(false);
+                      setMassJoinVisible(false);
                     } else if (e.value === 1) {
+                      setPlanNumVisible(true);
                       setIdInputVisible(false);
                       setDateVisible(false);
-                      setPlanNumVisible(true);
+                      setRegisterVisible(false);
+                      setMassJoinVisible(false);
+                    } else if (e.value === 2) {
+                      setRegisterVisible(true);
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setPlanNumVisible(false);
+                      setMassJoinVisible(false);
+                    } else if (e.value === 3) {
+                      setMassJoinVisible(true);
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setPlanNumVisible(false);
+                      setRegisterVisible(false);
                     } else if (e.value === 6) {
                       setDateVisible(true);
                       setIdInputVisible(false);
                       setPlanNumVisible(false);
+                      setRegisterVisible(false);
+                      setMassJoinVisible(false);
                     } else {
                       setIdInputVisible(false);
                       setDateVisible(false);
                       setPlanNumVisible(false);
+                      setRegisterVisible(false);
+                      setMassJoinVisible(false);
                     }
                   } else {
                     setSelectLoading(true);
                     setIdInputVisible(false);
                     setDateVisible(false);
+                    setRegisterVisible(false);
                     setPlanNumVisible(false);
+                    setMassJoinVisible(false);
                   }
                 }}
                 theme={(theme) => ({
@@ -1102,22 +1270,34 @@ const EmulatorPage = () => {
                   },
                 })}
               />
-              {/* plan num */}
+              {/*number of plan creating  */}
               <TextField
                 style={
                   planNumVisible ? { display: "block" } : { display: "none" }
                 }
                 id="outlined-disabled"
                 className="basic-text ml-2"
-                type="text"
-                placeholder="Nhập số lượng kế hoạch"
+                type="number"
+                value={planNum}
+                InputProps={{ inputProps: { min: 1 } }}
+                placeholder="Số lượng kế hoạch được tạo"
                 size="small"
                 name="numberPlan"
                 onChange={(e) => {
-                  setPlanNum(e.target.value);
+                  if (!e.target.value) {
+                    setPlanNum("");
+                    setSelectLoading(true);
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setPlanNum(1);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) > 0) {
+                    setPlanNum(e.target.value);
+                    setSelectLoading(false);
+                  }
                 }}
+                fullWidth
                 sx={{
-                  width: "15%",
+                  width: "18%",
                   "& label.Mui-focused": {
                     color: "black",
                   },
@@ -1137,7 +1317,7 @@ const EmulatorPage = () => {
                   },
                 }}
               />
-              {/* id plan */}
+              {/* specific plan id to join */}
               <TextField
                 style={
                   idInputVisible ? { display: "block" } : { display: "none" }
@@ -1151,8 +1331,9 @@ const EmulatorPage = () => {
                 onChange={(e) => {
                   setJoinId(e.target.value);
                 }}
+                fullWidth
                 sx={{
-                  width: "15%",
+                  width: "6%",
                   "& label.Mui-focused": {
                     color: "black",
                   },
@@ -1172,7 +1353,7 @@ const EmulatorPage = () => {
                   },
                 }}
               />
-              {/* join num */}
+              {/* number of traveler join to specific plan id*/}
               <TextField
                 style={
                   idInputVisible ? { display: "block" } : { display: "none" }
@@ -1180,14 +1361,15 @@ const EmulatorPage = () => {
                 id="outlined-disabled"
                 className="basic-text ml-2"
                 type="text"
-                placeholder="Nhập số lượng tham gia"
+                placeholder="Số lượng phượt thủ tham gia"
                 size="small"
                 name="numberJoin"
                 onChange={(e) => {
                   setJoinNum(e.target.value);
                 }}
+                fullWidth
                 sx={{
-                  width: "15%",
+                  width: "17%",
                   "& label.Mui-focused": {
                     color: "black",
                   },
@@ -1207,7 +1389,154 @@ const EmulatorPage = () => {
                   },
                 }}
               />
-              {/* date  */}
+              {/* number of host join their plans */}
+              <TextField
+                style={
+                  registerVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={registerNum}
+                placeholder="Số lượng kế hoạch được host tham gia"
+                size="small"
+                name="numberRegister"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setRegisterNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setRegisterNum(1);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) > 0) {
+                    setRegisterNum(e.target.value);
+                    setSelectLoading(false);
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "25%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              {/* number of plan mass join */}
+              <TextField
+                style={
+                  massJoinVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={massPlanJoinNum}
+                placeholder="Số lượng kế hoạch được tham gia"
+                size="small"
+                name="numberMassPlan"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setMassPlanJoinNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setMassPlanJoinNum(1);
+                    if (massTravelerJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setMassPlanJoinNum(e.target.value);
+                    if (massTravelerJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              {/* number of traveler mass join */}
+              <TextField
+                style={
+                  massJoinVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={massTravelerJoinNum}
+                placeholder="Nhập số lượng thành viên tham gia"
+                size="small"
+                name="numberMassJoin"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setMassTravelerJoinNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setMassTravelerJoinNum(1);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setMassTravelerJoinNum(e.target.value);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+
+              {/* date change system time */}
               <TextField
                 id="outlined-disabled"
                 style={dateVisible ? { display: "block" } : { display: "none" }}
@@ -1250,9 +1579,30 @@ const EmulatorPage = () => {
               <button
                 className={"link"}
                 onClick={async () => {
-                  if (loadingState) {
-                    await MassLogin();
+                  try {
+                    if (loadingState) {
+                      const { data } = await refetchAccounts();
+
+                      let res = data["accounts"]["nodes"].map((account) => {
+                        const { __typename, ...rest } = account;
+                        return { ...rest, token: "" };
+                      });
+                      await MassLogin(res);
+                      setLoading(false);
+                    }
+                  } catch (error) {
+                    console.log(error);
+                    const msg = localStorage.getItem("errorMsg");
+                    setErrMsg(msg);
+                    handleClick();
+                    localStorage.removeItem("errorMsg");
+                    return;
                   }
+
+                  // const loggedAcc = JSON.parse(
+                  //   localStorage.getItem("loggedAcc")
+                  // );
+                  // console.log(loggedAcc);
 
                   if (selectedSimulator === 1) {
                     if (planNum > 50) {
@@ -1261,20 +1611,52 @@ const EmulatorPage = () => {
                       handleClick();
                       return;
                     }
+                    simulateCreatePlans(planNum);
+                  } else if (selectedSimulator === 2) {
                     try {
-                      let num = parseInt(planNum, 10);
-
-                      simulateCreatePlans(num);
+                      const { data } = await refetchPending();
+                      const limitPending = data.plans.totalCount;
+                      if (registerNum > limitPending) {
+                        const msg = `Số lượng kế hoạch đang chờ vượt quá kế hoạch hiện có (${limitPending})`;
+                        setErrMsg(msg);
+                        handleClick();
+                        return;
+                      }
+                      simulateJoinAndChangeMethodPlan(registerNum);
                     } catch (error) {
                       console.log(error);
-                      const msg = `Vui lòng nhập đúng định dạng số`;
+                      const msg = localStorage.getItem("errorMsg");
                       setErrMsg(msg);
                       handleClick();
+                      localStorage.removeItem("errorMsg");
                     }
-                  } else if (selectedSimulator === 2) {
-                    simulateJoinAndChangeMethodPlan();
                   } else if (selectedSimulator === 3) {
-                    simulateMassJoinPlan();
+                    if (massTravelerJoinNum > 50) {
+                      const msg = `Giới hạn 50 phượt thủ giả lập`;
+                      setErrMsg(msg);
+                      handleClick();
+                      return;
+                    }
+                    try {
+                      const { data } = await refetchRegistering();
+                      const limitRegistering = data.plans.totalCount;
+                      if (massPlanJoinNum > limitRegistering) {
+                        const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang chờ)`;
+                        setErrMsg(msg);
+                        handleClick();
+                        return;
+                      }
+                      simulateMassJoinPlan(
+                        massPlanJoinNum,
+                        massTravelerJoinNum
+                      );
+                    } catch (error) {
+                      console.log(error);
+                      const msg = localStorage.getItem("errorMsg");
+                      setErrMsg(msg);
+                      handleClick();
+                      localStorage.removeItem("errorMsg");
+                    }
                   } else if (selectedSimulator === 4) {
                     simulateConfirmPlan();
                   } else if (selectedSimulator === 5) {
