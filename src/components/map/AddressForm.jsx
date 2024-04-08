@@ -31,31 +31,6 @@ export default function AddressForm({ address, onSubmit, setAddress }) {
     setAddress(newAddress);
   };
 
-  const handleLatInputChange = (event) => {
-    if (event.target.value) {
-      setLatitude(event.target.value);
-    }
-  };
-
-  const handleLngInputChange = (event) => {
-    if (event.target.value) {
-      setLongitude(event.target.value);
-    }
-  };
-
-  const handleLatLngSubmit = async (event) => {
-    const response = await getLocationbyLatLng(longitude, latitude, TOKEN);
-    const lng = response[0].center[0];
-    const lat = response[0].center[1];
-    const addressName = response[0].place_name;
-
-    setAddress({
-      streetAndNumber: addressName,
-      longitude: lng,
-      latitude: lat,
-    });
-  };
-
   return (
     <div className="address-form">
       <form className="form" onSubmit={onSubmit}>

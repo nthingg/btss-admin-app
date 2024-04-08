@@ -15,11 +15,23 @@ import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
-import { LOAD_PLANS, LOAD_PLANS_FILTER } from "../../services/graphql/plan";
+import FlagCircleIcon from "@mui/icons-material/FlagCircle";
+import {
+  LOAD_NUMBERS_CANCELED,
+  LOAD_NUMBERS_COMPLETED,
+  LOAD_NUMBERS_FLAWED,
+  LOAD_NUMBERS_PENDING,
+  LOAD_NUMBERS_READY,
+  LOAD_NUMBERS_REGISTERING,
+  LOAD_NUMBERS_VERIFIED,
+  LOAD_PLANS,
+  LOAD_PLANS_FILTER,
+} from "../../services/graphql/plan";
 import Slider from "react-slick";
 
 const PlanPage = () => {
   const planStat = [
+    "PENDING",
     "REGISTERING",
     "READY",
     "VERIFIED",
@@ -51,6 +63,9 @@ const PlanPage = () => {
       case 5:
         setSelectedStatus(planStat[5]);
         break;
+      case 6:
+        setSelectedStatus(planStat[6]);
+        break;
       default:
         break;
     }
@@ -69,70 +84,6 @@ const PlanPage = () => {
     refetch: refetchTotal,
   } = useQuery(LOAD_PLANS);
 
-  const [registeringPlans, setRegisteringPlans] = useState(0);
-  const [canceledPlans, setCanceled] = useState(0);
-  const [completedPlans, setCompletedPlans] = useState(0);
-  const [readyPlans, setReady] = useState(0);
-  const [flawedPlans, setFlawedPlans] = useState(0);
-  const [verified, setVerifiedPlans] = useState(0);
-  useEffect(() => {
-    if (
-      !loadingTotal &&
-      !errorTotal &&
-      dataTotal &&
-      dataTotal["plans"]["nodes"]
-    ) {
-      let countRegistering = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "REGISTERING") {
-          countRegistering++;
-        }
-      }
-
-      let countReady = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "READY") {
-          countReady++;
-        }
-      }
-
-      let countCanceled = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "CANCELED") {
-          countCanceled++;
-        }
-      }
-
-      let countCompleted = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "COMPLETED") {
-          countCompleted++;
-        }
-      }
-
-      let countFlawed = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "FLAWED") {
-          countFlawed++;
-        }
-      }
-
-      let countVeri = 0;
-      for (const item of dataTotal["plans"]["nodes"]) {
-        if (item["status"] === "VERIFIED") {
-          countVeri++;
-        }
-      }
-
-      setRegisteringPlans(countRegistering);
-      setReady(countReady);
-      setCanceled(countCanceled);
-      setCompletedPlans(countCompleted);
-      setFlawedPlans(countFlawed);
-      setVerifiedPlans(countVeri);
-    }
-  }, [dataTotal, loadingTotal, errorTotal]);
-
   const [plans, setPlans] = useState([]);
   useEffect(() => {
     if (!loading && !error && data && data["plans"]["nodes"]) {
@@ -143,6 +94,108 @@ const PlanPage = () => {
       setPlans(res);
     }
   }, [data, loading, error]);
+
+  const {
+    error: errRegis,
+    loading: loadingRegis,
+    data: dataRegis,
+    refetch: refetchRegis,
+  } = useQuery(LOAD_NUMBERS_REGISTERING);
+  const [registering, setRegistering] = useState(0);
+  useEffect(() => {
+    if (!loadingRegis && !errRegis && dataRegis && dataRegis["plans"]) {
+      // let res = data.plans.nodes.map(({ __typename, ...rest }) => rest);
+      setRegistering(dataRegis["plans"].totalCount);
+    }
+  }, [dataRegis, loadingRegis, errRegis]);
+
+  const {
+    errorCancelled,
+    loadingCancelled,
+    data: dataCancelled,
+    refetch: refetchCancelled,
+  } = useQuery(LOAD_NUMBERS_CANCELED);
+  const [cancelled, setCancelled] = useState(0);
+  useEffect(() => {
+    if (
+      !loadingCancelled &&
+      !errorCancelled &&
+      dataCancelled &&
+      dataCancelled["plans"]
+    ) {
+      setCancelled(dataCancelled["plans"].totalCount);
+    }
+  }, [dataCancelled, loadingCancelled, errorCancelled]);
+
+  const {
+    error: errComplete,
+    loading: loadingComplete,
+    data: dataComplete,
+    refetch: refetchComplete,
+  } = useQuery(LOAD_NUMBERS_COMPLETED);
+  const [completed, setCompleted] = useState(0);
+  useEffect(() => {
+    if (
+      !loadingComplete &&
+      !errComplete &&
+      dataComplete &&
+      dataComplete["plans"]
+    ) {
+      setCompleted(dataComplete["plans"].totalCount);
+    }
+  }, [dataComplete, loadingComplete, errComplete]);
+
+  const {
+    error: errVeri,
+    loading: loadingVeri,
+    data: dataVeri,
+    refetch: refetchVeri,
+  } = useQuery(LOAD_NUMBERS_VERIFIED);
+  const [veri, setVeri] = useState(0);
+  useEffect(() => {
+    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
+      setCompleted(dataVeri["plans"].totalCount);
+    }
+  }, [dataVeri, loadingVeri, errVeri]);
+
+  const {
+    error: errPend,
+    loading: loadingPend,
+    data: dataPend,
+    refetch: refetchPending,
+  } = useQuery(LOAD_NUMBERS_PENDING);
+  const [pending, setPending] = useState(0);
+  useEffect(() => {
+    if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
+      setPending(dataPend["plans"].totalCount);
+    }
+  }, [dataPend, loadingPend, errPend]);
+
+  const {
+    errorTemp,
+    loadingTemp,
+    data: dataTemp,
+    refetch: refetchTemp,
+  } = useQuery(LOAD_NUMBERS_READY);
+  const [temp, setTemp] = useState(0);
+  useEffect(() => {
+    if (!loadingTemp && !errorTemp && dataTemp && dataTemp["plans"]) {
+      setTemp(dataTemp.plans.totalCount);
+    }
+  }, [dataTemp, loadingTemp, errorTemp]);
+
+  const {
+    error: errorFlawed,
+    loading: loadingFlawed,
+    data: dataFlawed,
+    refetch: refetchFlawed,
+  } = useQuery(LOAD_NUMBERS_FLAWED);
+  const [flawed, setFlawed] = useState(0);
+  useEffect(() => {
+    if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
+      setFlawed(dataFlawed["plans"].totalCount);
+    }
+  }, [dataFlawed, loadingFlawed, errorFlawed]);
 
   var settings = {
     dots: false,
@@ -194,7 +247,7 @@ const PlanPage = () => {
       <div className="planContainer">
         <div className="icon-row">
           <Slider {...settings}>
-            {[0, 1, 2, 3, 4, 5].map((index) => (
+            {[0, 1, 2, 3, 4, 5, 6].map((index) => (
               <div
                 key={index}
                 className={`icon-item ${
@@ -205,23 +258,25 @@ const PlanPage = () => {
                 }}
               >
                 {/* Replace with appropriate icons */}
-                {index === 0 && (
+                {index === 0 && <FlagCircleIcon sx={{ color: "#3498DB" }} />}
+                {index === 1 && (
                   <AppRegistrationIcon sx={{ color: "#3498DB" }} />
                 )}
-                {index === 1 && (
+                {index === 2 && (
                   <PlaylistAddCheckIcon sx={{ color: "#3498DB" }} />
                 )}
-                {index === 2 && <NoCrashIcon sx={{ color: "#3498DB" }} />}
-                {index === 3 && <CancelIcon sx={{ color: "#E74C3C" }} />}
-                {index === 4 && <CheckCircleIcon color="success" />}
-                {index === 5 && <BuildCircleIcon sx={{ color: "#3498DB" }} />}
+                {index === 3 && <NoCrashIcon sx={{ color: "#3498DB" }} />}
+                {index === 4 && <CancelIcon sx={{ color: "#E74C3C" }} />}
+                {index === 5 && <CheckCircleIcon color="success" />}
+                {index === 6 && <BuildCircleIcon sx={{ color: "#3498DB" }} />}
                 <span>
-                  {index === 0 && `Chờ chốt (${registeringPlans})`}
-                  {index === 1 && `Sẵn sàng (${readyPlans})`}
-                  {index === 2 && `Check-in (${verified})`}
-                  {index === 3 && `Đã hủy (${canceledPlans})`}
-                  {index === 4 && `Đã hoàn thành (${completedPlans})`}
-                  {index === 5 && `Có vấn đề (${flawedPlans})`}
+                  {index === 0 && `Ban đầu (${pending})`}
+                  {index === 1 && `Chờ chốt (${registering})`}
+                  {index === 2 && `Sẵn sàng (${temp})`}
+                  {index === 3 && `Check-in (${veri})`}
+                  {index === 4 && `Đã hủy (${cancelled})`}
+                  {index === 5 && `Đã hoàn thành (${completed})`}
+                  {index === 6 && `Có vấn đề (${flawed})`}
                 </span>
               </div>
             ))}

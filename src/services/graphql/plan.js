@@ -104,71 +104,148 @@ export const LOAD_DETAIL_PLAN = gql`
 `;
 
 export const LOAD_NUMBERS_CANCELED = gql`
-  {
-    plans(first: 100, where: { status: { eq: CANCELED } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: CANCELED } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_COMPLETED = gql`
-  {
-    plans(first: 100, where: { status: { eq: COMPLETED } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: COMPLETED } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_FLAWED = gql`
-  {
-    plans(first: 100, where: { status: { eq: FLAWED } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: FLAWED } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_PENDING = gql`
-  {
-    plans(first: 100, where: { status: { eq: PENDING } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: PENDING } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  {
-    plans(first: 100, where: { status: { eq: READY } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: READY } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_REGISTERING = gql`
-  {
-    plans(first: 100, where: { status: { eq: REGISTERING } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: REGISTERING } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
 
 export const LOAD_NUMBERS_VERIFIED = gql`
-  {
-    plans(first: 100, where: { status: { eq: VERIFIED } }) {
-      nodes {
-        id
+  query {
+    plans(where: { status: { eq: VERIFIED } }) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;

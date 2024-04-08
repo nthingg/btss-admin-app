@@ -81,23 +81,27 @@ const DestinationAddPage = () => {
   const [open, setOpen] = useState(false);
   const [errorMsg, setErrMsg] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [acceptState, setAcceptState] = useState(false);
+  //error
+  const [nameError, setNameError] = useState(false);
+  const [nameHelperText, setNameHelperText] = useState("");
+  const [addressError, setAddressError] = useState(false);
+  const [addressHelperText, setAddressHelperText] = useState("");
+  const [descriptionError, setDescriptionError] = useState(false);
+  const [descriptionHelperText, setDescriptionHelperText] = useState("");
 
   const handleClick = () => {
     setSnackbarOpen(true);
   };
-
   const handleCloseSnack = () => {
     setSnackbarOpen(false);
   };
-
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
-
   const [add, { data: dataAdd, error: errorAdd }] =
     useMutation(ADD_DESTINATION);
 
@@ -239,19 +243,6 @@ const DestinationAddPage = () => {
                   ))}
                 </ImageList>
               )}
-
-              {/* {files.map((file) => (
-                <img
-                  key={file}
-                  src={
-                    files.length > 0
-                      ? URL.createObjectURL(file)
-                      : "https://vinhphucwater.com.vn/wp-content/uploads/2023/05/no-image.jpg"
-                  }
-                  alt=""
-                />
-              ))}
-               */}
               {files.length === 0 && (
                 <img
                   src={
@@ -260,29 +251,40 @@ const DestinationAddPage = () => {
                   alt=""
                 />
               )}
-              <div className="formInput imageAdd">
-                <label htmlFor="file">
-                  <DriveFolderUploadOutlinedIcon className="icon" />
-                  <span>Thêm ảnh</span>
-                </label>
-                <input
-                  type="file"
-                  id="file"
-                  onChange={(e) => {
-                    if (files.length === 5) {
-                      setErrMsg("Giới hạn hình ảnh của địa điểm là 5");
-                      handleClick();
-                      localStorage.removeItem("errorMsg");
-                      return;
-                    }
-                    let res = files;
-                    res.push(e.target.files[0]);
-                    setFiles(res);
-                    console.log(e.target.files);
-                    setFile(e.target.files[0]);
+              <div className="img-btns">
+                <button
+                  className="link reset"
+                  onClick={async () => {
+                    setFiles([]);
                   }}
-                  style={{ display: "none" }}
-                />
+                >
+                  <RotateLeftIcon />
+                  <span>Đặt lại</span>
+                </button>
+                <div className="formInput imageAdd">
+                  <label htmlFor="file">
+                    <DriveFolderUploadOutlinedIcon className="icon" />
+                    <span>Thêm ảnh</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="file"
+                    onChange={(e) => {
+                      if (files.length === 5) {
+                        setErrMsg("Giới hạn hình ảnh của địa điểm là 5");
+                        handleClick();
+                        localStorage.removeItem("errorMsg");
+                        return;
+                      }
+                      let res = files;
+                      res.push(e.target.files[0]);
+                      setFiles(res);
+                      console.log(e.target.files);
+                      setFile(e.target.files[0]);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -290,44 +292,41 @@ const DestinationAddPage = () => {
             <div className="details">
               <div className="left">
                 <div className="detailItem">
-                  <span className="itemKey">Tên:</span>
+                  <span className="itemKey">
+                    Tên<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <TextField
                     id="outlined-disabled"
-                    // label="Số người"
                     className="basic-single"
                     type="text"
-                    // defaultValue={200000}
                     placeholder="Nhập tên địa điểm"
                     size="small"
                     name="name"
+                    error={nameError}
+                    helperText={nameHelperText}
                     sx={{
                       width: "15%",
-                      "& label.Mui-focused": {
-                        color: "black",
-                      },
-                      "& .MuiInput-underline:after": {
-                        borderBottomColor: "black",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "gainsboro",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "black",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "black",
-                        },
-                      },
                     }}
                     onChange={(e) => {
+                      if (e.target.value.length < 10) {
+                        setNameError(true);
+                        setNameHelperText("Tên địa điểm gồm ít nhất 10 kí tự");
+                      } else if (e.target.value.length > 50) {
+                        setNameError(true);
+                        setNameHelperText("Tên địa điểm gồm ít nhất 10 kí tự");
+                      } else {
+                        setNameError(false);
+                        setNameHelperText("");
+                      }
                       setName(e.target.value);
                     }}
                   />
                 </div>
 
                 <div className="detailItem">
-                  <span className="itemKey">Mùa:</span>
+                  <span className="itemKey">
+                    Mùa<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <Select
                     placeholder={"Chọn các mùa"}
                     className="basic-single"
@@ -350,7 +349,9 @@ const DestinationAddPage = () => {
                   />
                 </div>
                 <div className="detailItem">
-                  <span className="itemKey">Tỉnh:</span>
+                  <span className="itemKey">
+                    Tỉnh<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <Select
                     placeholder={"Chọn tỉnh"}
                     className="basic-single"
@@ -374,7 +375,9 @@ const DestinationAddPage = () => {
               </div>
               <div className="right">
                 <div className="detailItem">
-                  <span className="itemKey">Địa điểm:</span>
+                  <span className="itemKey">
+                    Địa điểm<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <div className="address-cont">
                     <AddressForm
                       onSubmit={handleFormSubmit}
@@ -422,7 +425,9 @@ const DestinationAddPage = () => {
                   </Dialog>
                 </div>
                 <div className="detailItem">
-                  <span className="itemKey">Địa hình:</span>
+                  <span className="itemKey">
+                    Địa hình<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <Select
                     placeholder={"Chọn địa hình"}
                     className="basic-single"
@@ -444,7 +449,9 @@ const DestinationAddPage = () => {
                   />
                 </div>
                 <div className="detailItem">
-                  <span className="itemKey">Hoạt động:</span>
+                  <span className="itemKey">
+                    Hoạt động<span style={{ color: "red" }}>*</span>:
+                  </span>
                   <Select
                     placeholder={"Chọn các loại hoạt động"}
                     className="basic-single"
@@ -470,7 +477,9 @@ const DestinationAddPage = () => {
             </div>
             <div className="details">
               <div className="detailItem description">
-                <span className="itemKey">Mô tả:</span>
+                <span className="itemKey">
+                  Mô tả<span style={{ color: "red" }}>*</span>:
+                </span>
                 <TextField
                   id="outlined-disabled"
                   className="textarea"
@@ -509,25 +518,23 @@ const DestinationAddPage = () => {
           </div>
         </div>
         <div className="btn-group">
-          <button
-            className="link reset"
-            onClick={async () => {
-              setFiles([]);
-            }}
-          >
-            <RotateLeftIcon />
-            <span>Đặt lại</span>
-          </button>
-
-          <button
-            className="link confirm"
-            onClick={async () => {
-              handleConfirmClick();
-            }}
-          >
-            <ThumbUpAltIcon />
-            <span>Xác nhận</span>
-          </button>
+          {acceptState && (
+            <button
+              className="link confirm"
+              onClick={async () => {
+                handleConfirmClick();
+              }}
+            >
+              <ThumbUpAltIcon />
+              <span>Xác nhận</span>
+            </button>
+          )}
+          {!acceptState && (
+            <button className="link deny">
+              <ThumbUpAltIcon />
+              <span>Xác nhận</span>
+            </button>
+          )}
         </div>
       </div>
       <Snackbar

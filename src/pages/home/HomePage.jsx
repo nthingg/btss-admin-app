@@ -14,6 +14,7 @@ import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
   LOAD_NUMBERS_FLAWED,
+  LOAD_NUMBERS_PENDING,
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
   LOAD_NUMBERS_VERIFIED,
@@ -22,15 +23,6 @@ import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER } from "../../services/graphql/account";
 
 const HomePage = () => {
-  const { error, loading, data, refetch } = useQuery(LOAD_NUMBERS_REGISTERING);
-  const [registering, setRegistering] = useState(0);
-  useEffect(() => {
-    if (!loading && !error && data && data["plans"]["nodes"]) {
-      let res = data.plans.nodes.map(({ __typename, ...rest }) => rest);
-      setRegistering(res.length);
-    }
-  }, [data, loading, error]);
-
   const {
     error: errorTravelers,
     loading: loadingTravelers,
@@ -73,6 +65,15 @@ const HomePage = () => {
     }
   }, [dataDestinations, loadingDestinations, errDestinations]);
 
+  const { error, loading, data, refetch } = useQuery(LOAD_NUMBERS_REGISTERING);
+  const [registering, setRegistering] = useState(0);
+  useEffect(() => {
+    if (!loading && !error && data && data["plans"]) {
+      // let res = data.plans.nodes.map(({ __typename, ...rest }) => rest);
+      setRegistering(data["plans"].totalCount);
+    }
+  }, [data, loading, error]);
+
   const {
     errorCancelled,
     loadingCancelled,
@@ -85,12 +86,9 @@ const HomePage = () => {
       !loadingCancelled &&
       !errorCancelled &&
       dataCancelled &&
-      dataCancelled["plans"]["nodes"]
+      dataCancelled["plans"]
     ) {
-      let res = dataCancelled.plans.nodes.map(
-        ({ __typename, ...rest }) => rest
-      );
-      setCancelled(res.length);
+      setCancelled(dataCancelled["plans"].totalCount);
     }
   }, [dataCancelled, loadingCancelled, errorCancelled]);
 
@@ -106,10 +104,9 @@ const HomePage = () => {
       !loadingComplete &&
       !errComplete &&
       dataComplete &&
-      dataComplete["plans"]["nodes"]
+      dataComplete["plans"]
     ) {
-      let res = dataComplete.plans.nodes.map(({ __typename, ...rest }) => rest);
-      setCompleted(res.length);
+      setCompleted(dataComplete["plans"].totalCount);
     }
   }, [dataComplete, loadingComplete, errComplete]);
 
@@ -121,11 +118,23 @@ const HomePage = () => {
   } = useQuery(LOAD_NUMBERS_VERIFIED);
   const [veri, setVeri] = useState(0);
   useEffect(() => {
-    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]["nodes"]) {
-      let res = dataVeri.plans.nodes.map(({ __typename, ...rest }) => rest);
-      setCompleted(res.length);
+    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
+      setCompleted(dataVeri["plans"].totalCount);
     }
   }, [dataVeri, loadingVeri, errVeri]);
+
+  const {
+    error: errPend,
+    loading: loadingPend,
+    data: dataPend,
+    refetch: refetchPending,
+  } = useQuery(LOAD_NUMBERS_PENDING);
+  const [pending, setPending] = useState(0);
+  useEffect(() => {
+    if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
+      setPending(dataPend["plans"].totalCount);
+    }
+  }, [dataPend, loadingPend, errPend]);
 
   const {
     errorTemp,
@@ -135,9 +144,8 @@ const HomePage = () => {
   } = useQuery(LOAD_NUMBERS_READY);
   const [temp, setTemp] = useState(0);
   useEffect(() => {
-    if (!loadingTemp && !errorTemp && dataTemp && dataTemp["plans"]["nodes"]) {
-      let res = dataTemp.plans.nodes.map(({ __typename, ...rest }) => rest);
-      setTemp(res.length);
+    if (!loadingTemp && !errorTemp && dataTemp && dataTemp["plans"]) {
+      setTemp(dataTemp.plans.totalCount);
     }
   }, [dataTemp, loadingTemp, errorTemp]);
 
@@ -149,14 +157,8 @@ const HomePage = () => {
   } = useQuery(LOAD_NUMBERS_FLAWED);
   const [flawed, setFlawed] = useState(0);
   useEffect(() => {
-    if (
-      !loadingFlawed &&
-      !errorFlawed &&
-      dataFlawed &&
-      dataFlawed["plans"]["nodes"]
-    ) {
-      let res = dataFlawed.plans.nodes.map(({ __typename, ...rest }) => rest);
-      setFlawed(res.length);
+    if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
+      setFlawed(dataFlawed["plans"].totalCount);
     }
   }, [dataFlawed, loadingFlawed, errorFlawed]);
 
@@ -201,6 +203,21 @@ const HomePage = () => {
           </div>
         </div>
         <div className="item-list">
+          <div className="item-container info">
+            <div className="item-top">
+              <div className="item-title">Số kế hoạch ban đầu</div>
+              <div className="item-body">
+                <div className="left">
+                  <p>{pending}</p>
+                </div>
+                <div className="right">
+                  <div className="btn info">
+                    <InfoIcon sx={{ color: "white" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="item-container temp">
             <div className="item-top">
               <div className="item-title">Số kế hoạch chờ chốt</div>

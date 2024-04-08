@@ -296,7 +296,7 @@ const DestinationDetailPage = () => {
                   {destination?.imagePaths.map((imageUrl, index) => (
                     <div key={index}>
                       <img
-                        src={`https://d38ozmgi8b70tu.cloudfront.net${imageUrl}`}
+                        src={`https://d38ozmgi8b70tu.cloudfront.net/600x300${imageUrl}`}
                         alt=""
                       />
                     </div>
