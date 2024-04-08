@@ -1,5 +1,6 @@
 import "../../assets/scss/productCreate.scss";
 import "../../assets/scss/shared.scss";
+import "../../assets/scss/dialog.scss";
 import AddressForm from "../../components/map/AddressForm";
 import CustomMap from "../../components/map/Map";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -40,6 +41,125 @@ import { regionData } from "../../services/location/region";
 const DestinationAddPage = () => {
   const navigate = useNavigate();
 
+  const provinceOptions = [
+    {
+      value: 1,
+      label: "1. An Giang",
+    },
+    {
+      value: 2,
+      label: "2. Bà Rịa - Vũng Tàu",
+    },
+    {
+      value: 3,
+      label: "3. Bạc Liêu",
+    },
+    {
+      value: 7,
+      label: "4. Bến Tre",
+    },
+    {
+      value: 8,
+      label: "5. Bình Dương",
+    },
+    {
+      value: 9,
+      label: "6. Bình Định",
+    },
+    {
+      value: 10,
+      label: "7. Bình Phước",
+    },
+    {
+      value: 11,
+      label: "8. Bình Thuận",
+    },
+    {
+      value: 12,
+      label: "9. Cà Mau",
+    },
+    {
+      value: 14,
+      label: "10. Cần Thơ",
+    },
+    {
+      value: 16,
+      label: "11. Đắk Lắk",
+    },
+    {
+      value: 17,
+      label: "12. Đắk Nông",
+    },
+    {
+      value: 19,
+      label: "13. Đồng Nai",
+    },
+    {
+      value: 20,
+      label: "14. Đồng Tháp",
+    },
+    {
+      value: 21,
+      label: "15. Gia Lai",
+    },
+    {
+      value: 28,
+      label: "16. Hậu Giang",
+    },
+    {
+      value: 31,
+      label: "17. Khánh Hòa",
+    },
+    {
+      value: 32,
+      label: "18. Kiên Giang",
+    },
+    {
+      value: 33,
+      label: "19. Kon Tum",
+    },
+    {
+      value: 37,
+      label: "20. Lâm Đồng",
+    },
+    {
+      value: 38,
+      label: "21. Long An",
+    },
+    {
+      value: 42,
+      label: "22. Ninh Thuận",
+    },
+    {
+      value: 44,
+      label: "23. Phú Yên",
+    },
+    {
+      value: 50,
+      label: "24. Sóc Trăng",
+    },
+    {
+      value: 52,
+      label: "25. Tây Ninh",
+    },
+    {
+      value: 56,
+      label: "26. TP Hồ Chí Minh",
+    },
+    {
+      value: 58,
+      label: "27. Tiền Giang",
+    },
+    {
+      value: 59,
+      label: "28. Trà Vinh",
+    },
+    {
+      value: 61,
+      label: "29. Vĩnh Long",
+    },
+  ];
+
   const activityOptions = [
     { value: "BATHING", label: "Tắm" },
     { value: "CAMPING", label: "Cắm trại" },
@@ -79,6 +199,7 @@ const DestinationAddPage = () => {
   const [provinceId, setProvinceId] = useState(0);
   const [topo, setTopo] = useState("");
   const [open, setOpen] = useState(false);
+  const [openRedirect, setOpenRedirect] = useState(false);
   const [errorMsg, setErrMsg] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [acceptState, setAcceptState] = useState(false);
@@ -98,12 +219,22 @@ const DestinationAddPage = () => {
   const [nameFinErr, setNameFinErr] = useState(true);
   const [addressFinErr, setAddressFinErr] = useState(true);
   const [descriptionFinErr, setDescriptionFinErr] = useState(true);
+  //redirect
+  const [idCreated, setIdCreated] = useState(0);
 
   const [address, setAddress] = useState({
     streetAndNumber: "",
     latitude: 10.842033810975172,
     longitude: 106.80996883068278,
   });
+
+  const handleClickOpenRedirect = () => {
+    setOpen(true);
+  };
+
+  const handleCloseRedirect = () => {
+    setOpen(false);
+  };
 
   const handleClick = () => {
     setSnackbarOpen(true);
@@ -175,7 +306,8 @@ const DestinationAddPage = () => {
           dto: dataDestination,
         },
       });
-      navigate(`/destinations/${data.createDestination.id}`);
+      setIdCreated(data.createDestination.id);
+      setOpenRedirect(true);
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
@@ -443,7 +575,7 @@ const DestinationAddPage = () => {
                     isDisabled={false}
                     isClearable={false}
                     name="province"
-                    options={provinces}
+                    options={provinceOptions}
                     onChange={(e) => {
                       if (e.value) {
                         setProvinceId(e.value);
@@ -685,6 +817,44 @@ const DestinationAddPage = () => {
             </div>
           </div>
         </div>
+        <Dialog
+          open={openRedirect}
+          onClose={() => {
+            setOpenRedirect(false);
+          }}
+          maxWidth={false}
+        >
+          <DialogTitle
+            backgroundColor={"#2c3d50"}
+            color={"white"}
+            fontWeight={600}
+          >
+            Thêm thành công
+          </DialogTitle>
+          <DialogContent style={{ width: 400, height: 180 }}>
+            <DialogContentText style={{ padding: "20px 0 10px 0" }}>
+              Bạn có muốn tiếp tục thêm địa điểm?
+            </DialogContentText>
+            <div className="btns-group-dialog">
+              <button
+                className="link confirm"
+                onClick={async () => {
+                  navigate(`/destinations/add`);
+                }}
+              >
+                <span>Tiếp tục</span>
+              </button>
+              <button
+                className="link deny"
+                onClick={() => {
+                  navigate(`/destinations/${idCreated}`);
+                }}
+              >
+                <span>Trở về</span>
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <div className="btn-group">
           {!nameFinErr &&
             !imgError &&

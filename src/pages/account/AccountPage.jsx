@@ -108,7 +108,7 @@ const AccountPage = () => {
   var settings = {
     dots: false,
     infinite: false,
-    slidesToShow: 4,
+    slidesToShow: 3,
     slidesToScroll: 2,
     centerPadding: "60px",
   };

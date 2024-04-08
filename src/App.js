@@ -14,6 +14,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import "./index.css";
 import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 import DestinationAddPage from "./pages/destination/DestinationAddPage";
+import DestinationUpdatePage from "./pages/destination/DestinationUpdatePage";
 
 const App = () => {
   const token = localStorage.getItem("adminToken");
@@ -41,6 +42,10 @@ const App = () => {
                 element={<DestinationDetailPage />}
               />
               <Route path="add" element={<DestinationAddPage />} />
+              <Route
+                path="update/:destinationId"
+                element={<DestinationUpdatePage />}
+              />
             </Route>
             <Route path="plans">
               <Route

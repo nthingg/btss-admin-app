@@ -17,6 +17,7 @@ export const LOAD_DETAIL_DESTINATION = gql`
         topographic
         activities
         province {
+          id
           name
         }
         comments {
@@ -97,6 +98,14 @@ export const LOAD_DESTINATIONS_FILTER = gql`
 export const ADD_DESTINATION = gql`
   mutation createDestination($dto: DestinationCreateInput!) {
     createDestination(dto: $dto) {
+      id
+    }
+  }
+`;
+
+export const UDPATE_DESTINATION = gql`
+  mutation updateDestination($dto: DestinationUpdateInput!) {
+    updateDestination(dto: $dto) {
       id
     }
   }

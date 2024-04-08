@@ -1,7 +1,9 @@
 //account table
 .accountTable {
     width: fit-content;
+    overflow: auto;
     margin: 30px auto 0 auto;
+    padding: 0 40px 0 0;
     height: 580px;
 
     .cellWithImg {
@@ -30,24 +32,24 @@
     height: fit-content;
     min-height: 100vh;
 
-    .ic-r-ml {
-        margin-left: 30%;
-    }
-
     p {
         padding-left: 30px;
     }
 
-    .icon-item {
-        width: 180px !important;
+    .icon-row {
+        width: 700px;
+
+        .icon-item {
+            width: 180px !important;
+        }
     }
 
     .accountContainer {
         padding: 40px 40px 40px 40px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
-        max-width: 91%; /* Adjust as needed */
-        margin: 0 auto;
+        margin: 0 30px 0 30px;
+        overflow: auto;
         box-shadow:
             0 4px 8px 0 rgba(0, 0, 0, 0.1),
             0 6px 20px 0 rgba(0, 0, 0, 0.1);

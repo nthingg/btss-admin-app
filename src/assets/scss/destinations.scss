@@ -16,16 +16,20 @@
         padding-left: 30px;
     }
 
-    .icon-item {
-        width: 170px !important;
+    .icon-row {
+        width: 900px;
+
+        .icon-item {
+            width: 170px !important;
+        }
     }
 
     .destinationContainer {
         padding: 40px 40px 40px 40px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
-        max-width: 91%; /* Adjust as needed */
-        margin: 0 auto;
+        margin: 0 30px 0 30px;
+        overflow: auto;
         box-shadow:
             0 4px 8px 0 rgba(0, 0, 0, 0.1),
             0 6px 20px 0 rgba(0, 0, 0, 0.1);
@@ -46,31 +50,6 @@
         overflow: hidden;
         border-radius: 5px;
     }
-    // .period-item {
-    //     display: flex;
-    //     align-items: center;
-    //     justify-content: center;
-    //     width: 80px;
-    //     padding: 0 12px;
-    // }
-    // .spring {
-    //     background-color: #f1c40f;
-    //     margin-right: 4px;
-    // }
-    // .summer {
-    //     background-color: #cb4335;
-    //     margin-right: 4px;
-    // }
-    // .fall {
-    //     background-color: orange;
-    //     margin-right: 4px;
-    // }
-    // .winter {
-    //     background-color: purple;
-    // }
-    // .period-text {
-    //     color: white;
-    // }
 
     .detailContainer {
         background-color: white;
@@ -78,11 +57,11 @@
             0 4px 8px 0 rgba(0, 0, 0, 0.2),
             0 6px 20px 0 rgba(0, 0, 0, 0.19);
         border-radius: 8px;
-        padding: 10px 10px 30px 10px;
+        overflow: auto;
+        padding: 10px 0 30px 10px;
 
         .prodTitle {
-            padding: 20px 0 0 40px;
-            width: 100%;
+            padding: 20px 0 0 30px;
             font-size: 38px;
             font-weight: 600;
             display: flex;
@@ -151,16 +130,17 @@
         .details {
             .detailItem {
                 margin-bottom: 20px;
-                display: flex;
                 padding: 10px;
                 margin: 0 20px 20px 20px;
-                height: 30px;
+                height: 40px;
+                width: 680px;
 
                 .itemKey {
-                    width: 200px;
                     font-weight: 600;
                     margin-right: 5px;
                     font-size: 18px;
+                    display: inline-block;
+                    width: 160px;
                     color: #2c3d50;
                 }
 
@@ -168,6 +148,7 @@
                     font-weight: 300;
                     font-size: 18px;
                     color: #2c3d50;
+                    white-space: nowrap;
 
                     a {
                         color: #2c3d50;

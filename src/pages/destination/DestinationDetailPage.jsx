@@ -278,7 +278,10 @@ const DestinationDetailPage = () => {
                 </div>
               </div>
               <div className="right">
-                <Link to="/destination/update/" className="link">
+                <Link
+                  to={`/destinations/update/${destination?.id}`}
+                  className="link"
+                >
                   <EditIcon />
                   <p>Chỉnh sửa</p>
                 </Link>
@@ -308,14 +311,16 @@ const DestinationDetailPage = () => {
                 <div className="details">
                   <div className="detailItem">
                     <span className="itemKey">Địa chỉ:</span>
-                    <span className="itemValue">{destination?.address}</span>
-                    <IconButton
-                      className="mapBtn"
-                      color="info"
-                      onClick={handleClickOpen}
-                    >
-                      <MapIcon />
-                    </IconButton>
+                    <span className="itemValue">
+                      {destination?.address}{" "}
+                      <IconButton
+                        className="mapBtn"
+                        color="info"
+                        onClick={handleClickOpen}
+                      >
+                        <MapIcon />
+                      </IconButton>
+                    </span>
                   </div>
                   <div className="detailItem">
                     <span className="itemKey">Trạng thái:</span>
@@ -374,8 +379,7 @@ const DestinationDetailPage = () => {
                   <div className="detailItem">
                     <span className="itemKey">Mùa:</span>
                     <span className="itemValue">
-                      <div className="period-container">
-                        {/* {destination?.seasons.map((season) => (
+                      {/* {destination?.seasons.map((season) => (
                       <div
                         key={season}
                         className={`period-item ${season.toLowerCase()}`}
@@ -398,8 +402,7 @@ const DestinationDetailPage = () => {
                         </span>
                       </div>
                     ))} */}
-                        {seasons}
-                      </div>
+                      {seasons}
                     </span>
                   </div>
                 </div>
