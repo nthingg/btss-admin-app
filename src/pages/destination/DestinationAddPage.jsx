@@ -273,7 +273,6 @@ const DestinationAddPage = () => {
     }
 
     const loc = JSON.parse(localStorage.getItem("loc"));
-    const address = addressDetail;
 
     let acts = [];
     for (let index = 0; index < activities.length; index++) {
@@ -287,7 +286,7 @@ const DestinationAddPage = () => {
 
     const dataDestination = {
       activities: acts,
-      address: address,
+      address: addressDetail,
       coordinate: [loc.lng, loc.lat],
       description: description,
       imageUrls: imagePath,

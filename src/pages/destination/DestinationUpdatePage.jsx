@@ -273,6 +273,13 @@ const DestinationUpdatePage = () => {
         longitude:
           dataDes["destinations"]["nodes"][0].coordinate.coordinates[0],
       });
+
+      const loc = {
+        lng: dataDes["destinations"]["nodes"][0].coordinate.coordinates[0],
+        lat: dataDes["destinations"]["nodes"][0].coordinate.coordinates[1],
+      };
+      localStorage.setItem("loc", JSON.stringify(loc));
+
       setAddressDetail(dataDes["destinations"]["nodes"][0].address);
       setName(dataDes["destinations"]["nodes"][0].name);
       setDescription(dataDes["destinations"]["nodes"][0].description);
@@ -344,7 +351,6 @@ const DestinationUpdatePage = () => {
     }
 
     const loc = JSON.parse(localStorage.getItem("loc"));
-    const address = addressDetail;
 
     let acts = [];
     for (let index = 0; index < activities.length; index++) {
@@ -358,7 +364,7 @@ const DestinationUpdatePage = () => {
 
     const dataDestination = {
       activities: acts,
-      address: address,
+      address: addressDetail,
       coordinate: [loc.lng, loc.lat],
       description: description,
       imageUrls: imagePath,
