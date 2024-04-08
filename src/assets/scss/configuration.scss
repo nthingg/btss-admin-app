@@ -1,0 +1,89 @@
+.configuration-page {
+    background-color: #f8f9f9;
+    padding: 20px 0 40px 0;
+    height: fit-content;
+    min-height: 100vh;
+
+    p {
+        padding-left: 1.875rem;
+    }
+
+    .configuration-container {
+        padding: 2.5rem;
+        background-color: white;
+        /* Optional: Add a max-width to limit the width of the container */
+        max-width: 91%; /* Adjust as needed */
+        margin: 0 auto;
+        box-shadow:
+            0 4px 8px 0 rgba(0, 0, 0, 0.1),
+            0 6px 20px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .detailItem {
+        padding-bottom: 0.625rem;
+    }
+
+    .itemKey {
+        width: 20rem;
+        font-weight: 600;
+        margin-right: 0.313rem;
+        font-size: .9rem;
+        display: inline-block;
+    }
+
+    .itemkeyValue {
+        width: 20vw;
+    }
+
+    .description {
+        font-weight: 600;
+        margin-right: 0.313rem;
+        font-size: 1rem;
+        display: inline-block;
+    }
+
+    .confirmBtn {
+        background-color: #2c3d50;
+        color: white;
+        
+        transition: 0.4s;
+        border: none;
+        cursor: pointer;
+        width: 160px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0 10px 0;
+        margin-left: auto;
+        margin-right: 0;
+    }
+
+    .confirmBtn:hover {
+        background-color: #1c2833;
+    }
+
+    .holidaysBtn {
+        background-color: #2c3d50;
+        color: white;
+
+        border: none;
+        cursor: pointer;
+        width: 160px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        align-items: center;
+        padding: 10px 0 10px 0;
+        display: flex;
+        justify-content: center;
+        margin: auto;
+    }
+
+    .holidaysBtn:hover {
+        background-color: #1c2833;
+    }
+}
