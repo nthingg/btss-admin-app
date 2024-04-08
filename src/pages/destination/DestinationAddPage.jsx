@@ -228,11 +228,11 @@ const DestinationAddPage = () => {
   });
 
   const handleClickOpenRedirect = () => {
-    setOpen(true);
+    setOpenRedirect(true);
   };
 
   const handleCloseRedirect = () => {
-    setOpen(false);
+    setOpenRedirect(false);
   };
 
   const handleClick = () => {
