@@ -1,7 +1,6 @@
 import "../../assets/scss/productCreate.scss";
 import "../../assets/scss/shared.scss";
 import "../../assets/scss/dialog.scss";
-import AddressForm from "../../components/map/AddressForm";
 import CustomMap from "../../components/map/Map";
 import "mapbox-gl/dist/mapbox-gl.css";
 import getLocations from "../../services/apis/getLocations";

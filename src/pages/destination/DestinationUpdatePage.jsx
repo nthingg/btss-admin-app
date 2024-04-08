@@ -2,7 +2,6 @@ import "../../assets/scss/productCreate.scss";
 import "../../assets/scss/shared.scss";
 import "../../assets/scss/dialog.scss";
 import "../../assets/scss/loading.scss";
-import AddressForm from "../../components/map/AddressForm";
 import CustomMap from "../../components/map/Map";
 import "mapbox-gl/dist/mapbox-gl.css";
 import getLocations from "../../services/apis/getLocations";
@@ -204,7 +203,6 @@ const DestinationUpdatePage = () => {
   const [provinceId, setProvinceId] = useState(0);
   const [topo, setTopo] = useState("");
   const [open, setOpen] = useState(false);
-  const [openRedirect, setOpenRedirect] = useState(false);
   const [errorMsg, setErrMsg] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [acceptState, setAcceptState] = useState(false);
@@ -233,14 +231,6 @@ const DestinationUpdatePage = () => {
     latitude: 10.842033810975172,
     longitude: 106.80996883068278,
   });
-
-  const handleClickOpenRedirect = () => {
-    setOpen(true);
-  };
-
-  const handleCloseRedirect = () => {
-    setOpen(false);
-  };
 
   const handleClick = () => {
     setSnackbarOpen(true);
@@ -338,6 +328,7 @@ const DestinationUpdatePage = () => {
         }
       }
       setProvinces(provInit);
+      setProvinceId(provInit.value);
     }
   }, [dataDes, loadingDes, errDes]);
 
@@ -374,8 +365,8 @@ const DestinationUpdatePage = () => {
       name: name,
       provinceId: provinceId,
       seasons: seas,
-      topographic: topo,
-      destinationId: destinationId,
+      topographic: topo.value,
+      destinationId: parseInt(destinationId, 10),
     };
 
     console.log(dataDestination);
@@ -386,7 +377,7 @@ const DestinationUpdatePage = () => {
           dto: dataDestination,
         },
       });
-      setOpenRedirect(true);
+      navigate(`/destinations/${destinationId}`);
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
@@ -677,8 +668,10 @@ const DestinationUpdatePage = () => {
                         value={provinces}
                         options={provinceOptions}
                         onChange={(e) => {
+                          setProvinceId(e.value);
+                          setProvinces(e);
+                          console.log(e.value);
                           if (e.value) {
-                            setProvinceId(e.value);
                             setProvinceError(false);
                           } else {
                             setProvinceId(0);
@@ -809,8 +802,9 @@ const DestinationUpdatePage = () => {
                         value={topo}
                         options={topoOptions}
                         onChange={(e) => {
+                          setTopo(e);
+                          console.log(e);
                           if (e.value) {
-                            setTopo(e.value);
                             setTopoError(false);
                           } else {
                             setTopo("");
@@ -905,44 +899,6 @@ const DestinationUpdatePage = () => {
                 </div>
               </div>
             </div>
-            <Dialog
-              open={openRedirect}
-              onClose={() => {
-                setOpenRedirect(false);
-              }}
-              maxWidth={false}
-            >
-              <DialogTitle
-                backgroundColor={"#2c3d50"}
-                color={"white"}
-                fontWeight={600}
-              >
-                Cập nhật thành công
-              </DialogTitle>
-              <DialogContent style={{ width: 400, height: 180 }}>
-                <DialogContentText style={{ padding: "20px 0 10px 0" }}>
-                  Bạn có muốn tiếp tục cập nhật địa điểm này?
-                </DialogContentText>
-                <div className="btns-group-dialog">
-                  <button
-                    className="link confirm"
-                    onClick={async () => {
-                      navigate(`/destinations/update${destinationId}`);
-                    }}
-                  >
-                    <span>Tiếp tục</span>
-                  </button>
-                  <button
-                    className="link deny"
-                    onClick={() => {
-                      navigate(`/destinations/${destinationId}`);
-                    }}
-                  >
-                    <span>Trở về</span>
-                  </button>
-                </div>
-              </DialogContent>
-            </Dialog>
             <div className="btn-group">
               {!nameFinErr &&
                 !imgError &&

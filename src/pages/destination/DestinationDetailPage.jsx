@@ -84,11 +84,13 @@ const DestinationDetailPage = () => {
     setOpen(false);
   };
 
-  const { error, loading, data } = useQuery(LOAD_DETAIL_DESTINATION, {
+  const { error, loading, data, refetch } = useQuery(LOAD_DETAIL_DESTINATION, {
     variables: {
       id: parseInt(destinationId, 10),
     },
   });
+
+  refetch();
 
   const {
     error: errorProvider,
