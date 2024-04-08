@@ -34,6 +34,8 @@ import {
   ADD_DESTINATION,
   LOAD_PROVINCES,
 } from "../../services/graphql/destination";
+import * as turf from "@turf/turf";
+import { regionData } from "../../services/location/region";
 
 const DestinationAddPage = () => {
   const navigate = useNavigate();
@@ -70,18 +72,17 @@ const DestinationAddPage = () => {
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [files, setFiles] = useState([]);
-  const [file, setFile] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [seasons, setSeasons] = useState([]);
   const [activities, setActivities] = useState([]);
-  const [position, setPosition] = useState([]);
   const [provinceId, setProvinceId] = useState(0);
   const [topo, setTopo] = useState("");
   const [open, setOpen] = useState(false);
   const [errorMsg, setErrMsg] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [acceptState, setAcceptState] = useState(false);
+  const [addressDetail, setAddressDetail] = useState("");
   //error
   const [nameError, setNameError] = useState(false);
   const [nameHelperText, setNameHelperText] = useState("");
@@ -89,6 +90,20 @@ const DestinationAddPage = () => {
   const [addressHelperText, setAddressHelperText] = useState("");
   const [descriptionError, setDescriptionError] = useState(false);
   const [descriptionHelperText, setDescriptionHelperText] = useState("");
+  const [seasonError, setSeasonError] = useState(true);
+  const [topoError, setTopoError] = useState(true);
+  const [imgError, setImgError] = useState(true);
+  const [provinceError, setProvinceError] = useState(true);
+  const [activitiesError, setActivitiesError] = useState(true);
+  const [nameFinErr, setNameFinErr] = useState(true);
+  const [addressFinErr, setAddressFinErr] = useState(true);
+  const [descriptionFinErr, setDescriptionFinErr] = useState(true);
+
+  const [address, setAddress] = useState({
+    streetAndNumber: "",
+    latitude: 10.842033810975172,
+    longitude: 106.80996883068278,
+  });
 
   const handleClick = () => {
     setSnackbarOpen(true);
@@ -123,12 +138,12 @@ const DestinationAddPage = () => {
   const handleConfirmClick = async () => {
     let imagePath = [];
     for (let index = 0; index < files.length; index++) {
-      const imgName = await addPosts(files[index]);
+      const imgName = await addPosts(files[index].file);
       imagePath.push(imgName);
     }
 
     const loc = JSON.parse(localStorage.getItem("loc"));
-    const address = localStorage.getItem("address");
+    const address = addressDetail;
 
     let acts = [];
     for (let index = 0; index < activities.length; index++) {
@@ -139,15 +154,6 @@ const DestinationAddPage = () => {
     for (let index = 0; index < seasons.length; index++) {
       seas.push(seasons[index].value);
     }
-
-    // console.log(loc);
-    // console.log(address);
-    // console.log(name);
-    // console.log(acts);
-    // console.log(topo);
-    // console.log(seas);
-    // console.log(description);
-    // console.log(provinceId);
 
     const dataDestination = {
       activities: acts,
@@ -161,13 +167,15 @@ const DestinationAddPage = () => {
       topographic: topo,
     };
 
+    console.log(dataDestination);
+
     try {
       const { data } = await add({
         variables: {
           dto: dataDestination,
         },
       });
-      navigate("/destinations");
+      navigate(`/destinations/${data.createDestination.id}`);
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
@@ -180,24 +188,82 @@ const DestinationAddPage = () => {
   const TOKEN =
     "pk.eyJ1IjoicGhhbmR1eSIsImEiOiJjbGswaDQzNjgwbGJlM2Z0NXd2c2V0eTgxIn0.mu5cOmm7meqqmT7eicLbKA";
 
-  const [address, setAddress] = useState({
-    streetAndNumber: "",
-    latitude: 10.842033810975172,
-    longitude: 106.80996883068278,
-  });
-
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-
-    if (address.streetAndNumber) {
-      console.log("Selected address:", address);
-      const result = await getLocations(address.streetAndNumber, TOKEN);
-      updateCoordinates(result[0].center[1], result[0].center[0]);
-    }
-  };
-
   const updateCoordinates = (latitude, longitude) => {
     setAddress({ ...address, latitude, longitude });
+  };
+
+  const [suggestions, setSuggestions] = useState([]);
+
+  const handleChange = (event) => {
+    handleInputChange(event.target.value);
+  };
+
+  const handleInputChange = async (query) => {
+    const suggestions = await getLocations(query, TOKEN);
+
+    let res = [];
+
+    for (let index = 0; index < suggestions.length; index++) {
+      let points = turf.points([
+        [suggestions[index].center[0], suggestions[index].center[1]],
+      ]);
+
+      let searchWithin = turf.polygon(
+        regionData.features[0].geometry.coordinates[0]
+      );
+
+      var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
+
+      if (ptsWithin.features.length > 0) {
+        res.push(suggestions[index]);
+      }
+    }
+
+    setSuggestions(res);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    // const streetAndNumber = suggestion.place_name.split(",")[0];
+
+    if (suggestion.place_name.length < 20) {
+      setAddressError(true);
+      setAddressHelperText("Vị trí địa điểm gồm ít nhất 20 kí tự");
+    } else if (suggestion.place_name.length > 100) {
+      setAddressError(true);
+      setAddressHelperText("Vị trí địa điểm gồm nhiều nhất 100 kí tự");
+    } else {
+      setAddressError(false);
+      setAddressHelperText("");
+    }
+
+    const streetAndNumber = suggestion.place_name;
+    const latitude = suggestion.center[1];
+    const longitude = suggestion.center[0];
+
+    const address = {
+      streetAndNumber,
+      latitude,
+      longitude,
+    };
+
+    suggestion.context.forEach((element) => {
+      const identifier = element.id.split(".")[0];
+
+      address[identifier] = element.text;
+    });
+
+    const loc = {
+      lng: address.longitude,
+      lat: address.latitude,
+    };
+    localStorage.setItem("loc", JSON.stringify(loc));
+
+    console.log(address);
+    console.log(loc);
+
+    setAddress(address);
+    setAddressDetail(address.streetAndNumber);
+    setSuggestions([]);
   };
 
   return (
@@ -232,10 +298,10 @@ const DestinationAddPage = () => {
                   cols={2}
                   rowHeight={210}
                 >
-                  {files.map((file) => (
-                    <ImageListItem key={Math.random()}>
+                  {files.map((file, index) => (
+                    <ImageListItem key={Math.random(index)}>
                       <img
-                        src={`${URL.createObjectURL(file)}`}
+                        src={`${file.url}`}
                         // srcSet={`${URL.createObjectURL(file)}`}
                         alt=""
                       />
@@ -256,6 +322,7 @@ const DestinationAddPage = () => {
                   className="link reset"
                   onClick={async () => {
                     setFiles([]);
+                    setImgError(true);
                   }}
                 >
                   <RotateLeftIcon />
@@ -277,10 +344,17 @@ const DestinationAddPage = () => {
                         return;
                       }
                       let res = files;
-                      res.push(e.target.files[0]);
+                      const imgData = {
+                        file: e.target.files[0],
+                        url: URL.createObjectURL(e.target.files[0]),
+                      };
+                      res.push(imgData);
                       setFiles(res);
-                      console.log(e.target.files);
-                      setFile(e.target.files[0]);
+                      if (res.length > 0) {
+                        setImgError(false);
+                      } else {
+                        setImgError(true);
+                      }
                     }}
                     style={{ display: "none" }}
                   />
@@ -311,18 +385,22 @@ const DestinationAddPage = () => {
                       if (e.target.value.length < 10) {
                         setNameError(true);
                         setNameHelperText("Tên địa điểm gồm ít nhất 10 kí tự");
+                        setNameFinErr(true);
                       } else if (e.target.value.length > 50) {
                         setNameError(true);
-                        setNameHelperText("Tên địa điểm gồm ít nhất 10 kí tự");
+                        setNameHelperText(
+                          "Tên địa điểm gồm nhiều nhất 50 kí tự"
+                        );
+                        setNameFinErr(true);
                       } else {
                         setNameError(false);
                         setNameHelperText("");
+                        setNameFinErr(false);
+                        setName(e.target.value);
                       }
-                      setName(e.target.value);
                     }}
                   />
                 </div>
-
                 <div className="detailItem">
                   <span className="itemKey">
                     Mùa<span style={{ color: "red" }}>*</span>:
@@ -337,7 +415,13 @@ const DestinationAddPage = () => {
                     isMulti
                     options={seasonOptions}
                     onChange={(e) => {
-                      setSeasons(e);
+                      if (e) {
+                        setSeasons(e);
+                        setSeasonError(false);
+                      } else {
+                        setSeasons([]);
+                        setSeasonError(true);
+                      }
                     }}
                     theme={(theme) => ({
                       ...theme,
@@ -361,7 +445,13 @@ const DestinationAddPage = () => {
                     name="province"
                     options={provinces}
                     onChange={(e) => {
-                      setProvinceId(e.value);
+                      if (e.value) {
+                        setProvinceId(e.value);
+                        setProvinceError(false);
+                      } else {
+                        setProvinceId(0);
+                        setProvinceError(true);
+                      }
                     }}
                     theme={(theme) => ({
                       ...theme,
@@ -378,12 +468,59 @@ const DestinationAddPage = () => {
                   <span className="itemKey">
                     Địa điểm<span style={{ color: "red" }}>*</span>:
                   </span>
-                  <div className="address-cont">
-                    <AddressForm
-                      onSubmit={handleFormSubmit}
-                      address={address}
-                      setAddress={setAddress}
+                  <div className="address-cont autoCompleteInputContainer">
+                    <TextField
+                      id="address"
+                      className="basic-single"
+                      size="small"
+                      type="text"
+                      placeholder="Nhập địa điểm"
+                      error={addressError}
+                      helperText={addressHelperText}
+                      value={addressDetail}
+                      onChange={(e) => {
+                        setAddressDetail(e.target.value);
+                        if (e.target.value.length < 20) {
+                          setAddressError(true);
+                          setAddressFinErr(true);
+                          setAddressHelperText(
+                            "Vị trí địa điểm gồm ít nhất 20 kí tự"
+                          );
+                        } else if (e.target.value.length > 100) {
+                          setAddressError(true);
+                          setAddressFinErr(true);
+                          setAddressHelperText(
+                            "Vị trí địa điểm gồm nhiều nhất 100 kí tự"
+                          );
+                        } else {
+                          setAddressError(false);
+                          setAddressFinErr(false);
+                          setAddressHelperText("");
+                        }
+                        handleChange(e);
+                      }}
+                      sx={{
+                        width: "15%",
+                      }}
+                      onBlur={() => {
+                        setTimeout(function () {
+                          setSuggestions([]);
+                        }, 500);
+                      }}
                     />
+                    <ul className="addressSuggestions">
+                      {suggestions?.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          onClick={() => {
+                            handleSuggestionClick(suggestion);
+                            console.log("alo");
+                          }}
+                        >
+                          {suggestion.place_name}
+                        </li>
+                      ))}
+                    </ul>
                     <IconButton
                       className="mapBtn"
                       color="info"
@@ -437,7 +574,13 @@ const DestinationAddPage = () => {
                     name="topographic"
                     options={topoOptions}
                     onChange={(e) => {
-                      setTopo(e.value);
+                      if (e.value) {
+                        setTopo(e.value);
+                        setTopoError(false);
+                      } else {
+                        setTopo("");
+                        setTopoError(true);
+                      }
                     }}
                     theme={(theme) => ({
                       ...theme,
@@ -462,7 +605,13 @@ const DestinationAddPage = () => {
                     options={activityOptions}
                     isMulti
                     onChange={(e) => {
-                      setActivities(e);
+                      if (e) {
+                        setActivities(e);
+                        setActivitiesError(false);
+                      } else {
+                        setActivities([]);
+                        setActivitiesError(true);
+                      }
                     }}
                     theme={(theme) => ({
                       ...theme,
@@ -489,28 +638,47 @@ const DestinationAddPage = () => {
                   placeholder="Nhập mô tả"
                   size="small"
                   name="description"
+                  error={descriptionError}
+                  helperText={descriptionHelperText}
                   sx={{
                     width: "15%",
-                    "& label.Mui-focused": {
-                      color: "black",
-                    },
-                    "& .MuiInput-underline:after": {
-                      borderBottomColor: "black",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "gainsboro",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "black",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
-                      },
-                    },
+                    // "& label.Mui-focused": {
+                    //   color: "black",
+                    // },
+                    // "& .MuiInput-underline:after": {
+                    //   borderBottomColor: "black",
+                    // },
+                    // "& .MuiOutlinedInput-root": {
+                    //   "& fieldset": {
+                    //     borderColor: "gainsboro",
+                    //   },
+                    //   "&:hover fieldset": {
+                    //     borderColor: "black",
+                    //   },
+                    //   "&.Mui-focused fieldset": {
+                    //     borderColor: "black",
+                    //   },
+                    // },
                   }}
                   onChange={(e) => {
-                    setDescription(e.target.value);
+                    if (e.target.value.length < 100) {
+                      setDescriptionError(true);
+                      setDescriptionHelperText(
+                        "Mô tả địa điểm gồm ít nhất 100 kí tự"
+                      );
+                      setDescriptionFinErr(true);
+                    } else if (e.target.value.length > 999) {
+                      setDescriptionError(true);
+                      setDescriptionHelperText(
+                        "Mô tả địa điểm gồm nhiều nhất 999 kí tự"
+                      );
+                      setDescriptionFinErr(true);
+                    } else {
+                      setDescriptionError(false);
+                      setDescriptionHelperText("");
+                      setDescriptionFinErr(false);
+                      setDescription(e.target.value);
+                    }
                   }}
                 />
               </div>
@@ -518,18 +686,33 @@ const DestinationAddPage = () => {
           </div>
         </div>
         <div className="btn-group">
-          {acceptState && (
-            <button
-              className="link confirm"
-              onClick={async () => {
-                handleConfirmClick();
-              }}
-            >
-              <ThumbUpAltIcon />
-              <span>Xác nhận</span>
-            </button>
-          )}
-          {!acceptState && (
+          {!nameFinErr &&
+            !imgError &&
+            !addressFinErr &&
+            !seasonError &&
+            !topoError &&
+            !provinceError &&
+            !activitiesError &&
+            !descriptionFinErr && (
+              <button
+                className="link confirm"
+                onClick={async () => {
+                  handleConfirmClick();
+                }}
+              >
+                <ThumbUpAltIcon />
+                <span>Xác nhận</span>
+              </button>
+            )}
+
+          {(nameFinErr ||
+            imgError ||
+            addressFinErr ||
+            seasonError ||
+            topoError ||
+            provinceError ||
+            activitiesError ||
+            descriptionFinErr) && (
             <button className="link deny">
               <ThumbUpAltIcon />
               <span>Xác nhận</span>

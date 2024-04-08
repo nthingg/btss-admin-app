@@ -10,13 +10,14 @@
     }
 
     .destination-add-cont {
+        overflow: auto;
         padding: 40px 40px 40px 40px;
         height: fit-content;
         min-height: 640px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
-        max-width: 91%; /* Adjust as needed */
-        margin: 0 auto;
+        // max-width: 91%; /* Adjust as needed */
+        margin: 0 30px 0 30px;
         box-shadow:
             0 4px 8px 0 rgba(0, 0, 0, 0.1),
             0 6px 20px 0 rgba(0, 0, 0, 0.1);
