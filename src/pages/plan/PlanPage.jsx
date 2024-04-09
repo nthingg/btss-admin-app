@@ -28,8 +28,10 @@ import {
   LOAD_PLANS_FILTER,
 } from "../../services/graphql/plan";
 import Slider from "react-slick";
+import { useParams } from "react-router-dom";
 
 const PlanPage = () => {
+  const { sbsNumber } = useParams();
   const planStat = [
     "PENDING",
     "REGISTERING",
@@ -39,8 +41,12 @@ const PlanPage = () => {
     "COMPLETED",
     "FLAWED",
   ];
-  const [selectedDiv, setSelectedDiv] = useState(0);
-  const [selectedStatus, setSelectedStatus] = useState(planStat[0]);
+  const [selectedDiv, setSelectedDiv] = useState(
+    sbsNumber ? parseInt(sbsNumber, 10) : 0
+  );
+  const [selectedStatus, setSelectedStatus] = useState(
+    planStat[sbsNumber ? parseInt(sbsNumber, 10) : 0]
+  );
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -154,7 +160,7 @@ const PlanPage = () => {
   const [veri, setVeri] = useState(0);
   useEffect(() => {
     if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
-      setCompleted(dataVeri["plans"].totalCount);
+      setVeri(dataVeri["plans"].totalCount);
     }
   }, [dataVeri, loadingVeri, errVeri]);
 

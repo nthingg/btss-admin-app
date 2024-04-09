@@ -21,6 +21,7 @@ import {
 } from "../../services/graphql/plan";
 import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER } from "../../services/graphql/account";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const {
@@ -119,7 +120,7 @@ const HomePage = () => {
   const [veri, setVeri] = useState(0);
   useEffect(() => {
     if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
-      setCompleted(dataVeri["plans"].totalCount);
+      setVeri(dataVeri["plans"].totalCount);
     }
   }, [dataVeri, loadingVeri, errVeri]);
 
@@ -208,7 +209,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch ban đầu</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{pending}</p>
+                  <Link to={`/plans`} className="navigateButton">
+                    <p>{pending}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">
@@ -223,7 +226,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch chờ chốt</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{registering}</p>
+                  <Link to={`/plans/sbs/1`} className="navigateButton">
+                    <p>{registering}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn temp">
@@ -238,7 +243,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch đã sẵn sàng</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{temp}</p>
+                  <Link to={`/plans/sbs/2`} className="navigateButton">
+                    <p>{temp}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">
@@ -253,7 +260,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch đã hoàn thành</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{completed}</p>
+                  <Link to={`/plans/sbs/5`} className="navigateButton">
+                    <p>{completed}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn success">
@@ -268,7 +277,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch lỗi</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{flawed}</p>
+                  <Link to={`/plans/sbs/6`} className="navigateButton">
+                    <p>{flawed}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">
@@ -283,7 +294,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch đã hủy</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{cancelled}</p>
+                  <Link to={`/plans/sbs/4`} className="navigateButton">
+                    <p>{cancelled}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn cancel">
@@ -298,7 +311,9 @@ const HomePage = () => {
               <div className="item-title">Số kế hoạch check-in</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{veri}</p>
+                  <Link to={`/plans/sbs/3`} className="navigateButton">
+                    <p>{veri}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">
@@ -313,7 +328,9 @@ const HomePage = () => {
               <div className="item-title">Số địa điểm trong hệ thống</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{destinations}</p>
+                  <Link to={`/destinations`} className="navigateButton">
+                    <p>{destinations}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">
@@ -328,7 +345,9 @@ const HomePage = () => {
               <div className="item-title">Số phượt thủ hiện tại</div>
               <div className="item-body">
                 <div className="left">
-                  <p>{travelers}</p>
+                  <Link to={`/accounts`} className="navigateButton">
+                    <p>{travelers}</p>
+                  </Link>
                 </div>
                 <div className="right">
                   <div className="btn info">

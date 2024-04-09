@@ -52,6 +52,7 @@ const App = () => {
                 index
                 element={token ? <PlanPage /> : <Navigate to="/login" />}
               />
+              <Route path="sbs/:sbsNumber" element={<PlanPage />} />
               <Route path=":planId" element={<PlanDetailPage />} />
               <Route
                 path=":planId/account/:accountId"

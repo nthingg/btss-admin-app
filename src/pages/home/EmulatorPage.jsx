@@ -493,11 +493,11 @@ const EmulatorPage = () => {
             };
             let currentJoinMethod = "NONE";
             if (currentPlans[j].joinMethod === "NONE") {
-              let random = Math.floor(Math.random() * 2);
-              if (random !== 0) {
-                currentJoinMethod = "INVITE";
-              } else {
+              // let random = Math.floor(Math.random() * 2);
+              if (i <= 25) {
                 currentJoinMethod = "SCAN";
+              } else {
+                currentJoinMethod = "INVITE";
               }
             } else if (currentPlans[j].joinMethod === "INVITE") {
               currentJoinMethod = "SCAN";
@@ -763,7 +763,7 @@ const EmulatorPage = () => {
             limitMassJoin++;
             console.log(limitMassJoin);
           } else {
-            console.log("im in");
+            count++;
             const cancelData = {
               id: currentPlans[j].id,
               planName: currentPlans[j].name,
@@ -947,11 +947,11 @@ const EmulatorPage = () => {
             break;
           }
           let temp = [];
-          if (loggedAcc[i].id === 7) {
+          if (i <= 15) {
             temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
             console.log("half");
             console.log(temp);
-          } else if (loggedAcc[i].id === 8) {
+          } else if (15 < i && i <= 30) {
             temp = planData[0].tempOrders;
             console.log("full");
             console.log(temp);
@@ -976,8 +976,6 @@ const EmulatorPage = () => {
               period: temp[k].period,
               planName: currentPlans[j].name,
             };
-            // console.log("/////////////////////////////////////");
-            // console.log(orderData);
             log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
             const res = await handleOrderPlan(orderData, count, loggedAcc[i]);
             response.push(res);

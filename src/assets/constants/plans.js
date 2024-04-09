@@ -8,7 +8,7 @@ export const planData = [
   {
     departAt: eightDaysLater, //done
     departure: [106.80992590984253, 10.841327798960252], //done
-    destinationId: 1, //done
+    destinationId: 2, //done
     maxMemberCount: 10, //done
     maxMemberWeight: 3, //done
     departureAddress: "Đ. D1, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh", //done
