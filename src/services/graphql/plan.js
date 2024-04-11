@@ -23,6 +23,33 @@ export const LOAD_PLANS_FILTER = gql`
   }
 `;
 
+export const LOAD_PLANS_PUBLISHED_FILTER = gql`
+  query LoadPlans($status: Boolean!) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: { isPublished: { eq: $status } }
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+    }
+  }
+`;
+
 export const LOAD_PLANS = gql`
   {
     plans(first: 100, order: { id: ASC }) {
@@ -55,7 +82,7 @@ export const LOAD_PLANS_PUBLISHED = gql`
       }
     }
   }
-`
+`;
 
 export const LOAD_DETAIL_PLAN = gql`
   query GetPlanById($id: Int!) {
@@ -250,19 +277,19 @@ export const LOAD_NUMBERS_PUBLISHED = gql`
   query {
     plans(where: { isPublished: { eq: true } }) {
       edges {
-          node {
-            id
-            name
-            status
-          }
+        node {
+          id
+          name
+          status
         }
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
-        }
-        totalCount
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
-`
+`;

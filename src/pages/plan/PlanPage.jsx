@@ -16,7 +16,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
-import PublicIcon from '@mui/icons-material/Public';
+import PublicIcon from "@mui/icons-material/Public";
 import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
@@ -28,6 +28,7 @@ import {
   LOAD_NUMBERS_PUBLISHED,
   LOAD_PLANS,
   LOAD_PLANS_FILTER,
+  LOAD_PLANS_PUBLISHED_FILTER,
 } from "../../services/graphql/plan";
 import Slider from "react-slick";
 import { useParams } from "react-router-dom";
@@ -42,7 +43,6 @@ const PlanPage = () => {
     "CANCELED",
     "COMPLETED",
     "FLAWED",
-    "PUBLISHED"
   ];
   const [selectedDiv, setSelectedDiv] = useState(
     sbsNumber ? parseInt(sbsNumber, 10) : 0
@@ -51,50 +51,69 @@ const PlanPage = () => {
     planStat[sbsNumber ? parseInt(sbsNumber, 10) : 0]
   );
 
+  const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
+
   const handleClick = (index) => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[0]);
+        refetch();
         break;
       case 1:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[1]);
+        refetch();
         break;
       case 2:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[2]);
+        refetch();
         break;
       case 3:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[3]);
+        refetch();
         break;
       case 4:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[4]);
+        refetch();
         break;
       case 5:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[5]);
+        refetch();
         break;
       case 6:
+        setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[6]);
+        refetch();
         break;
       case 7:
-        // setSelectedStatus(planStat[7]);
+        setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
+        setSelectedStatus(true);
+        refetch();
         break;
       default:
         break;
     }
-    refetch();
+    refetchRegis();
+    refetchPending();
+    refetchCancelled();
+    refetchFlawed();
+    refetchTemp();
+    refetchComplete();
+    refetchVeri();
+    refetchPublished();
   };
 
-  const { error, loading, data, refetch } = useQuery(LOAD_PLANS_FILTER, {
+  const { error, loading, data, refetch } = useQuery(planQuery, {
     variables: {
       status: selectedStatus,
     },
   });
-  const {
-    error: errorTotal,
-    loading: loadingTotal,
-    data: dataTotal,
-    refetch: refetchTotal,
-  } = useQuery(LOAD_PLANS);
 
   const [plans, setPlans] = useState([]);
   useEffect(() => {
@@ -208,7 +227,7 @@ const PlanPage = () => {
       setFlawed(dataFlawed["plans"].totalCount);
     }
   }, [dataFlawed, loadingFlawed, errorFlawed]);
-  
+
   const {
     error: errorPublished,
     loading: loadingPublished,
@@ -217,7 +236,12 @@ const PlanPage = () => {
   } = useQuery(LOAD_NUMBERS_PUBLISHED);
   const [published, setPublished] = useState(0);
   useEffect(() => {
-    if (!loadingPublished && !errorPublished && dataPublished && dataPublished["plans"]) {
+    if (
+      !loadingPublished &&
+      !errorPublished &&
+      dataPublished &&
+      dataPublished["plans"]
+    ) {
       setPublished(dataPublished["plans"].totalCount);
     }
   }, [dataPublished, loadingPublished, errorPublished]);
@@ -247,7 +271,7 @@ const PlanPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
           />
-          <button className="link" onClick={() => { }}>
+          <button className="link" onClick={() => {}}>
             <SearchIcon />
           </button>
         </div>
@@ -262,7 +286,6 @@ const PlanPage = () => {
             className="link"
             onClick={() => {
               refetch();
-              refetchTotal();
               refetchRegis();
               refetchPending();
               refetchCancelled();
@@ -270,6 +293,7 @@ const PlanPage = () => {
               refetchTemp();
               refetchComplete();
               refetchVeri();
+              refetchPublished();
             }}
           >
             <RefreshIcon />
@@ -282,8 +306,9 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -300,7 +325,7 @@ const PlanPage = () => {
                 {index === 4 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 {index === 5 && <CheckCircleIcon color="success" />}
                 {index === 6 && <BuildCircleIcon sx={{ color: "#3498DB" }} />}
-                {index === 7 && <PublicIcon sx={{ color: "#3498DB" }}/>}
+                {index === 7 && <PublicIcon sx={{ color: "#3498DB" }} />}
                 <span>
                   {index === 0 && `Ban đầu (${pending})`}
                   {index === 1 && `Chờ chốt (${registering})`}

@@ -20,17 +20,6 @@ const PlanTable = ({ plans, accountPlans }) => {
       renderCell: (params) => {
         let check = params.row.status;
         switch (check) {
-          case "PUBLISHED":
-            return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
-                }}
-              >
-                <VisibilityIcon />
-              </IconButton>
-            );
           case "READY":
             return (
               <IconButton
@@ -43,6 +32,28 @@ const PlanTable = ({ plans, accountPlans }) => {
               </IconButton>
             );
           case "VERIFIED":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          case "FLAWED":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          case "COMPLETED":
             return (
               <IconButton
                 color="info"
