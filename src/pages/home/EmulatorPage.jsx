@@ -212,7 +212,7 @@ const EmulatorPage = () => {
           variables: {
             dto: {
               channel: "VONAGE",
-              deviceToken: "test123",
+              deviceToken: "test",
               otp: "123123",
               phone: travelerPhone,
             },

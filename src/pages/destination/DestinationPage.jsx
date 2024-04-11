@@ -49,6 +49,7 @@ const DestinationPage = () => {
   const [successMsg, setSucessMsg] = useState(false);
   const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
+  const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -209,6 +210,31 @@ const DestinationPage = () => {
       setLake(countLake);
       setMountain(countMountain);
       setWaterfall(countWaterfall);
+
+      const arrInt = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const locArr = {
+        beach: 1,
+        brook: 1,
+        cave: 0,
+        dune: 0,
+        hill: 0,
+        jungle: 2,
+        lake: 1,
+        mountain: 8,
+        waterfall: 8,
+      };
+
+      // Create a new array to store the sorted indices
+      const sortedArr = arrInt.slice().sort((a, b) => {
+        // Get the location values for indices a and b
+        const locValueA = locArr[Object.keys(locArr)[a]];
+        const locValueB = locArr[Object.keys(locArr)[b]];
+
+        // Sort descending by location value
+        return locValueB - locValueA;
+      });
+      sortedArr.unshift(0);
+      setFilter(sortedArr);
     }
   }, [dataTotal, loadingTotal, errorTotal]);
 
@@ -457,7 +483,7 @@ const DestinationPage = () => {
       <div className="destinationContainer">
         <div className="icon-row">
           <Slider {...settings}>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+            {filter.map((index) => (
               <div
                 key={index}
                 className={`icon-item ${
