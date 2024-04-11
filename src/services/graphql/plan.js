@@ -65,38 +65,11 @@ export const LOAD_DETAIL_PLAN = gql`
         startDate
         endDate
         gcoinBudgetPerCapita
-        members {
-          account {
-            name
-            phone
-          }
-          weight
-          status
-        }
-        orders {
-          id
-          total
-          currentStatus
-          createdAt
-          account {
-            id
-            name
-          }
-          type
-        }
         savedContacts {
           imagePath
           name
           phone
           address
-        }
-        schedule {
-          events {
-            type
-            shortDescription
-            description
-            duration
-          }
         }
       }
     }

@@ -194,9 +194,11 @@ const HomePage = () => {
                 refetchCancelled();
                 refetchFlawed();
                 refetchTemp();
-                refetchDestination();
                 refetchComplete();
+                refetchPending();
+                refetchVeri();
                 refetchTravelers();
+                refetchDestination();
               }}
             >
               <RefreshIcon />

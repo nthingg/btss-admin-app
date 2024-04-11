@@ -244,6 +244,13 @@ const PlanPage = () => {
             onClick={() => {
               refetch();
               refetchTotal();
+              refetchRegis();
+              refetchPending();
+              refetchCancelled();
+              refetchFlawed();
+              refetchTemp();
+              refetchComplete();
+              refetchVeri();
             }}
           >
             <RefreshIcon />
