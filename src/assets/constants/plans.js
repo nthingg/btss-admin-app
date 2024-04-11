@@ -183,7 +183,7 @@ export const planData = [
       ],
     ],
     surcharges: [
-      { alreadyDivided: true, gcoinAmount: 100000, note: "Mua thêm thức ăn" },
+      { alreadyDivided: true, gcoinAmount: 1000, note: "Mua thêm thức ăn" },
     ], //done
     travelDuration: "05:42:10", //done
     sourceId: null, //done

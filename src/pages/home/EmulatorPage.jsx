@@ -32,6 +32,7 @@ import {
   LOAD_DESTINATION_LOC_BY_ID,
 } from "../../services/graphql/destination";
 import { LOAD_PRODUCTS_BY_PROVIDER } from "../../services/graphql/products";
+import client from "../../services/apollo/config";
 
 const EmulatorPage = () => {
   const initQuery = gql`
@@ -300,14 +301,6 @@ const EmulatorPage = () => {
     }
   };
 
-  const [providerQuery, setProviderQuery] = useState(initQuery);
-  const {
-    error: errorProvider,
-    loading: loadingProvider,
-    data: dataProvider,
-    refetch: refetchProvider,
-  } = useQuery(providerQuery);
-
   const {
     error: errorProduct,
     loading: loadingProduct,
@@ -316,6 +309,7 @@ const EmulatorPage = () => {
   } = useQuery(LOAD_PRODUCTS_BY_PROVIDER, {
     variables: {
       id: 0,
+      type: ["BEVERAGE", "FOOD"],
     },
   });
 
@@ -366,22 +360,8 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateCreatePlans = async (planNum, dateTime) => {
-    const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
-
-    localStorage.setItem("checkIsUserCall", "yes");
-    let response = [];
-    let count = 0;
-    let log = "";
-    for (let i = 0; i < planNum; i++) {
-      localStorage.setItem("userToken", loggedAcc[i].token);
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-      count++;
-      let random = Math.floor(Math.random() * destinations.length);
-
-      let destination = destinations[random];
-
-      const query = gql`
+  async function fetchData(destination) {
+    const query = gql`
         {
           providers(
             where: {
@@ -394,9 +374,10 @@ const EmulatorPage = () => {
                   }
                 }
               }
-              type: {nin: [GROCERY, REPAIR, TAXI]}
+              type: {nin: [VEHICLE_RENTAL, MOTEL, HOTEL, GROCERY, REPAIR, TAXI]}
             }
             order: {id: DESC}
+            first: 100
           ) {
             nodes {
               id
@@ -413,20 +394,42 @@ const EmulatorPage = () => {
         }
       `;
 
-      setProviderQuery(query);
-      const { data: dataProvider } = await refetchProvider();
-      let providers = dataProvider.providers.nodes;
+    const result = await client.query({ query });
+    return result.data;
+  }
 
+  const simulateCreatePlans = async (planNum, dateTime) => {
+    const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
+
+    localStorage.setItem("checkIsUserCall", "yes");
+    let response = [];
+    let count = 0;
+    let log = "";
+    for (let i = 0; i < planNum; i++) {
+      localStorage.setItem("userToken", loggedAcc[i].token);
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+      count++;
+      let random = Math.floor(Math.random() * destinations.length);
+
+      let destination = destinations[random];
+
+      const dataProvider = await fetchData(destination);
       console.log(destination);
       console.log(dataProvider);
-      console.log(providers);
+
+      let providers = dataProvider.providers.nodes;
 
       let planTempData = planData[0];
+
+      planTempData.destinationId = destination.id;
 
       let contacts = [];
       for (let index = 0; index < providers.length; index++) {
         if (providers[index].type === "EMERGENCY") {
           contacts.push(providers[index].id);
+        }
+        if (contacts.length === 5) {
+          break;
         }
       }
       planTempData.savedProviderIds = contacts;
@@ -441,6 +444,7 @@ const EmulatorPage = () => {
               ) {
                 const { data: dataProduct } = await refetchProduct({
                   id: providers[j].id,
+                  type: ["BEVERAGE", "FOOD"],
                 });
 
                 const products = dataProduct.products.nodes;
@@ -465,92 +469,17 @@ const EmulatorPage = () => {
                   }
                 }
 
-                planTempData.schedule[i][k].tempOrder = {
-                  cart: tempCart,
-                  note: "",
-                  period: "NOON",
-                  providerId: providers[j].id,
-                  total: tempTotal,
-                };
-              }
-            }
-          } else if (planTempData.schedule[i][k].type === "CHECKIN") {
-            for (let j = 0; j < providers.length; j++) {
-              if (
-                providers[j].type === "HOTEL" ||
-                providers[j].type === "MOTEL"
-              ) {
-                const { data: dataProduct } = await refetchProduct({
-                  id: providers[j].id,
-                });
-
-                const products = dataProduct.products.nodes;
-
-                let tempCart = [];
-                let tempTotal = 0;
-                if (products.length > 0) {
-                  for (let l = 0; l < 2; l++) {
-                    let random = Math.floor(Math.random() * products.length);
-
-                    let isExisted = false;
-                    for (let m = 0; m < tempCart.length; m++) {
-                      if (tempCart[m].key === products[random].id) {
-                        tempCart[m].value += 5;
-                        isExisted = true;
-                      }
-                    }
-                    if (!isExisted) {
-                      tempCart.push({ key: products[random].id, value: 5 });
-                    }
-                    tempTotal += products[random].price * 5;
-                  }
-                }
-
-                planTempData.schedule[i][k].tempOrder = {
-                  cart: tempCart,
-                  note: "",
-                  period: "NOON",
-                  providerId: providers[j].id,
-                  total: tempTotal,
-                };
-              }
-            }
-          } else if (planTempData.schedule[i][k].type === "VISIT") {
-            for (let j = 0; j < providers.length; j++) {
-              if (providers[j].type === "VEHICLE_RENTAL") {
-                const { data: dataProduct } = await refetchProduct({
-                  id: providers[j].id,
-                });
-
-                const products = dataProduct.products.nodes;
-
-                let tempCart = [];
-                let tempTotal = 0;
-                if (products.length > 0) {
-                  for (let l = 0; l < 5; l++) {
-                    let random = Math.floor(Math.random() * products.length);
-
-                    let isExisted = false;
-                    for (let m = 0; m < tempCart.length; m++) {
-                      if (tempCart[m].key === products[random].id) {
-                        tempCart[m].value += 1;
-                        isExisted = true;
-                      }
-                    }
-                    if (!isExisted) {
-                      tempCart.push({ key: products[random].id, value: 1 });
-                    }
-                    tempTotal += products[random].price * 1;
-                  }
-                }
-
-                planTempData.schedule[i][k].tempOrder = {
-                  cart: tempCart,
-                  note: "",
-                  period: "NOON",
-                  providerId: providers[j].id,
-                  total: tempTotal,
-                };
+                planTempData.schedule[i][k].tempOrder =
+                  tempCart.length === 0
+                    ? null
+                    : {
+                        cart: tempCart,
+                        note: "",
+                        period: "NOON",
+                        providerId: providers[j].id,
+                        total: tempTotal,
+                      };
+                break;
               }
             }
           }
@@ -1204,41 +1133,72 @@ const EmulatorPage = () => {
           if (limitOrder > orderNum) {
             break;
           }
+
           let temp = [];
-          if (i <= 15) {
-            temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
-            console.log("half");
-            console.log(temp);
-          } else if (15 < i && i <= 30) {
-            temp = planData[0].tempOrders;
-            console.log("full");
-            console.log(temp);
-          } else {
-            temp = [
-              planData[0].tempOrders[0],
-              planData[0].tempOrders[1],
-              planData[0].tempOrders[2],
-            ];
-            console.log("70%");
-            console.log(temp);
+          for (
+            let index = 0;
+            index < currentPlans[j].schedule.length;
+            index++
+          ) {
+            for (let l = 0; l < currentPlans[j].schedule[index].length; l++) {
+              if (currentPlans[j].schedule[index][l].type === "EAT") {
+                if (currentPlans[j].schedule[index][l].tempOrder !== null) {
+                  temp.push(currentPlans[j].schedule[index][l].tempOrder);
+                }
+              }
+            }
           }
+
+          // if (i <= 15) {
+          //   temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
+          //   console.log("half");
+          // } else if (15 < i && i <= 30) {
+          //   temp = planData[0].tempOrders;
+          //   console.log("full");
+          // } else {
+          //   temp = [
+          //     planData[0].tempOrders[0],
+          //     planData[0].tempOrders[1],
+          //     planData[0].tempOrders[2],
+          //   ];
+          //   console.log("70%");
+          // }
+
+          var a = moment
+            .utc(currentPlans[j].utcStartAt)
+            .utcOffset("+07:00")
+            .add(1, "days");
+          var b = moment
+            .utc(currentPlans[j].utcStartAt)
+            .utcOffset("+07:00")
+            .add(2, "days");
+          var formattedA = a.format();
+          var formattedB = b.format();
 
           for (let k = 0; k < temp.length; k++) {
             count++;
+
+            const convertedData = [];
+
+            for (const key in temp[k].cart) {
+              convertedData.push({ key: [key], value: temp[k].cart[key] });
+            }
+
             const orderData = {
-              cart: temp[k].cart,
+              cart: convertedData,
               note: temp[k].note,
               planId: currentPlans[j].id,
-              serveDates: temp[k].serveDates,
+              serveDates: [formattedA, formattedB],
               type: temp[k].type,
               period: temp[k].period,
               planName: currentPlans[j].name,
             };
-            log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
-            const res = await handleOrderPlan(orderData, count, loggedAcc[i]);
-            response.push(res);
-            setResponseMsg(response);
-            setLoginMsg(log);
+            console.log(orderData);
+            // log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
+            // const res = await handleOrderPlan(orderData, count, loggedAcc[i]);
+            // response.push(res);
+            // setResponseMsg(response);
+            // setLoginMsg(log);
           }
           limitOrder++;
         }

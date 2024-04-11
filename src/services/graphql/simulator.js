@@ -60,18 +60,12 @@ export const LOAD_PLANS_SIMULATOR = gql`
         account {
           name
         }
-        members {
-          id
-          status
-          account {
-            id
-            name
-          }
-        }
         status
         memberCount
         maxMemberCount
         joinMethod
+        schedule
+        utcStartAt
       }
     }
   }
