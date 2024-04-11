@@ -8,6 +8,7 @@ import MapIcon from "@mui/icons-material/Map";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -56,6 +57,12 @@ const SideBar = () => {
             <li>
               <MapIcon className="icon" />
               <span>Quản lý địa điểm</span>
+            </li>
+          </NavLink>
+          <NavLink to="/transactions" style={{ textDecoration: "none" }}>
+            <li>
+              <ReceiptIcon className="icon" />
+              <span>Quản lý giao dịch</span>
             </li>
           </NavLink>
           <NavLink to="/emulator" style={{ textDecoration: "none" }}>

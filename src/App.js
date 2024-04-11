@@ -15,6 +15,7 @@ import "./index.css";
 import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 import DestinationAddPage from "./pages/destination/DestinationAddPage";
 import DestinationUpdatePage from "./pages/destination/DestinationUpdatePage";
+import TransactionPage from "./pages/transactions/TransactionPage";
 
 const App = () => {
   const token = localStorage.getItem("adminToken");
@@ -63,6 +64,12 @@ const App = () => {
               <Route
                 index
                 element={token ? <AccountPage /> : <Navigate to="/login" />}
+              />
+            </Route>
+            <Route path="transactions">
+              <Route
+                index
+                element={token ? <TransactionPage /> : <Navigate to="/login" />}
               />
             </Route>
             <Route
