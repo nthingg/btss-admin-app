@@ -36,11 +36,15 @@ export const destinationsColumns = [
   },
   {
     field: "comments",
-    width: 200,
+    width: 210,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.comments.length}</div>;
+      if (params.row.comments.length === 0) {
+        return <div>Không có dữ liệu</div>;
+      } else {
+        return <div>{params.row.comments.length}</div>;
+      }
     },
     renderHeader: () => <span>ĐÁNH GIÁ</span>,
   },

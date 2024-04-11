@@ -2,7 +2,11 @@ import { gql } from "@apollo/client";
 
 export const LOAD_ACCOUNTS_FILTER = gql`
   query LoadAccounts($role: [Role!]) {
-    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } }) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: { role: { in: $role }, name: { nstartsWith: "test-account-" } }
+    ) {
       nodes {
         id
         name
@@ -21,7 +25,11 @@ export const LOAD_ACCOUNTS_FILTER = gql`
 
 export const LOAD_ACCOUNTS = gql`
   {
-    accounts(first: 100, order: { id: ASC }) {
+    accounts(
+      first: 100
+      order: { id: ASC }
+      where: { name: { nstartsWith: "test-account-" } }
+    ) {
       nodes {
         id
         role
@@ -68,7 +76,7 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
     accounts(
       first: 100
       order: { id: ASC }
-      where: { role: { eq: TRAVELER } }
+      where: { role: { eq: TRAVELER }, name: { nstartsWith: "test-account-" } }
     ) {
       nodes {
         id

@@ -172,7 +172,12 @@ const HomePage = () => {
   } = useQuery(LOAD_NUMBERS_PUBLISHED);
   const [published, setPublished] = useState(0);
   useEffect(() => {
-    if (!loadingPublished && !errorPublished && dataPublished && dataPublished["plans"]) {
+    if (
+      !loadingPublished &&
+      !errorPublished &&
+      dataPublished &&
+      dataPublished["plans"]
+    ) {
       setPublished(dataPublished["plans"].totalCount);
     }
   }, [dataPublished, loadingPublished, errorPublished]);
@@ -208,14 +213,14 @@ const HomePage = () => {
                 refetchCancelled();
                 refetchFlawed();
                 refetchTemp();
-refetchDestination();
+                refetchDestination();
                 refetchComplete();
                 refetchPending();
                 refetchVeri();
                 refetchTravelers();
-refetchPublished();
+                refetchPublished();
               }}
-              style={{cursor: "pointer"}}
+              style={{ cursor: "pointer" }}
             >
               <RefreshIcon />
             </button>
