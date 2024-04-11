@@ -1,34 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const LOAD_PLANS_FILTER = gql`
-  query LoadPlans($status: [PlanStatus!]) {
-    plans(first: 100, order: { id: DESC }, where: { status: { in: $status } }) {
-      nodes {
-        id
-        name
-        account {
-          name
-        }
-        destination {
-          name
-        }
-        utcDepartAt
-        startDate
-        memberCount
-        maxMemberCount
-        endDate
-        status
-      }
-    }
-  }
-`;
-
-export const LOAD_PLANS_PUBLISHED_FILTER = gql`
-  query LoadPlans($status: Boolean!) {
+  query LoadPlans($status: [PlanStatus!], $searchTerm: String) {
     plans(
       first: 100
       order: { id: DESC }
-      where: { isPublished: { eq: $status } }
+      where: { status: { in: $status } }
+      searchTerm: $searchTerm
     ) {
       nodes {
         id
@@ -46,24 +24,19 @@ export const LOAD_PLANS_PUBLISHED_FILTER = gql`
         endDate
         status
       }
+      totalCount
     }
   }
 `;
 
-export const LOAD_PLANS = gql`
-  {
-    plans(first: 100, order: { id: ASC }) {
-      nodes {
-        id
-        status
-      }
-    }
-  }
-`;
-
-export const LOAD_PLANS_PUBLISHED = gql`
-  query {
-    plans(where: { isPublished: { eq: true } }) {
+export const LOAD_PLANS_PUBLISHED_FILTER = gql`
+  query LoadPlans($status: Boolean!, $searchTerm: String) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: { isPublished: { eq: $status } }
+      searchTerm: $searchTerm
+    ) {
       nodes {
         id
         name
@@ -78,6 +51,18 @@ export const LOAD_PLANS_PUBLISHED = gql`
         memberCount
         maxMemberCount
         endDate
+        status
+      }
+      totalCount
+    }
+  }
+`;
+
+export const LOAD_PLANS = gql`
+  {
+    plans(first: 100, order: { id: ASC }) {
+      nodes {
+        id
         status
       }
     }
@@ -127,8 +112,8 @@ export const LOAD_DETAIL_PLAN = gql`
 `;
 
 export const LOAD_NUMBERS_CANCELED = gql`
-  query {
-    plans(where: { status: { eq: CANCELED } }) {
+  query NumerOfCancel($searchTerm: String) {
+    plans(where: { status: { eq: CANCELED } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -148,8 +133,8 @@ export const LOAD_NUMBERS_CANCELED = gql`
 `;
 
 export const LOAD_NUMBERS_COMPLETED = gql`
-  query {
-    plans(where: { status: { eq: COMPLETED } }) {
+  query NumberOfComplete($searchTerm: String){
+    plans(where: { status: { eq: COMPLETED } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -169,8 +154,8 @@ export const LOAD_NUMBERS_COMPLETED = gql`
 `;
 
 export const LOAD_NUMBERS_FLAWED = gql`
-  query {
-    plans(where: { status: { eq: FLAWED } }) {
+  query FlawedPlan($searchTerm: String){
+    plans(where: { status: { eq: FLAWED } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -190,8 +175,8 @@ export const LOAD_NUMBERS_FLAWED = gql`
 `;
 
 export const LOAD_NUMBERS_PENDING = gql`
-  query {
-    plans(where: { status: { eq: PENDING } }) {
+  query PendingPlans($searchTerm: String){
+    plans(where: { status: { eq: PENDING } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -211,8 +196,8 @@ export const LOAD_NUMBERS_PENDING = gql`
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  query {
-    plans(where: { status: { eq: READY } }) {
+  query ReadyPlans($searchTerm: String){
+    plans(where: { status: { eq: READY } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -232,8 +217,8 @@ export const LOAD_NUMBERS_READY = gql`
 `;
 
 export const LOAD_NUMBERS_REGISTERING = gql`
-  query {
-    plans(where: { status: { eq: REGISTERING } }) {
+  query RegisteringPlans($searchTerm: String){
+    plans(where: { status: { eq: REGISTERING } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -253,8 +238,8 @@ export const LOAD_NUMBERS_REGISTERING = gql`
 `;
 
 export const LOAD_NUMBERS_VERIFIED = gql`
-  query {
-    plans(where: { status: { eq: VERIFIED } }) {
+  query VerifiedPlan($searchTerm: String){
+    plans(where: { status: { eq: VERIFIED } } searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -274,8 +259,8 @@ export const LOAD_NUMBERS_VERIFIED = gql`
 `;
 
 export const LOAD_NUMBERS_PUBLISHED = gql`
-  query {
-    plans(where: { isPublished: { eq: true } }) {
+  query PublishedPlans($searchTerm: String){
+    plans(where: { isPublished: { eq: true } } searchTerm: $searchTerm) {
       edges {
         node {
           id

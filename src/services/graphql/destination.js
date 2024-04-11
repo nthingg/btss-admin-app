@@ -64,11 +64,12 @@ export const LOAD_DESTINATIONS = gql`
 `;
 
 export const LOAD_DESTINATIONS_FILTER = gql`
-  query LoadDestinations($topo: [Topographic!]) {
+  query LoadDestinations($topo: [Topographic!], , $searchTerm: String) {
     destinations(
       first: 100
       order: { id: DESC }
       where: { topographic: { in: $topo } }
+      searchTerm: $searchTerm
     ) {
       nodes {
         id

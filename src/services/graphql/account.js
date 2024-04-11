@@ -1,11 +1,41 @@
 import { gql } from "@apollo/client";
 
+export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
+  query LoadAccounts($role: [Role!], $searchTerm: String) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: {
+        role: { in: $role }
+        name: { nstartsWith: "test-account-" }
+        phone: { contains: $searchTerm }
+      }
+    ) {
+      nodes {
+        id
+        name
+        phone
+        email
+        isMale
+        isActive
+        prestigePoint
+        provider {
+          name
+        }
+      }
+    }
+  }
+`;
+
 export const LOAD_ACCOUNTS_FILTER = gql`
   query LoadAccounts($role: [Role!]) {
     accounts(
       first: 100
       order: { id: DESC }
-      where: { role: { in: $role }, name: { nstartsWith: "test-account-" } }
+      where: {
+        role: { in: $role }
+        name: { nstartsWith: "test-account-" }
+      }
     ) {
       nodes {
         id

@@ -52,6 +52,7 @@ const PlanPage = () => {
   );
 
   const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
+  const [searchTerm, setSearchTerm] = useState(null);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -112,6 +113,7 @@ const PlanPage = () => {
   const { error, loading, data, refetch } = useQuery(planQuery, {
     variables: {
       status: selectedStatus,
+      searchTerm: searchTerm
     },
   });
 
@@ -131,7 +133,11 @@ const PlanPage = () => {
     loading: loadingRegis,
     data: dataRegis,
     refetch: refetchRegis,
-  } = useQuery(LOAD_NUMBERS_REGISTERING);
+  } = useQuery(LOAD_NUMBERS_REGISTERING, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [registering, setRegistering] = useState(0);
   useEffect(() => {
     if (!loadingRegis && !errRegis && dataRegis && dataRegis["plans"]) {
@@ -145,7 +151,11 @@ const PlanPage = () => {
     loadingCancelled,
     data: dataCancelled,
     refetch: refetchCancelled,
-  } = useQuery(LOAD_NUMBERS_CANCELED);
+  } = useQuery(LOAD_NUMBERS_CANCELED, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [cancelled, setCancelled] = useState(0);
   useEffect(() => {
     if (
@@ -163,7 +173,11 @@ const PlanPage = () => {
     loading: loadingComplete,
     data: dataComplete,
     refetch: refetchComplete,
-  } = useQuery(LOAD_NUMBERS_COMPLETED);
+  } = useQuery(LOAD_NUMBERS_COMPLETED, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [completed, setCompleted] = useState(0);
   useEffect(() => {
     if (
@@ -181,7 +195,11 @@ const PlanPage = () => {
     loading: loadingVeri,
     data: dataVeri,
     refetch: refetchVeri,
-  } = useQuery(LOAD_NUMBERS_VERIFIED);
+  } = useQuery(LOAD_NUMBERS_VERIFIED, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [veri, setVeri] = useState(0);
   useEffect(() => {
     if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
@@ -194,7 +212,11 @@ const PlanPage = () => {
     loading: loadingPend,
     data: dataPend,
     refetch: refetchPending,
-  } = useQuery(LOAD_NUMBERS_PENDING);
+  } = useQuery(LOAD_NUMBERS_PENDING, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [pending, setPending] = useState(0);
   useEffect(() => {
     if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
@@ -207,7 +229,11 @@ const PlanPage = () => {
     loadingTemp,
     data: dataTemp,
     refetch: refetchTemp,
-  } = useQuery(LOAD_NUMBERS_READY);
+  } = useQuery(LOAD_NUMBERS_READY, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [temp, setTemp] = useState(0);
   useEffect(() => {
     if (!loadingTemp && !errorTemp && dataTemp && dataTemp["plans"]) {
@@ -220,7 +246,11 @@ const PlanPage = () => {
     loading: loadingFlawed,
     data: dataFlawed,
     refetch: refetchFlawed,
-  } = useQuery(LOAD_NUMBERS_FLAWED);
+  } = useQuery(LOAD_NUMBERS_FLAWED, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [flawed, setFlawed] = useState(0);
   useEffect(() => {
     if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
@@ -233,7 +263,11 @@ const PlanPage = () => {
     loading: loadingPublished,
     data: dataPublished,
     refetch: refetchPublished,
-  } = useQuery(LOAD_NUMBERS_PUBLISHED);
+  } = useQuery(LOAD_NUMBERS_PUBLISHED, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
   const [published, setPublished] = useState(0);
   useEffect(() => {
     if (
@@ -254,6 +288,52 @@ const PlanPage = () => {
     centerPadding: "60px",
   };
 
+  const handleSearchSubmit = async () => {
+    const search = document.getElementById('floatingValue').value;
+    setSearchTerm(search);
+    const result = await refetch({
+      status: selectedStatus,
+      searchTerm: search
+    });
+    if (!result.loading && !result.error && result.data && result.data["plans"]["nodes"]) {
+      const totalCount = result.data.plans.totalCount;
+      switch (selectedStatus) {
+        case planStat[0]: {
+          setPending(totalCount);
+          break;
+        }
+        case planStat[1]: {
+          setRegistering(totalCount);
+          break;
+        }
+        case planStat[2]: {
+          setTemp(totalCount);
+          break;
+        }
+        case planStat[3]: {
+          setVeri(totalCount);
+          break;
+        }
+        case planStat[4]: {
+          setCancelled(totalCount);
+          break;
+        }
+        case planStat[5]: {
+          setCompleted(totalCount);
+          break;
+        }
+        case planStat[6]: {
+          setFlawed(totalCount);
+          break;
+        }
+        case planStat[true]: {
+          setPublished(totalCount);
+          break;
+        }
+      }
+    }
+  }
+
   return (
     <div className="plan">
       <div className="shared-title">
@@ -270,8 +350,13 @@ const PlanPage = () => {
             id="floatingValue"
             name="value"
             placeholder="Tìm kiếm ..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchSubmit();
+              }
+            }}
           />
-          <button className="link" onClick={() => {}}>
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -285,6 +370,7 @@ const PlanPage = () => {
           <button
             className="link"
             onClick={() => {
+              setSearchTerm(null);
               refetch();
               refetchRegis();
               refetchPending();
@@ -306,9 +392,8 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}

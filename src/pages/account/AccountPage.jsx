@@ -14,6 +14,7 @@ import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded
 import {
   LOAD_ACCOUNTS,
   LOAD_ACCOUNTS_FILTER,
+  LOAD_TRAVELER_ACCOUNT_FILTER,
 } from "../../services/graphql/account";
 import AccountTable from "../../components/tables/AccountTable";
 import Slider from "react-slick";
@@ -22,19 +23,27 @@ const AccountPage = () => {
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(accountRole[0]);
+  const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchedTraveler, setSearchedTraveler] = useState(null);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
+        if (searchTerm !== "") {
+          setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+        }
         setSelectedStatus(accountRole[0]);
         refetch();
         break;
       case 1:
+        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
         setSelectedStatus(accountRole[1]);
         refetch();
         break;
       case 2:
+        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
         setSelectedStatus(accountRole[2]);
         refetch();
         break;
@@ -87,9 +96,10 @@ const AccountPage = () => {
     }
   }, [dataTotal, loadingTotal, errorTotal]);
 
-  const { error, loading, data, refetch } = useQuery(LOAD_ACCOUNTS_FILTER, {
+  const { error, loading, data, refetch } = useQuery(accountQuery, {
     variables: {
       role: selectedStatus,
+      searchTerm: searchTerm
     },
   });
 
@@ -101,9 +111,31 @@ const AccountPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setAccounts(res);
-      console.log(res);
+      if (selectedStatus === accountRole[0]) {
+        setSearchedTraveler(res);
+      }
     }
   }, [data, loading, error]);
+
+  const handleSearchSubmit = () => {
+    setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+    let search = document.getElementById('floatingValue').value;
+    if (search.startsWith("0")) {
+      search = "84" + search.substring(1);
+    }
+    setSearchTerm(search);
+    refetch();
+  }
+
+  useEffect(() => {
+    if (searchedTraveler) {
+      let countTraveler = 0;
+      for (const item of searchedTraveler) {
+        countTraveler++;
+      }
+      setTravelers(countTraveler);
+    }
+  }, [searchedTraveler])
 
   var settings = {
     dots: false,
@@ -129,8 +161,14 @@ const AccountPage = () => {
             id="floatingValue"
             name="value"
             placeholder="Tìm kiếm ..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchSubmit();
+              }
+            }}
           />
-          <button className="link">
+          <button className="link"
+            onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -148,6 +186,8 @@ const AccountPage = () => {
           <button
             className="link"
             onClick={() => {
+              setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+              setSearchTerm("");
               refetch();
             }}
           >
@@ -161,9 +201,8 @@ const AccountPage = () => {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
