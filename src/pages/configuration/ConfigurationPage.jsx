@@ -77,8 +77,6 @@ const ConfigurationPage = () => {
             });
             setLastModified(dayjs(configs.LAST_MODIFIED).format('DD/MM/YYYY, HH:mm'));
         }
-
-        console.log(holidays);
     }
 
     // useEffect(() => {

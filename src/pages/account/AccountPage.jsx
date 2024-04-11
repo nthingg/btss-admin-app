@@ -18,6 +18,7 @@ import {
 } from "../../services/graphql/account";
 import AccountTable from "../../components/tables/AccountTable";
 import Slider from "react-slick";
+import AccountCreateTable from "../../components/tables/AccoutCreateTable";
 
 const AccountPage = () => {
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
@@ -173,10 +174,11 @@ const AccountPage = () => {
           </button>
         </div>
         <div className="right">
-          {/* <Link to="/products/new" className="link">
-              <AddIcon />
-              <span>Thêm dịch vụ</span>
+          {/* <Link to="/accounts/add" className="link">
+              <AddCircleIcon />
+              <span>Thêm quản lý</span>
             </Link> */}
+            <AccountCreateTable />
           <button className="link">
             <CloudDownloadIcon />
           </button>

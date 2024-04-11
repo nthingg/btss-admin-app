@@ -56,3 +56,34 @@
         border-radius: 8px;
     }
 }
+
+//account create table
+#account-create-container {
+    .form-body {
+        .details {
+            .detailItem {
+                padding-bottom: 1rem;
+            }
+        }
+
+        .confirmBtn {
+            background-color: #2c3d50;
+            color: white;
+            
+            transition: 0.4s;
+            border: none;
+            cursor: pointer;
+            width: 160px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0 10px 0;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 2rem;
+        }
+    }
+}
