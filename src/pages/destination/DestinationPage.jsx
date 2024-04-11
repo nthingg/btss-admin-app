@@ -5,7 +5,7 @@ import "../../assets/scss/filter.scss";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import DestinationTable from "../../components/tables/DestinationTable";
 import BeachAccessIcon from "@mui/icons-material/BeachAccess";
@@ -21,10 +21,13 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   LOAD_DESTINATIONS,
   LOAD_DESTINATIONS_FILTER,
+  IMPORT_EXCEL_DESTINATION,
 } from "../../services/graphql/destination";
 import { BikeScooter } from "@mui/icons-material";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
+import { Snackbar, Alert, Typography } from "@mui/material";
+import * as XLSX from "xlsx";
 
 const DestinationPage = () => {
   const topoType = [
@@ -38,8 +41,14 @@ const DestinationPage = () => {
     "MOUNTAIN",
     "WATERFALL",
   ];
+  const [vertical, setVertical] = useState("top");
+  const [horizontal, setHorizontal] = useState("right");
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(topoType);
+  const [errorMsg, setErrMsg] = useState(false);
+  const [successMsg, setSucessMsg] = useState(false);
+  const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
+  const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -200,6 +209,142 @@ const DestinationPage = () => {
     }
   }, [dataTotal, loadingTotal, errorTotal]);
 
+  //#region Import excel
+  const [add, { data: dataAdd, error: errorAdd }] = useMutation(IMPORT_EXCEL_DESTINATION);
+
+  const openErrorSnackBar = () => {
+    setsnackBarErrorOpen(true);
+  }
+
+  const openSuccessSnackBar = () => {
+    setsnackBarSucessOpen(true);
+  }
+
+  const handleCloseSnack = () => {
+    setsnackBarErrorOpen(false);
+    setsnackBarSucessOpen(false);
+  }
+
+  const seas = ["SPRING", "SUMMER", "FALL", "WINTER"];
+  const topos = ["LAKE", "MOUNTAIN", "BEACH", "BROOK", "JUNGLE", "CAVE", "DUNE", "WATERFALL", "HILL"];
+  const actis = ["BATHING", "CAMPING", "CLIMBING", "PADDLING", "DIVING", "SURFING", "FISHING"];
+
+  const validateImportData = (data, index) => {
+    const minNameLength = 10;
+    const maxNameLength = 30;
+    const minDescriptionLength = 100;
+    const maxDescriptionLength = 999;
+    const imageUrlsMax = 5;
+    const imageUrlSource = "https://d38ozmgi8b70tu.cloudfront.net";
+    const addressMinLength = 20;
+    const addressMaxLength = 120;
+    let errorMsg = "Lỗi tại dòng " + (index + 1) + ":\n";
+    let result = true;
+
+    if (!data.name || data.name.length < minNameLength || data.name.length > maxNameLength) {
+      errorMsg += "Tên không hợp lệ! Tên không được để trống và độ dài cho phép từ 10 tới 30!\n";
+    }
+
+    if (!data.description || data.description.length < minDescriptionLength || data.description.length > maxDescriptionLength) {
+      errorMsg += "Mô tả không hợp lệ! Mô tả không được để trống và độ dài cho phép từ 100 tới 999!\n";
+    }
+
+    if (!data.imageUrls || data.imageUrls.length > imageUrlsMax) {
+      errorMsg += "Đường dẫn ảnh không hợp lệ! Đường dẫn ảnh không được để trống và số lượng ảnh không vượt quá 5!\n";
+    }
+
+    for (let i = 0; i < data.imageUrls.length; i++) {
+      if (!data.imageUrls[i].startsWith(imageUrlSource)) {
+        errorMsg += "Đường dẫn ảnh tới từ nguồn không hợp lệ!\n";
+        break;
+      }
+    }
+
+    if (!data.address || data.address.length < addressMinLength || data.address.length > addressMaxLength) {
+      errorMsg += "Địa chỉ không hợp lệ! Địa chỉ không được để trống và độ dài cho phép từ 20 tới 120!\n";
+    }
+
+    if (!data.topographic || !topos.some(t => t.includes(data.topographic))) {
+      errorMsg += "Loại địa hình không hợp lệ!\n";
+    }
+
+    if (!data.seasons || !data.seasons.every(s => seas.includes(s))) {
+      errorMsg += "Mùa không hợp lệ!\n";
+    }
+
+    if (!data.activities || !data.activities.every(a => actis.includes(a))) {
+      errorMsg += "Hoạt động không hợp lệ!\n";
+    }
+
+    if (errorMsg !== ("Lỗi tại dòng " + (index + 1) + ":\n")) {
+      setErrMsg(errorMsg);
+      setsnackBarErrorOpen(true);
+      result = false;
+    }
+
+    return result;
+  }
+
+  const handleImportExcel = (e) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(e.target.files[0]);
+      reader.onload = async (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const parsedData = XLSX.utils.sheet_to_json(sheet);
+
+        const importData = [];
+        parsedData.forEach((value) => {
+          importData.push({
+            activities: value.Activities.substring(1, value.Activities.length - 1).split(", "),
+            address: value.Address,
+            coordinate: [value.Longitude, value.Latitude],
+            description: value.Description,
+            imageUrls: value.ImagePaths.substring(1, value.ImagePaths.length - 1).split(', '),
+            name: value.Name,
+            provinceId: value.ProvinceId,
+            seasons: value.Seasons.substring(1, value.Seasons.length - 1).split(", "),
+            topographic: value.Topographic
+          })
+        });
+
+        let isValidData = true;
+
+        for (let i = 0; i < importData.length; i++) {
+          if (!validateImportData(importData[i], i)) {
+            isValidData = false;
+            break;
+          }
+        }
+
+        if (isValidData) {
+          const { inputData } = await add({
+            variables: {
+              input: importData,
+            },
+          });
+
+          setSucessMsg("Thêm thành công!");
+          openSuccessSnackBar();
+        }
+
+        refetch();
+        document.getElementById('upload-excel').value = '';
+      }
+    } catch {
+      document.getElementById('upload-excel').value = '';
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      setErrMsg(msg);
+      openErrorSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
+  //#endregion
+
   var settings = {
     dots: false,
     infinite: false,
@@ -237,9 +382,10 @@ const DestinationPage = () => {
           <button className="link">
             <FilterAltIcon />
           </button>
-          <button className="link">
+          <input type="file" id="upload-excel" accept=".xlsx, .xls" onChange={handleImportExcel} hidden />
+          <label htmlFor="upload-excel" className="link" style={{ marginLeft: "10px" }} onChange={handleImportExcel}>
             <CloudDownloadIcon />
-          </button>
+          </label>
           <button
             className="link"
             onClick={() => {
@@ -256,9 +402,8 @@ const DestinationPage = () => {
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -296,6 +441,41 @@ const DestinationPage = () => {
         </div>
         <DestinationTable destinations={destinations} />
       </div>
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarErrorOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "error"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          <Typography whiteSpace="pre-line">
+            {errorMsg}
+          </Typography>
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarSuccessOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "success"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {successMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

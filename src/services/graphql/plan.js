@@ -12,7 +12,7 @@ export const LOAD_PLANS_FILTER = gql`
         destination {
           name
         }
-        departDate
+        utcDepartAt
         startDate
         memberCount
         maxMemberCount
@@ -34,6 +34,29 @@ export const LOAD_PLANS = gql`
   }
 `;
 
+export const LOAD_PLANS_PUBLISHED = gql`
+  query {
+    plans(where: { isPublished: { eq: true } }) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+    }
+  }
+`
+
 export const LOAD_DETAIL_PLAN = gql`
   query GetPlanById($id: Int!) {
     plans(where: { id: { eq: $id } }) {
@@ -51,7 +74,7 @@ export const LOAD_DETAIL_PLAN = gql`
         memberCount
         maxMemberCount
         status
-        departDate
+        utcDepartAt
         departure {
           coordinates
         }
@@ -222,3 +245,24 @@ export const LOAD_NUMBERS_VERIFIED = gql`
     }
   }
 `;
+
+export const LOAD_NUMBERS_PUBLISHED = gql`
+  query {
+    plans(where: { isPublished: { eq: true } }) {
+      edges {
+          node {
+            id
+            name
+            status
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        totalCount
+    }
+  }
+`

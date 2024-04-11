@@ -121,3 +121,12 @@ export const LOAD_PROVINCES = gql`
     }
   }
 `;
+
+export const IMPORT_EXCEL_DESTINATION = gql`
+  mutation createMultiDestination($input: [DestinationCreateInput!]!) {
+    createMultiDestination(dtos: $input) {
+      id
+      name
+    }
+  }
+`

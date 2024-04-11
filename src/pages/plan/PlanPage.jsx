@@ -16,6 +16,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
+import PublicIcon from '@mui/icons-material/Public';
 import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
@@ -24,6 +25,7 @@ import {
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
   LOAD_NUMBERS_VERIFIED,
+  LOAD_NUMBERS_PUBLISHED,
   LOAD_PLANS,
   LOAD_PLANS_FILTER,
 } from "../../services/graphql/plan";
@@ -40,6 +42,7 @@ const PlanPage = () => {
     "CANCELED",
     "COMPLETED",
     "FLAWED",
+    "PUBLISHED"
   ];
   const [selectedDiv, setSelectedDiv] = useState(
     sbsNumber ? parseInt(sbsNumber, 10) : 0
@@ -71,6 +74,9 @@ const PlanPage = () => {
         break;
       case 6:
         setSelectedStatus(planStat[6]);
+        break;
+      case 7:
+        // setSelectedStatus(planStat[7]);
         break;
       default:
         break;
@@ -202,6 +208,19 @@ const PlanPage = () => {
       setFlawed(dataFlawed["plans"].totalCount);
     }
   }, [dataFlawed, loadingFlawed, errorFlawed]);
+  
+  const {
+    error: errorPublished,
+    loading: loadingPublished,
+    data: dataPublished,
+    refetch: refetchPublished,
+  } = useQuery(LOAD_NUMBERS_PUBLISHED);
+  const [published, setPublished] = useState(0);
+  useEffect(() => {
+    if (!loadingPublished && !errorPublished && dataPublished && dataPublished["plans"]) {
+      setPublished(dataPublished["plans"].totalCount);
+    }
+  }, [dataPublished, loadingPublished, errorPublished]);
 
   var settings = {
     dots: false,
@@ -228,7 +247,7 @@ const PlanPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
           />
-          <button className="link" onClick={() => {}}>
+          <button className="link" onClick={() => { }}>
             <SearchIcon />
           </button>
         </div>
@@ -260,12 +279,11 @@ const PlanPage = () => {
       <div className="planContainer">
         <div className="icon-row">
           <Slider {...settings}>
-            {[0, 1, 2, 3, 4, 5, 6].map((index) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -282,6 +300,7 @@ const PlanPage = () => {
                 {index === 4 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 {index === 5 && <CheckCircleIcon color="success" />}
                 {index === 6 && <BuildCircleIcon sx={{ color: "#3498DB" }} />}
+                {index === 7 && <PublicIcon sx={{ color: "#3498DB" }}/>}
                 <span>
                   {index === 0 && `Ban đầu (${pending})`}
                   {index === 1 && `Chờ chốt (${registering})`}
@@ -290,6 +309,7 @@ const PlanPage = () => {
                   {index === 4 && `Đã hủy (${cancelled})`}
                   {index === 5 && `Đã hoàn thành (${completed})`}
                   {index === 6 && `Có vấn đề (${flawed})`}
+                  {index === 7 && `Đã chia sẻ (${published})`}
                 </span>
               </div>
             ))}
