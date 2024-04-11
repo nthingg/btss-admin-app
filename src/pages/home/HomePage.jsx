@@ -18,6 +18,7 @@ import {
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
   LOAD_NUMBERS_VERIFIED,
+  LOAD_NUMBERS_PUBLISHED,
 } from "../../services/graphql/plan";
 import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER } from "../../services/graphql/account";
@@ -163,6 +164,19 @@ const HomePage = () => {
     }
   }, [dataFlawed, loadingFlawed, errorFlawed]);
 
+  const {
+    error: errorPublished,
+    loading: loadingPublished,
+    data: dataPublished,
+    refetch: refetchPublished,
+  } = useQuery(LOAD_NUMBERS_PUBLISHED);
+  const [published, setPublished] = useState(0);
+  useEffect(() => {
+    if (!loadingPublished && !errorPublished && dataPublished && dataPublished["plans"]) {
+      setPublished(dataPublished["plans"].totalCount);
+    }
+  }, [dataPublished, loadingPublished, errorPublished]);
+
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
@@ -197,7 +211,9 @@ const HomePage = () => {
                 refetchDestination();
                 refetchComplete();
                 refetchTravelers();
+                refetchPublished();
               }}
+              style={{cursor: "pointer"}}
             >
               <RefreshIcon />
             </button>
@@ -215,7 +231,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/plans`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -232,7 +250,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn temp">
-                    <ErrorOutlineOutlinedIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/1`} className="navigateButton">
+                      <ErrorOutlineOutlinedIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -249,7 +269,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/2`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -266,7 +288,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn success">
-                    <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/5`} className="navigateButton">
+                      <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -283,7 +307,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/6`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -300,7 +326,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn cancel">
-                    <CancelOutlinedIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/4`} className="navigateButton">
+                      <CancelOutlinedIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -317,7 +345,28 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/plans/sbs/3`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="item-container publish">
+            <div className="item-top">
+              <div className="item-title">Số kế hoạch đã được chia sẻ</div>
+              <div className="item-body">
+                <div className="left">
+                  <Link to={`/plans/sbs/7`} className="navigateButton">
+                    <p>{published}</p>
+                  </Link>
+                </div>
+                <div className="right">
+                  <div className="btn info">
+                    <Link to={`/plans/sbs/7`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -334,7 +383,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/destinations`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -351,7 +402,9 @@ const HomePage = () => {
                 </div>
                 <div className="right">
                   <div className="btn info">
-                    <InfoIcon sx={{ color: "white" }} />
+                    <Link to={`/accounts`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
                   </div>
                 </div>
               </div>
