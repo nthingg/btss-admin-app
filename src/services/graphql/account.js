@@ -115,3 +115,29 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
     }
   }
 `;
+
+export const LOAD_PROVIDER = gql`
+  query {
+    providers(where: {
+      isActive: {
+        eq: true
+      }
+      account: null
+    })
+    {
+      nodes {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const CREATE_STAFF = gql`
+  mutation createStaff($dto: StaffCreateInput!){
+    createStaff(dto: $dto) {
+      id
+      name
+    }
+  }
+`

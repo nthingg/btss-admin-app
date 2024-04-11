@@ -16,6 +16,9 @@ export const LOAD_TRANSACTIONS_FILTER = gql`
         gateway
         bankTransCode
         createdAt
+        provider {
+          name
+        }
         account {
           name
         }

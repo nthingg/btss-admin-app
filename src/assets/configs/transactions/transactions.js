@@ -59,7 +59,17 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.createdAt}</div>;
+      const date = new Date(params.row.createdAt);
+
+      const formattedDateTime = date.toLocaleString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      
+      return <div>{formattedDateTime}</div>;
     },
     renderHeader: () => <span>NGÀY TẠO</span>,
   },
@@ -70,8 +80,29 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.account.name}</div>;
+      const value = params.row;
+      if (value.account) {
+        return <div>{params.row.account.name}</div>;
+      } else if (value.provider) {
+        return <div>{params.row.provider.name}</div>;
+      }
     },
     renderHeader: () => <span>NGƯỜI TẠO</span>,
+  },
+  {
+    field: "createdBy",
+    headerName: "ROLE",
+    width: 180,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      const value = params.row;
+      if (value.account) {
+        return <div>Người dùng</div>;
+      } else if (value.provider) {
+        return <div>Nhà cung cấp</div>;
+      }
+    },
+    renderHeader: () => <span>VAI TRÒ</span>,
   },
 ];
