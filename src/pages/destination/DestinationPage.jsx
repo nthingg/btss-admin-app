@@ -50,6 +50,8 @@ const DestinationPage = () => {
   const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
   const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [searchedData, setSearchedData] = useState(null);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -102,6 +104,7 @@ const DestinationPage = () => {
   const { error, loading, data, refetch } = useQuery(LOAD_DESTINATIONS_FILTER, {
     variables: {
       topo: selectedStatus,
+      searchTerm: searchTerm
     },
   });
   const [destinations, setDestinations] = useState([]);
@@ -138,105 +141,94 @@ const DestinationPage = () => {
       dataTotal &&
       dataTotal["destinations"]["nodes"]
     ) {
-      let countBeach = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "BEACH") {
-          countBeach++;
-        }
-      }
-
-      let countCave = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "CAVE") {
-          countCave++;
-        }
-      }
-
-      let countBrook = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "BROOK") {
-          countBrook++;
-        }
-      }
-
-      let countDune = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "DUNE") {
-          countDune++;
-        }
-      }
-
-      let countHill = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "HILL") {
-          countHill++;
-        }
-      }
-
-      let countJungle = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "JUNGLE") {
-          countJungle++;
-        }
-      }
-
-      let countLake = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "LAKE") {
-          countLake++;
-        }
-      }
-
-      let countMountain = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "MOUNTAIN") {
-          countMountain++;
-        }
-      }
-
-      let countWaterfall = 0;
-      for (const item of dataTotal["destinations"]["nodes"]) {
-        if (item["topographic"] === "WATERFALL") {
-          countWaterfall++;
-        }
-      }
-
-      setBeach(countBeach);
-      setBrook(countBrook);
-      setCave(countCave);
-      setDune(countDune);
-      setHill(countHill);
-      setJungle(countJungle);
-      setLake(countLake);
-      setMountain(countMountain);
-      setWaterfall(countWaterfall);
-
-      const arrInt = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-      const locArr = {
-        beach: 1,
-        brook: 1,
-        cave: 0,
-        dune: 0,
-        hill: 0,
-        jungle: 2,
-        lake: 1,
-        mountain: 8,
-        waterfall: 8,
-      };
-
-      // Create a new array to store the sorted indices
-      const sortedArr = arrInt.slice().sort((a, b) => {
-        // Get the location values for indices a and b
-        const locValueA = locArr[Object.keys(locArr)[a]];
-        const locValueB = locArr[Object.keys(locArr)[b]];
-
-        // Sort descending by location value
-        return locValueB - locValueA;
-      });
-      sortedArr.unshift(0);
-      setFilter(sortedArr);
+      initSlider(dataTotal["destinations"]["nodes"]);
     }
-  }, [dataTotal, loadingTotal, errorTotal]);
+  }, [dataTotal, loadingTotal, errorTotal, searchedData]);
+
+  useEffect(() => {
+    if (searchedData && searchTerm) {
+      initSlider(searchedData);
+    };
+  }, [searchedData]);
+
+  const initSlider = (dataArr) => {
+    let countBeach = 0;
+    let countCave = 0;
+    let countBrook = 0;
+    let countDune = 0;
+    let countHill = 0;
+    let countJungle = 0;
+    let countLake = 0;
+    let countMountain = 0;
+    let countWaterfall = 0;
+
+    for (const item of dataArr) {
+      switch (item["topographic"]) {
+        case "BEACH":
+          countBeach++;
+          break;
+        case "CAVE":
+          countCave++;
+          break;
+        case "BROOK":
+          countBrook++;
+          break;
+        case "DUNE":
+          countDune++;
+          break;
+        case "HILL":
+          countHill++;
+          break;
+        case "JUNGLE":
+          countJungle++;
+          break;
+        case "LAKE":
+          countLake++;
+          break;
+        case "MOUNTAIN":
+          countMountain++;
+          break;
+        case "WATERFALL":
+          countWaterfall++;
+          break;
+      }
+    }
+
+    setBeach(countBeach);
+    setBrook(countBrook);
+    setCave(countCave);
+    setDune(countDune);
+    setHill(countHill);
+    setJungle(countJungle);
+    setLake(countLake);
+    setMountain(countMountain);
+    setWaterfall(countWaterfall);
+
+    const arrInt = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const locArr = {
+      beach: 1,
+      brook: 1,
+      cave: 0,
+      dune: 0,
+      hill: 0,
+      jungle: 2,
+      lake: 1,
+      mountain: 8,
+      waterfall: 8,
+    };
+
+    // Create a new array to store the sorted indices
+    const sortedArr = arrInt.slice().sort((a, b) => {
+      // Get the location values for indices a and b
+      const locValueA = locArr[Object.keys(locArr)[a]];
+      const locValueB = locArr[Object.keys(locArr)[b]];
+
+      // Sort descending by location value
+      return locValueB - locValueA;
+    });
+    sortedArr.unshift(0);
+    setFilter(sortedArr);
+  }
 
   //#region Import excel
   const [add, { data: dataAdd, error: errorAdd }] = useMutation(
@@ -426,6 +418,15 @@ const DestinationPage = () => {
     centerPadding: "60px",
   };
 
+  const handleSearchSubmit = async () => {
+    const search = document.getElementById('floatingValue').value;
+    setSearchTerm(search);
+    const result = await refetch({
+      searchTerm: search
+    });
+    setSearchedData(result["data"]["destinations"]["nodes"]);
+  }
+
   return (
     <div className="destination-page">
       <div className="shared-title">
@@ -442,8 +443,14 @@ const DestinationPage = () => {
             id="floatingValue"
             name="value"
             placeholder="Tìm kiếm ..."
+            onKeyDown={async (e) => {
+              if (e.key === 'Enter') {
+                await handleSearchSubmit();
+              }
+            }}
           />
-          <button className="link">
+          <button className="link"
+            onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -473,6 +480,8 @@ const DestinationPage = () => {
           <button
             className="link"
             onClick={() => {
+              setSearchTerm(null);
+              setSearchedData(null);
               refetch();
             }}
           >
@@ -486,9 +495,8 @@ const DestinationPage = () => {
             {filter.map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
