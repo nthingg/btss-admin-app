@@ -5,7 +5,7 @@ import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -28,6 +28,7 @@ import {
   LOAD_NUMBERS_PUBLISHED,
   LOAD_PLANS,
   LOAD_PLANS_FILTER,
+  SEARCH_PLANS,
   LOAD_PLANS_PUBLISHED_FILTER,
 } from "../../services/graphql/plan";
 import Slider from "react-slick";
@@ -246,6 +247,8 @@ const PlanPage = () => {
     }
   }, [dataPublished, loadingPublished, errorPublished]);
 
+  const [search, { loading: loadingSearch, errorSearch, dataSearch }] = useLazyQuery(SEARCH_PLANS);
+
   var settings = {
     dots: false,
     infinite: false,
@@ -253,6 +256,24 @@ const PlanPage = () => {
     slidesToScroll: 2,
     centerPadding: "60px",
   };
+
+  const handleSearchSubmit = async () => {
+    const searchTerm = document.getElementById('floatingValue').value;
+    if (searchTerm !== '') {
+      const result = await search({
+        input: searchTerm
+      });
+      console.log(result);
+      if (!loadingSearch && !errorSearch && dataSearch && dataSearch["plans"]["nodes"]) {
+        let res = dataSearch.plans.nodes.map((node, index) => {
+          const { __typename, ...rest } = node;
+          return { ...rest, index: index + 1 }; // Add the index to the object
+        });
+        console.log(res);
+        setPlans(res);
+      }
+    }
+  }
 
   return (
     <div className="plan">
@@ -270,8 +291,13 @@ const PlanPage = () => {
             id="floatingValue"
             name="value"
             placeholder="Tìm kiếm ..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchSubmit();
+              }
+            }}
           />
-          <button className="link" onClick={() => {}}>
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>

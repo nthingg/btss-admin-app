@@ -84,6 +84,29 @@ export const LOAD_PLANS_PUBLISHED = gql`
   }
 `;
 
+export const SEARCH_PLANS = gql`
+  query plans($input: String){
+    plans(searchTerm: $input) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+    }
+  }
+`
+
 export const LOAD_DETAIL_PLAN = gql`
   query GetPlanById($id: Int!) {
     plans(where: { id: { eq: $id } }) {
