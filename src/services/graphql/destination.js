@@ -55,6 +55,9 @@ export const LOAD_DESTINATIONS = gql`
             name
           }
         }
+        coordinate {
+          coordinates
+        }
       }
     }
   }
@@ -129,4 +132,4 @@ export const IMPORT_EXCEL_DESTINATION = gql`
       name
     }
   }
-`
+`;

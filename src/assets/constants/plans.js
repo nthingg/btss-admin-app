@@ -62,7 +62,7 @@ export const planData = [
         },
         {
           type: "FREE",
-          duration: "00:15:00",
+          duration: "00:30:00",
           isStarred: false,
           description: "Nghỉ ngơi",
           shortDescription: "Nghỉ ngơi với buổi tối tự túc.",
@@ -70,6 +70,14 @@ export const planData = [
         },
       ],
       [
+        {
+          type: "VISIT",
+          duration: "02:00:00",
+          isStarred: false,
+          description: "Tham quan và giải trí",
+          shortDescription: "Vui chơi tại cầu tre dài nhất Việt Nam.",
+          tempOrder: null,
+        },
         {
           type: "EAT",
           duration: "01:00:00",
@@ -80,26 +88,10 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description: "Tham quan và giải trí",
-          shortDescription: "Vui chơi tại cầu tre dài nhất Việt Nam.",
-          tempOrder: null,
-        },
-        {
-          type: "VISIT",
           duration: "00:30:00",
           isStarred: false,
           description: "Tham quan, giải trí",
           shortDescription: "Chụp hình tại Thành phố Bố Câu.",
-          tempOrder: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Dùng bữa tại nhà hàng",
-          shortDescription: "Dùng bữa trưa tại nhà hàng 3*",
           tempOrder: null,
         },
         {

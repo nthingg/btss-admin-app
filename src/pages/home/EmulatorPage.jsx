@@ -3,7 +3,7 @@ import "../../assets/scss/emulator.scss";
 import "../../assets/scss/shared.scss";
 import Select from "react-select";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Alert, Snackbar, TextField } from "@mui/material";
 import {
   CANCEL_PLAN_SIMULATOR,
@@ -26,9 +26,42 @@ import {
   VERIFY_PLAN_SIMULATOR,
 } from "../../services/graphql/simulator";
 import { planData } from "../../assets/constants/plans";
-import { companionData } from "../../assets/constants/companions";
+import moment from "moment-timezone";
+import {
+  LOAD_DESTINATIONS,
+  LOAD_DESTINATION_LOC_BY_ID,
+} from "../../services/graphql/destination";
+import { LOAD_PRODUCTS_BY_PROVIDER } from "../../services/graphql/products";
 
 const EmulatorPage = () => {
+  const initQuery = gql`
+    {
+      providers(
+        where: {
+          coordinate: {
+            distance: {
+              geometry: { type: Point, coordinates: [0, 0], crs: 4326 }
+              buffer: 0.09138622285234489
+              eq: 0
+            }
+          }
+          type: { eq: EMERGENCY }
+        }
+        order: { id: DESC }
+      ) {
+        nodes {
+          id
+          name
+          address
+          phone
+          imagePath
+          coordinate {
+            coordinates
+          }
+        }
+      }
+    }
+  `;
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -52,11 +85,31 @@ const EmulatorPage = () => {
   const [dateVisible, setDateVisible] = useState(false);
   const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
+  const [dateCreatePlanSimulator, setDateCreatePlanSimulator] = useState("");
   const [registerVisible, setRegisterVisible] = useState(false);
   const [massJoinVisible, setMassJoinVisible] = useState(false);
   const [readyNumVisible, setReadyNumVisible] = useState(false);
   const [orderNumVisible, setOrderNumVisible] = useState(false);
   const [verifyNumVisible, setVerifyNumVisible] = useState(false);
+  const [loginMsg, setLoginMsg] = useState("");
+
+  const {
+    error: errDestinations,
+    loading: loadingDestinations,
+    data: dataDestinations,
+    refetch: refetchDestination,
+  } = useQuery(LOAD_DESTINATIONS);
+  const [destinations, setDestination] = useState(0);
+  useEffect(() => {
+    if (
+      !loadingDestinations &&
+      !errDestinations &&
+      dataDestinations &&
+      dataDestinations["destinations"]["nodes"]
+    ) {
+      setDestination(dataDestinations.destinations.nodes);
+    }
+  }, [dataDestinations, loadingDestinations, errDestinations]);
 
   const emulatorOptions = [
     {
@@ -247,12 +300,31 @@ const EmulatorPage = () => {
     }
   };
 
-  const handleCreatePlan = async (plan, count, acc) => {
+  const [providerQuery, setProviderQuery] = useState(initQuery);
+  const {
+    error: errorProvider,
+    loading: loadingProvider,
+    data: dataProvider,
+    refetch: refetchProvider,
+  } = useQuery(providerQuery);
+
+  const {
+    error: errorProduct,
+    loading: loadingProduct,
+    data: dataProduct,
+    refetch: refetchProduct,
+  } = useQuery(LOAD_PRODUCTS_BY_PROVIDER, {
+    variables: {
+      id: 0,
+    },
+  });
+
+  const handleCreatePlan = async (plan, count, acc, dateTime) => {
     try {
       const { data } = await create({
         variables: {
           dto: {
-            departAt: plan.departAt,
+            departAt: dateTime,
             departure: plan.departure,
             destinationId: plan.destinationId,
             gcoinBudgetPerCapita: plan.gcoinBudgetPerCapita,
@@ -265,7 +337,6 @@ const EmulatorPage = () => {
             savedProviderIds: plan.savedProviderIds,
             schedule: plan.schedule,
             surcharges: plan.surcharges,
-            tempOrders: plan.tempOrders,
             travelDuration: plan.travelDuration,
           },
         },
@@ -295,7 +366,7 @@ const EmulatorPage = () => {
     }
   };
 
-  const simulateCreatePlans = async (planNum) => {
+  const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     localStorage.setItem("checkIsUserCall", "yes");
@@ -306,7 +377,194 @@ const EmulatorPage = () => {
       localStorage.setItem("userToken", loggedAcc[i].token);
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
       count++;
-      const res = await handleCreatePlan(planData[0], count, loggedAcc[i]);
+      let random = Math.floor(Math.random() * destinations.length);
+
+      let destination = destinations[random];
+
+      const query = gql`
+        {
+          providers(
+            where: {
+              coordinate: {
+                distance: {
+                  lte: 10000, 
+                  geometry:{
+                    type: Point,
+                    coordinates: [${destination.coordinate.coordinates[0]}, ${destination.coordinate.coordinates[1]}]
+                  }
+                }
+              }
+              type: {nin: [GROCERY, REPAIR, TAXI]}
+            }
+            order: {id: DESC}
+          ) {
+            nodes {
+              id
+              name
+              address
+              phone
+              type
+              imagePath
+              coordinate {
+                coordinates
+              }
+            }
+          }
+        }
+      `;
+
+      setProviderQuery(query);
+      const { data: dataProvider } = await refetchProvider();
+      let providers = dataProvider.providers.nodes;
+
+      console.log(destination);
+      console.log(dataProvider);
+      console.log(providers);
+
+      let planTempData = planData[0];
+
+      let contacts = [];
+      for (let index = 0; index < providers.length; index++) {
+        if (providers[index].type === "EMERGENCY") {
+          contacts.push(providers[index].id);
+        }
+      }
+      planTempData.savedProviderIds = contacts;
+
+      for (let i = 0; i < planTempData.schedule.length; i++) {
+        for (let k = 0; k < planTempData.schedule[i].length; k++) {
+          if (planTempData.schedule[i][k].type === "EAT") {
+            for (let j = 0; j < providers.length; j++) {
+              if (
+                providers[j].type === "FOOD_STALL" ||
+                providers[j].type === "RESTAURANT"
+              ) {
+                const { data: dataProduct } = await refetchProduct({
+                  id: providers[j].id,
+                });
+
+                const products = dataProduct.products.nodes;
+
+                let tempCart = [];
+                let tempTotal = 0;
+                if (products.length > 0) {
+                  for (let l = 0; l < 4; l++) {
+                    let random = Math.floor(Math.random() * products.length);
+
+                    let isExisted = false;
+                    for (let m = 0; m < tempCart.length; m++) {
+                      if (tempCart[m].key === products[random].id) {
+                        tempCart[m].value += 3;
+                        isExisted = true;
+                      }
+                    }
+                    if (!isExisted) {
+                      tempCart.push({ key: products[random].id, value: 3 });
+                    }
+                    tempTotal += products[random].price * 3;
+                  }
+                }
+
+                planTempData.schedule[i][k].tempOrder = {
+                  cart: tempCart,
+                  note: "",
+                  period: "NOON",
+                  providerId: providers[j].id,
+                  total: tempTotal,
+                };
+              }
+            }
+          } else if (planTempData.schedule[i][k].type === "CHECKIN") {
+            for (let j = 0; j < providers.length; j++) {
+              if (
+                providers[j].type === "HOTEL" ||
+                providers[j].type === "MOTEL"
+              ) {
+                const { data: dataProduct } = await refetchProduct({
+                  id: providers[j].id,
+                });
+
+                const products = dataProduct.products.nodes;
+
+                let tempCart = [];
+                let tempTotal = 0;
+                if (products.length > 0) {
+                  for (let l = 0; l < 2; l++) {
+                    let random = Math.floor(Math.random() * products.length);
+
+                    let isExisted = false;
+                    for (let m = 0; m < tempCart.length; m++) {
+                      if (tempCart[m].key === products[random].id) {
+                        tempCart[m].value += 5;
+                        isExisted = true;
+                      }
+                    }
+                    if (!isExisted) {
+                      tempCart.push({ key: products[random].id, value: 5 });
+                    }
+                    tempTotal += products[random].price * 5;
+                  }
+                }
+
+                planTempData.schedule[i][k].tempOrder = {
+                  cart: tempCart,
+                  note: "",
+                  period: "NOON",
+                  providerId: providers[j].id,
+                  total: tempTotal,
+                };
+              }
+            }
+          } else if (planTempData.schedule[i][k].type === "VISIT") {
+            for (let j = 0; j < providers.length; j++) {
+              if (providers[j].type === "VEHICLE_RENTAL") {
+                const { data: dataProduct } = await refetchProduct({
+                  id: providers[j].id,
+                });
+
+                const products = dataProduct.products.nodes;
+
+                let tempCart = [];
+                let tempTotal = 0;
+                if (products.length > 0) {
+                  for (let l = 0; l < 5; l++) {
+                    let random = Math.floor(Math.random() * products.length);
+
+                    let isExisted = false;
+                    for (let m = 0; m < tempCart.length; m++) {
+                      if (tempCart[m].key === products[random].id) {
+                        tempCart[m].value += 1;
+                        isExisted = true;
+                      }
+                    }
+                    if (!isExisted) {
+                      tempCart.push({ key: products[random].id, value: 1 });
+                    }
+                    tempTotal += products[random].price * 1;
+                  }
+                }
+
+                planTempData.schedule[i][k].tempOrder = {
+                  cart: tempCart,
+                  note: "",
+                  period: "NOON",
+                  providerId: providers[j].id,
+                  total: tempTotal,
+                };
+              }
+            }
+          }
+        }
+      }
+
+      console.log(planTempData);
+
+      const res = await handleCreatePlan(
+        planData[0],
+        count,
+        loggedAcc[i],
+        dateTime
+      );
       response.push(res);
       setResponseMsg(response);
       log += `[Tạo kế hoạch] ${loggedAcc[i].name} \n`;
@@ -1189,8 +1447,6 @@ const EmulatorPage = () => {
     localStorage.setItem("checkIsUserCall", "no");
   };
 
-  const [loginMsg, setLoginMsg] = useState("");
-
   return (
     <div>
       <div className="emulator">
@@ -1377,6 +1633,47 @@ const EmulatorPage = () => {
                       borderColor: "black",
                     },
                   },
+                }}
+              />
+              {/* date create plan */}
+              <TextField
+                id="outlined-disabled"
+                style={
+                  planNumVisible ? { display: "block" } : { display: "none" }
+                }
+                sx={{
+                  width: "15%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+                className="basic-text ml-2"
+                type="datetime-local"
+                // placeholder="Nhập ID"
+                size="small"
+                name="id"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setDateCreatePlanSimulator("");
+                    setSelectLoading(true);
+                  } else {
+                    setDateCreatePlanSimulator(e.target.value);
+                    setSelectLoading(false);
+                  }
                 }}
               />
               {/* specific plan id to join */}
@@ -1835,10 +2132,10 @@ const EmulatorPage = () => {
                     return;
                   }
 
-                  const loggedAcc = JSON.parse(
-                    localStorage.getItem("loggedAcc")
-                  );
-                  console.log(loggedAcc);
+                  // const loggedAcc = JSON.parse(
+                  //   localStorage.getItem("loggedAcc")
+                  // );
+                  // console.log(loggedAcc);
 
                   if (selectedSimulator === 1) {
                     if (planNum > 50) {
@@ -1847,7 +2144,26 @@ const EmulatorPage = () => {
                       handleClick();
                       return;
                     }
-                    simulateCreatePlans(planNum);
+
+                    let selectedDate = new Date(dateCreatePlanSimulator);
+                    let today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const sevenDaysLater = new Date(
+                      today.getTime() + 8 * 24 * 60 * 60 * 1000
+                    );
+
+                    if (selectedDate < sevenDaysLater) {
+                      const msg = `Thời gian tạo kế hoạch phải cách 7 ngày kể từ hôm nay`;
+                      setErrMsg(msg);
+                      handleClick();
+                      return;
+                    }
+
+                    var a = moment.utc(selectedDate).utcOffset("+07:00");
+                    var formatted = a.format();
+                    // console.log(formatted);
+
+                    simulateCreatePlans(planNum, formatted);
                   } else if (selectedSimulator === 2) {
                     try {
                       const { data } = await refetchPending();
