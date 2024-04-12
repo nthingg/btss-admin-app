@@ -1181,7 +1181,10 @@ const EmulatorPage = () => {
             const convertedData = [];
 
             for (const key in temp[k].cart) {
-              convertedData.push({ key: [key], value: temp[k].cart[key] });
+              convertedData.push({
+                key: parseInt(key, 10),
+                value: temp[k].cart[key],
+              });
             }
 
             const orderData = {
@@ -1189,16 +1192,16 @@ const EmulatorPage = () => {
               note: temp[k].note,
               planId: currentPlans[j].id,
               serveDates: [formattedA, formattedB],
-              type: temp[k].type,
+              type: "EAT",
               period: temp[k].period,
               planName: currentPlans[j].name,
             };
             console.log(orderData);
-            // log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
-            // const res = await handleOrderPlan(orderData, count, loggedAcc[i]);
-            // response.push(res);
-            // setResponseMsg(response);
-            // setLoginMsg(log);
+            log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
+            const res = await handleOrderPlan(orderData, count, loggedAcc[i]);
+            response.push(res);
+            setResponseMsg(response);
+            setLoginMsg(log);
           }
           limitOrder++;
         }
