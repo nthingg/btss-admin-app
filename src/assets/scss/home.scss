@@ -13,7 +13,8 @@
         padding: 40px 40px 40px 40px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
-        max-width: 91%; /* Adjust as needed */
+        max-width: 91%;
+        /* Adjust as needed */
         margin: 0 auto;
         box-shadow:
             0 4px 8px 0 rgba(0, 0, 0, 0.1),
@@ -38,13 +39,14 @@
                     color: white;
                     transition: 0.4s;
                 }
+
                 button:hover {
                     background-color: #1c2833;
                 }
             }
         }
 
-        .item-list {
+        .item-list-plan {
             display: flex;
             width: 100%;
             justify-content: space-between;
@@ -115,6 +117,95 @@
                     }
                 }
             }
+        }
+        
+        .item-list-plan::after {
+            content: '';
+            flex-grow: 0.7;
+            width: 20%;
+        }
+
+        .item-list-system {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+
+            .item-container {
+                width: 20%;
+                margin: 20px 0 20px 0;
+                border-radius: 8px;
+                border: 1px solid;
+                border-color: gainsboro;
+
+                .item-top {
+                    .item-title {
+                        font-size: 20px;
+                        text-align: center;
+                        font-weight: 600;
+                        margin-top: 20px;
+                    }
+
+                    .item-body {
+                        display: flex;
+                        height: 100px;
+                        justify-content: space-around;
+
+                        .left,
+                        .right {
+                            font-size: 30px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+
+                        .right {
+                            .btn {
+                                cursor: text;
+
+                                &.success {
+                                    background-color: #2ecc71;
+                                    padding: 4px 10px 4px 10px;
+                                    border-radius: 100%;
+                                }
+
+                                &.cancel {
+                                    background-color: #e74c3c;
+                                    padding: 4px 10px 4px 10px;
+                                    border-radius: 100%;
+                                }
+
+                                &.temp {
+                                    background-color: #dce73c;
+                                    padding: 4px 10px 4px 10px;
+                                    border-radius: 100%;
+                                }
+
+                                &.info {
+                                    background-color: #3cb1e7;
+                                    padding: 4px 10px 4px 10px;
+                                    border-radius: 100%;
+                                }
+                            }
+                        }
+
+                        .navigateButton {
+                            text-decoration: none;
+                            color: #2c3d50;
+                        }
+                    }
+                }
+            }
+        }
+
+        .item-list-system::after {
+            content: '';
+            flex-grow: 0.7;
+            width: 20%;
+        }
+
+        .item-list-title {
+            margin: 2rem 0;
         }
     }
 }

@@ -178,7 +178,7 @@ const AccountPage = () => {
               <AddCircleIcon />
               <span>Thêm quản lý</span>
             </Link> */}
-            <AccountCreateTable />
+            <AccountCreateTable refetch={refetch} refetchTotal={refetchTotal} />
           <button className="link">
             <CloudDownloadIcon />
           </button>
@@ -190,7 +190,10 @@ const AccountPage = () => {
             onClick={() => {
               setAccoutQuery(LOAD_ACCOUNTS_FILTER);
               setSearchTerm("");
+              console.log(refetch());
+              console.log(refetchTotal());
               refetch();
+              refetchTotal();
             }}
           >
             <RefreshIcon />
