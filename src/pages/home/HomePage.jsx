@@ -226,8 +226,9 @@ const HomePage = () => {
             </button>
           </div>
         </div>
-        <div className="item-list">
-          <div className="item-container info">
+        <h2 className="item-list-title">Báo cáo kế hoạch</h2>
+        <div className="item-list-plan">
+          {/* <div className="item-container info">
             <div className="item-top">
               <div className="item-title">Số kế hoạch ban đầu</div>
               <div className="item-body">
@@ -245,7 +246,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="item-container temp">
             <div className="item-top">
               <div className="item-title">Số kế hoạch chờ chốt</div>
@@ -303,7 +304,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          <div className="item-container info">
+          {/* <div className="item-container info">
             <div className="item-top">
               <div className="item-title">Số kế hoạch lỗi</div>
               <div className="item-body">
@@ -321,7 +322,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="item-container cancel">
             <div className="item-top">
               <div className="item-title">Số kế hoạch đã hủy</div>
@@ -341,7 +342,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          <div className="item-container cancel">
+          {/* <div className="item-container checkIn">
             <div className="item-top">
               <div className="item-title">Số kế hoạch check-in</div>
               <div className="item-body">
@@ -359,7 +360,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="item-container publish">
             <div className="item-top">
               <div className="item-title">Số kế hoạch đã được chia sẻ</div>
@@ -379,6 +380,10 @@ const HomePage = () => {
               </div>
             </div>
           </div>
+        </div>
+        <hr style={{borderTop: "1px solid #e4e4e4", marginTop: "1rem"}}/>
+        <h2 className="item-list-title">Báo cáo hệ thống</h2>
+        <div className="item-list-system">
           <div className="item-container info">
             <div className="item-top">
               <div className="item-title">Số địa điểm trong hệ thống</div>
@@ -400,7 +405,7 @@ const HomePage = () => {
           </div>
           <div className="item-container info">
             <div className="item-top">
-              <div className="item-title">Số phượt thủ hiện tại</div>
+              <div className="item-title">Số người dùng hiện tại</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/accounts`} className="navigateButton">

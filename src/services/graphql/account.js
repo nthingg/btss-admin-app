@@ -7,7 +7,6 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
       order: { id: DESC }
       where: {
         role: { in: $role }
-        name: { nstartsWith: "test-account-" }
         phone: { contains: $searchTerm }
       }
     ) {
@@ -34,7 +33,6 @@ export const LOAD_ACCOUNTS_FILTER = gql`
       order: { id: DESC }
       where: {
         role: { in: $role }
-        name: { nstartsWith: "test-account-" }
       }
     ) {
       nodes {
@@ -58,7 +56,6 @@ export const LOAD_ACCOUNTS = gql`
     accounts(
       first: 100
       order: { id: ASC }
-      where: { name: { nstartsWith: "test-account-" } }
     ) {
       nodes {
         id
@@ -106,7 +103,7 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
     accounts(
       first: 100
       order: { id: ASC }
-      where: { role: { eq: TRAVELER }, name: { nstartsWith: "test-account-" } }
+      where: { role: { eq: TRAVELER } }
     ) {
       nodes {
         id
