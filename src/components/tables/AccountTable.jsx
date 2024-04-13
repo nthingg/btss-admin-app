@@ -1,12 +1,16 @@
 import "../../assets/scss/accounts.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import React from "react";
-import { Switch } from "@mui/material";
+import { Switch, IconButton } from "@mui/material";
 import { accountTravelersColumn } from "../../assets/configs/accounts/accountTravelers";
 import { providerAccountsColumn } from "../../assets/configs/accounts/accountProvider";
 import { staffAccountsColumn } from "../../assets/configs/accounts/accountStaffs";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useNavigate } from "react-router-dom";
 
 const AccountTable = ({ travelers, suppliers, staffs }) => {
+  const navigate = useNavigate();
+  
   const actionColumn = [
     {
       field: "action",
@@ -17,7 +21,7 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
         return (
           <Switch
             checked={params.row.isActive}
-            onChange={() => {}}
+            onChange={() => { }}
             inputProps={{ "aria-label": "controlled" }}
             sx={{
               "& .MuiSwitch-switchBase.Mui-checked": {
@@ -31,15 +35,36 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
         );
       },
       renderHeader: () => <span>TRẠNG THÁI</span>,
-    },
+    }
   ];
+  const detailColumn = [
+    {
+      field: "details",
+      width: 100,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        return (
+          <IconButton
+            color="info"
+            onClick={() => {
+              navigate(`/accounts/${params.row.id}`);
+            }}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        );
+      },
+      renderHeader: () => <span>CHI TIẾT</span>,
+    }
+  ]
   return (
     <div>
       {travelers && (
         <div className="accountTable">
           <DataGrid
             rows={travelers}
-            columns={accountTravelersColumn.concat(actionColumn)}
+            columns={accountTravelersColumn.concat(actionColumn).concat(detailColumn)}
             rowSelection={false}
             pagination
             autoPageSize={true}

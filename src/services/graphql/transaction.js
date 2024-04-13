@@ -30,6 +30,36 @@ export const LOAD_TRANSACTIONS_FILTER = gql`
   }
 `;
 
+export const LOAD_TRAVELER_TRANSACTIONS = gql`
+  query TravelerTransaction($id: Int) {
+    transactions(
+      first: 20
+      order: { id: DESC }
+      where: { accountId: { eq: $id } }
+    ) {
+      nodes {
+        id
+        orderId
+        type
+        status
+        gcoinAmount
+        gateway
+        bankTransCode
+        createdAt
+        provider {
+          name
+        }
+        account {
+          name
+        }
+        provider {
+          name
+        }
+      }
+    }
+  }
+`
+
 export const LOAD_TRANSACTIONS_TOTAL = gql`
   query {
     transactions {

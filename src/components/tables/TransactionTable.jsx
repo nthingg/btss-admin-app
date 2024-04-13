@@ -6,8 +6,9 @@ import React, { useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { transactionsColumns } from "../../assets/configs/transactions/transactions";
+import { accounttransactionsColumns } from "../../assets/configs/accounts/accountTransaction";
 
-const TransactionTable = ({ transactions }) => {
+const TransactionTable = ({ transactions, accountTransactions }) => {
   const navigate = useNavigate();
   const [anchorId, setAnchorId] = useState(null);
   const [anchor, setAnchor] = useState(null);
@@ -99,25 +100,51 @@ const TransactionTable = ({ transactions }) => {
   ];
 
   return (
-    <div className="destinationTable">
-      <DataGrid
-        rows={transactions}
-        columns={transactionsColumns}
-        rowSelection={false}
-        pagination
-        autoPageSize
-        showColumnVerticalBorder={true}
-        sx={{
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: "#2c3d50",
-            color: "white",
-            fontWeight: "bold",
-          },
-          "& .MuiDataGrid-columnHeader--withRightBorder": {
-            borderRightWidth: "2px",
-          },
-        }}
-      />
+    <div>
+      {transactions && (
+        <div className="destinationTable" >
+          <DataGrid
+            rows={transactions}
+            columns={transactionsColumns}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2c3d50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
+      {accountTransactions && (
+        <div className="accountTransactionTable" style={{width: "fit-content", height: "23.28rem"}}>
+          <DataGrid
+            rows={accountTransactions}
+            columns={accounttransactionsColumns}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2c3d50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -65,6 +65,10 @@ const App = () => {
                 index
                 element={token ? <AccountPage /> : <Navigate to="/login" />}
               />
+              <Route
+                path=":accountId"
+                element={<AccountProfilePage />}
+              />
             </Route>
             <Route path="transactions">
               <Route

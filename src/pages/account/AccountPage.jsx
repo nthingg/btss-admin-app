@@ -76,7 +76,6 @@ const AccountPage = () => {
     ) {
       let countTraveler = 0;
       for (const item of dataTotal["accounts"]["nodes"]) {
-        console.log(item["plans"]);
         if (item["role"] === "TRAVELER" && item["plans"]) {
           countTraveler++;
         }
@@ -196,8 +195,6 @@ const AccountPage = () => {
             onClick={() => {
               setAccoutQuery(LOAD_ACCOUNTS_FILTER);
               setSearchTerm("");
-              console.log(refetch());
-              console.log(refetchTotal());
               refetch();
               refetchTotal();
             }}

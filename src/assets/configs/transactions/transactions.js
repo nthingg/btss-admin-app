@@ -28,7 +28,12 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.status}</div>;
+      const statusType = {
+        "PENDING": "Chờ xác nhận",
+        "ACCEPTED": "Thành công",
+        "ERROR": "Thất bại"
+      }
+      return <div>{statusType[params.row.status]}</div>;
     },
     renderHeader: () => <span>TRẠNG THÁI</span>,
   },
@@ -68,7 +73,7 @@ export const transactionsColumns = [
         hour: "2-digit",
         minute: "2-digit"
       });
-      
+
       return <div>{formattedDateTime}</div>;
     },
     renderHeader: () => <span>NGÀY TẠO</span>,
