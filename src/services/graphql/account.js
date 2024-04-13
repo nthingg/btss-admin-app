@@ -74,7 +74,7 @@ export const LOAD_DETAIL_ACCOUNT = gql`
           destination {
             name
           }
-          departDate
+          utcDepartAt
           startDate
           maxMemberCount
           memberCount

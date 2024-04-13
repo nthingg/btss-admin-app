@@ -43,12 +43,12 @@ export const accountPlansColumns = [
     renderHeader: () => <span>THÀNH VIÊN</span>,
   },
   {
-    field: "departAt",
+    field: "utcDepartAt",
     width: 180,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.departDate);
+      const date = new Date(params.row.utcDepartAt);
 
       const formattedDateTime = date.toLocaleDateString("vi-VN", {
         timeZone: "UTC",

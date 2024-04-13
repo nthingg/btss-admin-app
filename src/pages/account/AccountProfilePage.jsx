@@ -87,9 +87,7 @@ const AccountProfilePage = () => {
       // setPhoneHide(formatPhoneNumberCen(data["accounts"]["nodes"][0]["phone"]));
       setPhone(formatPhoneNumberCen(data["accounts"]["nodes"][0]["phone"]));
       let avt = data["accounts"]["nodes"][0]["avatarPath"];
-      let subAvt =
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
-      setAvatarUrl(avt != null ? avt : subAvt);
+      setAvatarUrl(avt);
       setIsActive(data["accounts"]["nodes"][0]["isActive"]);
       let gender = data["accounts"]["nodes"][0]["isMale"];
       setIsMale(gender === true ? "Nam" : "Nữ");
@@ -150,7 +148,11 @@ const AccountProfilePage = () => {
                 <div className="profile-name">
                   <img
                     className="cellImg"
-                    src={`https://d38ozmgi8b70tu.cloudfront.net${avatarUrl}`}
+                    src={
+                      avatarUrl
+                        ? `https://d38ozmgi8b70tu.cloudfront.net${avatarUrl}`
+                        : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+                    }
                     alt="avatar"
                   />
                   <p>{name}</p>
