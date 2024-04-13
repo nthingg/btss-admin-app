@@ -167,6 +167,12 @@ const PlanDetailPage = () => {
         })
       );
 
+      let res = data["plans"]["nodes"][0]["orders"].map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 }; // Add the index to the object
+      });
+      setOrders(res);
+
       //Schedule
       setSchedule(data["plans"]["nodes"][0]["schedule"]);
 

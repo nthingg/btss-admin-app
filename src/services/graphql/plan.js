@@ -106,6 +106,13 @@ export const LOAD_DETAIL_PLAN = gql`
           phone
           address
         }
+        orders {
+          id
+          createdAt
+          currentStatus
+          type
+          total
+        }
       }
     }
   }

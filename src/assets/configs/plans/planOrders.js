@@ -74,12 +74,20 @@ export const planOrdersColumn = [
     headerAlign: "center",
     renderCell: (params) => {
       switch (params.row.type) {
-        case "LODGING":
-          return <div>Phòng nghỉ</div>;
-        case "MEAL":
+        case "CHECKIN":
+          return <div>Check-in</div>;
+        case "CHECKOUT":
+          return <div>Check-out</div>;
+        case "EAT":
           return <div>Ăn uống</div>;
-        case "MOVING":
-          return <div>Phương tiện</div>;
+        case "ENTERTAIN":
+          return <div>Giải trí</div>;
+        case "FREE":
+          return <div>Tự túc</div>;
+        case "GATHER":
+          return <div>Tập trung</div>;
+        case "VISIT":
+          return <div>Tham quan</div>;
         default:
           // Handle default case or unknown status
           break;
