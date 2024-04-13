@@ -23,7 +23,7 @@ const style = {
   p: 4,
 };
 
-function AccountCreateTable() {
+function AccountCreateTable({refetch, refetchTotal}) {
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [open, setOpen] = useState(false);
@@ -37,6 +37,7 @@ function AccountCreateTable() {
   const [successMsg, setSucessMsg] = useState(false);
   const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
+  const [validateErrors, setValidateErrors] = useState([]);
 
   const [providers, setProviders] = useState([]);
   const { loading, error, data } = useQuery(LOAD_PROVIDER);
@@ -52,32 +53,77 @@ function AccountCreateTable() {
 
   const [create, { data: createData, loading: createLoading, error: createError }] = useMutation(CREATE_STAFF);
 
-  const handleSubmit = async () => {
-    const dataCreate = {
-      email: email,
-      name,
-      password,
-      providerId: providerId === "0" ? null : providerId
-    };
+  const validateFormSubmit = () => {
+    let result = true;
+    const minNameLength = 4;
+    const maxNameLength = 30;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordMinLength = 8;
+    const passwordMaxLength = 20;
+    const validateErrors = {};
+    console.log(validateErrors);
 
-    try {
-      const { data } = await create({
-        variables: {
-          dto: dataCreate,
-        },
-      });
-
-      if (data) {
-        setSucessMsg("Tạo thành công!");
-        openSuccessSnackBar();
-      }
-    } catch {
-      console.log(error);
-      const msg = localStorage.getItem("errorMsg");
-      setErrMsg(msg);
-      openErrorSnackBar();
-      localStorage.removeItem("errorMsg");
+    if (!name.trim()) {
+      validateErrors.name = "Tên không được để trống!";
+    } else if (name.length < minNameLength || name.length > maxNameLength) {
+      validateErrors.name = "Độ dài của tên chỉ cho phép từ 4 tới 30!";
     }
+
+    if (!email.trim()) {
+      validateErrors.email = "Địa chỉ email không được để trống!";
+    } else if (!email.match(emailRegex)) {
+      validateErrors.email = "Địa chỉ email không hợp lệ!";
+    }
+
+    if (!password.trim()) {
+      validateErrors.password = "Mật khẩu không được để trống!";
+    } else if (password.length < passwordMinLength || password.length > passwordMaxLength) {
+      validateErrors.password = "Độ dài của mật khẩu chỉ cho phép từ 8 tới 20!";
+    }
+
+    if (Object.keys(validateErrors).length !== 0) {
+      result = false;
+      setValidateErrors(validateErrors);
+    }
+    return result;
+  }
+
+  const handleSubmit = async () => {
+      const dataCreate = {
+        email: email,
+        name,
+        password,
+        providerId: providerId === 0 ? null : parseInt(providerId)
+      };
+      console.log(dataCreate);
+
+      try {
+        const { data } = await create({
+          variables: {
+            dto: dataCreate,
+          },
+        });
+
+        if (data) {
+          setSucessMsg("Tạo thành công!");
+          openSuccessSnackBar();
+
+          setEmail("");
+          setName("");
+          setPassword("");
+          setProvinceId(0);
+          setValidateErrors({});
+
+          refetch();
+          refetchTotal();
+        }
+      } catch {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        openErrorSnackBar();
+        localStorage.removeItem("errorMsg");
+      }
   }
 
   const openErrorSnackBar = () => {
@@ -129,6 +175,7 @@ function AccountCreateTable() {
                     setName(e.target.value);
                   }}
                 />
+                {validateErrors.name && <span className="errors">{validateErrors.name}</span>}
               </div>
             </div>
             <div className="details">
@@ -152,6 +199,7 @@ function AccountCreateTable() {
                     setEmail(e.target.value);
                   }}
                 />
+                {validateErrors.email && <span className="errors">{validateErrors.email}</span>}
               </div>
             </div>
             <div className="details">
@@ -175,6 +223,7 @@ function AccountCreateTable() {
                     setPassword(e.target.value);
                   }}
                 />
+                {validateErrors.password && <span className="errors">{validateErrors.password}</span>}
               </div>
             </div>
             <div className="details">
@@ -206,8 +255,12 @@ function AccountCreateTable() {
             </div>
             <button className="confirmBtn"
               onClick={() => {
-                handleSubmit();
-                handleClose();
+                refetch();
+                refetchTotal();
+                if (validateFormSubmit()) {
+                  handleSubmit();
+                  handleClose();
+                }
               }}>
               <span>Xác nhận</span>
             </button>

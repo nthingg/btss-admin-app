@@ -63,13 +63,20 @@
         .details {
             .detailItem {
                 padding-bottom: 1rem;
+
+                .errors {
+                    color: #f00;
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    margin: 1rem 0.8rem;
+                }
             }
         }
 
         .confirmBtn {
             background-color: #2c3d50;
             color: white;
-            
+
             transition: 0.4s;
             border: none;
             cursor: pointer;
