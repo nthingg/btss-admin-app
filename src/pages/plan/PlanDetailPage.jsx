@@ -119,20 +119,6 @@ const PlanDetailPage = () => {
     if (!loading && !error && data && data["plans"] && data["plans"]["nodes"]) {
       setPlan(data["plans"]["nodes"][0]);
 
-      let res = data["plans"]["nodes"][0]["orders"].map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 }; // Add the index to the object
-      });
-      setOrders(res);
-
-      let resEmer = data["plans"]["nodes"][0]["savedContacts"].map(
-        (node, id) => {
-          const { __typename, ...rest } = node;
-          return { ...rest, id: id + 1 }; // Add the index to the object
-        }
-      );
-      setEmergencies(resEmer);
-
       const destination = {
         lat: data["plans"]["nodes"][0].destination.coordinate.coordinates[1],
         lng: data["plans"]["nodes"][0].destination.coordinate.coordinates[0],
@@ -144,7 +130,7 @@ const PlanDetailPage = () => {
       };
       setPositionDepart(depart);
 
-      const departDate = new Date(data["plans"]["nodes"][0]["departDate"]);
+      const departDate = new Date(data["plans"]["nodes"][0]["utcDepartAt"]);
       setDepartDate(
         departDate.toLocaleDateString("vi-VN", {
           timeZone: "UTC",
@@ -153,7 +139,7 @@ const PlanDetailPage = () => {
           year: "numeric",
         })
       );
-      const closeRegDate = new Date(data["plans"]["nodes"][0]["regClosedAt"]);
+      const closeRegDate = new Date(data["plans"]["nodes"][0]["utcRegCloseAt"]);
       setCloseRegDate(
         closeRegDate.toLocaleDateString("vi-VN", {
           timeZone: "UTC",
@@ -198,12 +184,6 @@ const PlanDetailPage = () => {
       }
 
       setDates(dateArray);
-
-      let resMem = data["plans"]["nodes"][0]["members"].map((node, id) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, id: id + 1 }; // Add the index to the object
-      });
-      setMembers(resMem);
     }
   }, [data, loading, error]);
 

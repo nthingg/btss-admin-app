@@ -32,10 +32,7 @@ export const LOAD_ACCOUNTS_FILTER = gql`
     accounts(
       first: 100
       order: { id: DESC }
-      where: {
-        role: { in: $role }
-        name: { nstartsWith: "test-account-" }
-      }
+      where: { role: { in: $role }, name: { nstartsWith: "test-account-" } }
     ) {
       nodes {
         id
@@ -106,7 +103,7 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
     accounts(
       first: 100
       order: { id: ASC }
-      where: { role: { eq: TRAVELER }, name: { nstartsWith: "test-account-" } }
+      where: { role: { eq: TRAVELER } }
     ) {
       nodes {
         id
@@ -118,26 +115,20 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
 
 export const LOAD_PROVIDER = gql`
   query {
-    providers(where: {
-      isActive: {
-        eq: true
-      }
-      account: null
-    })
-    {
+    providers(where: { isActive: { eq: true }, account: null }) {
       nodes {
         id
         name
       }
     }
   }
-`
+`;
 
 export const CREATE_STAFF = gql`
-  mutation createStaff($dto: StaffCreateInput!){
+  mutation createStaff($dto: StaffCreateInput!) {
     createStaff(dto: $dto) {
       id
       name
     }
   }
-`
+`;

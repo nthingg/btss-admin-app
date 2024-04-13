@@ -80,7 +80,7 @@ export const LOAD_DETAIL_PLAN = gql`
           name
           phone
         }
-        regCloseAt
+        utcRegCloseAt
         createdAt
         actualGcoinBudget
         memberCount
@@ -133,8 +133,8 @@ export const LOAD_NUMBERS_CANCELED = gql`
 `;
 
 export const LOAD_NUMBERS_COMPLETED = gql`
-  query NumberOfComplete($searchTerm: String){
-    plans(where: { status: { eq: COMPLETED } } searchTerm: $searchTerm) {
+  query NumberOfComplete($searchTerm: String) {
+    plans(where: { status: { eq: COMPLETED } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -154,8 +154,8 @@ export const LOAD_NUMBERS_COMPLETED = gql`
 `;
 
 export const LOAD_NUMBERS_FLAWED = gql`
-  query FlawedPlan($searchTerm: String){
-    plans(where: { status: { eq: FLAWED } } searchTerm: $searchTerm) {
+  query FlawedPlan($searchTerm: String) {
+    plans(where: { status: { eq: FLAWED } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -175,8 +175,8 @@ export const LOAD_NUMBERS_FLAWED = gql`
 `;
 
 export const LOAD_NUMBERS_PENDING = gql`
-  query PendingPlans($searchTerm: String){
-    plans(where: { status: { eq: PENDING } } searchTerm: $searchTerm) {
+  query PendingPlans($searchTerm: String) {
+    plans(where: { status: { eq: PENDING } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -196,8 +196,8 @@ export const LOAD_NUMBERS_PENDING = gql`
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  query ReadyPlans($searchTerm: String){
-    plans(where: { status: { eq: READY } } searchTerm: $searchTerm) {
+  query ReadyPlans($searchTerm: String) {
+    plans(where: { status: { eq: READY } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -217,8 +217,8 @@ export const LOAD_NUMBERS_READY = gql`
 `;
 
 export const LOAD_NUMBERS_REGISTERING = gql`
-  query RegisteringPlans($searchTerm: String){
-    plans(where: { status: { eq: REGISTERING } } searchTerm: $searchTerm) {
+  query RegisteringPlans($searchTerm: String) {
+    plans(where: { status: { eq: REGISTERING } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -238,8 +238,8 @@ export const LOAD_NUMBERS_REGISTERING = gql`
 `;
 
 export const LOAD_NUMBERS_VERIFIED = gql`
-  query VerifiedPlan($searchTerm: String){
-    plans(where: { status: { eq: VERIFIED } } searchTerm: $searchTerm) {
+  query VerifiedPlan($searchTerm: String) {
+    plans(where: { status: { eq: VERIFIED } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -259,8 +259,8 @@ export const LOAD_NUMBERS_VERIFIED = gql`
 `;
 
 export const LOAD_NUMBERS_PUBLISHED = gql`
-  query PublishedPlans($searchTerm: String){
-    plans(where: { isPublished: { eq: true } } searchTerm: $searchTerm) {
+  query PublishedPlans($searchTerm: String) {
+    plans(where: { isPublished: { eq: true } }, searchTerm: $searchTerm) {
       edges {
         node {
           id

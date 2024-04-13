@@ -417,6 +417,8 @@ const HomePage = () => {
               </div>
             </div>
           </div>
+          <div className="item-container info" style={{ border: "none" }}></div>
+          <div className="item-container info" style={{ border: "none" }}></div>
         </div>
       </div>
     </div>
