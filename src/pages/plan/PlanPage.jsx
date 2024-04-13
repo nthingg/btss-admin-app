@@ -48,7 +48,8 @@ const PlanPage = () => {
     sbsNumber ? parseInt(sbsNumber, 10) : 0
   );
   const [selectedStatus, setSelectedStatus] = useState(
-    planStat[sbsNumber ? parseInt(sbsNumber, 10) : 0]
+    sbsNumber ? (sbsNumber === '5' ? [planStat[parseInt(5, 10)], planStat[parseInt(6, 10)]] : planStat[parseInt(sbsNumber, 10)]) : planStat[0]
+    // planStat[sbsNumber ? parseInt(sbsNumber, 10) : 0]
   );
 
   const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
@@ -72,11 +73,11 @@ const PlanPage = () => {
         setSelectedStatus(planStat[2]);
         refetch();
         break;
-      case 3:
-        setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[3]);
-        refetch();
-        break;
+      // case 3:
+      //   setPlanQuery(LOAD_PLANS_FILTER);
+      //   setSelectedStatus(planStat[3]);
+      //   refetch();
+      //   break;
       case 4:
         setPlanQuery(LOAD_PLANS_FILTER);
         setSelectedStatus(planStat[4]);
@@ -84,14 +85,14 @@ const PlanPage = () => {
         break;
       case 5:
         setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[5]);
+        setSelectedStatus([planStat[5], planStat[6]]);
         refetch();
         break;
-      case 6:
-        setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[6]);
-        refetch();
-        break;
+      // case 6:
+      //   setPlanQuery(LOAD_PLANS_FILTER);
+      //   setSelectedStatus(planStat[6]);
+      //   refetch();
+      //   break;
       case 7:
         setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
         setSelectedStatus(true);
@@ -103,10 +104,10 @@ const PlanPage = () => {
     refetchRegis();
     refetchPending();
     refetchCancelled();
-    refetchFlawed();
+    // refetchFlawed();
     refetchTemp();
     refetchComplete();
-    refetchVeri();
+    // refetchVeri();
     refetchPublished();
   };
 
@@ -190,22 +191,22 @@ const PlanPage = () => {
     }
   }, [dataComplete, loadingComplete, errComplete]);
 
-  const {
-    error: errVeri,
-    loading: loadingVeri,
-    data: dataVeri,
-    refetch: refetchVeri,
-  } = useQuery(LOAD_NUMBERS_VERIFIED, {
-    variables: {
-      searchTerm: searchTerm
-    }
-  });
-  const [veri, setVeri] = useState(0);
-  useEffect(() => {
-    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
-      setVeri(dataVeri["plans"].totalCount);
-    }
-  }, [dataVeri, loadingVeri, errVeri]);
+  // const {
+  //   error: errVeri,
+  //   loading: loadingVeri,
+  //   data: dataVeri,
+  //   refetch: refetchVeri,
+  // } = useQuery(LOAD_NUMBERS_VERIFIED, {
+  //   variables: {
+  //     searchTerm: searchTerm
+  //   }
+  // });
+  // const [veri, setVeri] = useState(0);
+  // useEffect(() => {
+  //   if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
+  //     setVeri(dataVeri["plans"].totalCount);
+  //   }
+  // }, [dataVeri, loadingVeri, errVeri]);
 
   const {
     error: errPend,
@@ -241,22 +242,22 @@ const PlanPage = () => {
     }
   }, [dataTemp, loadingTemp, errorTemp]);
 
-  const {
-    error: errorFlawed,
-    loading: loadingFlawed,
-    data: dataFlawed,
-    refetch: refetchFlawed,
-  } = useQuery(LOAD_NUMBERS_FLAWED, {
-    variables: {
-      searchTerm: searchTerm
-    }
-  });
-  const [flawed, setFlawed] = useState(0);
-  useEffect(() => {
-    if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
-      setFlawed(dataFlawed["plans"].totalCount);
-    }
-  }, [dataFlawed, loadingFlawed, errorFlawed]);
+  // const {
+  //   error: errorFlawed,
+  //   loading: loadingFlawed,
+  //   data: dataFlawed,
+  //   refetch: refetchFlawed,
+  // } = useQuery(LOAD_NUMBERS_FLAWED, {
+  //   variables: {
+  //     searchTerm: searchTerm
+  //   }
+  // });
+  // const [flawed, setFlawed] = useState(0);
+  // useEffect(() => {
+  //   if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
+  //     setFlawed(dataFlawed["plans"].totalCount);
+  //   }
+  // }, [dataFlawed, loadingFlawed, errorFlawed]);
 
   const {
     error: errorPublished,
@@ -310,10 +311,10 @@ const PlanPage = () => {
           setTemp(totalCount);
           break;
         }
-        case planStat[3]: {
-          setVeri(totalCount);
-          break;
-        }
+        // case planStat[3]: {
+        //   setVeri(totalCount);
+        //   break;
+        // }
         case planStat[4]: {
           setCancelled(totalCount);
           break;
@@ -322,10 +323,10 @@ const PlanPage = () => {
           setCompleted(totalCount);
           break;
         }
-        case planStat[6]: {
-          setFlawed(totalCount);
-          break;
-        }
+        // case planStat[6]: {
+        //   setFlawed(totalCount);
+        //   break;
+        // }
         case planStat[true]: {
           setPublished(totalCount);
           break;
@@ -375,10 +376,10 @@ const PlanPage = () => {
               refetchRegis();
               refetchPending();
               refetchCancelled();
-              refetchFlawed();
+              // refetchFlawed();
               refetchTemp();
               refetchComplete();
-              refetchVeri();
+              // refetchVeri();
               refetchPublished();
             }}
           >
@@ -389,7 +390,7 @@ const PlanPage = () => {
       <div className="planContainer">
         <div className="icon-row">
           <Slider {...settings}>
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
+            {[0, 1, 2, 4, 5, 7].map((index) => (
               <div
                 key={index}
                 className={`icon-item ${selectedDiv === index ? "selected" : ""
@@ -409,16 +410,16 @@ const PlanPage = () => {
                 {index === 3 && <NoCrashIcon sx={{ color: "#3498DB" }} />}
                 {index === 4 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 {index === 5 && <CheckCircleIcon color="success" />}
-                {index === 6 && <BuildCircleIcon sx={{ color: "#3498DB" }} />}
+                {/* {index === 6 && <BuildCircleIcon sx={{ color: "#3498DB" }} />} */}
                 {index === 7 && <PublicIcon sx={{ color: "#3498DB" }} />}
                 <span>
                   {index === 0 && `Ban đầu (${pending})`}
                   {index === 1 && `Chờ chốt (${registering})`}
                   {index === 2 && `Sẵn sàng (${temp})`}
-                  {index === 3 && `Check-in (${veri})`}
+                  {/* {index === 3 && `Check-in (${veri})`} */}
                   {index === 4 && `Đã hủy (${cancelled})`}
                   {index === 5 && `Đã hoàn thành (${completed})`}
-                  {index === 6 && `Có vấn đề (${flawed})`}
+                  {/* {index === 6 && `Có vấn đề (${flawed})`} */}
                   {index === 7 && `Đã chia sẻ (${published})`}
                 </span>
               </div>

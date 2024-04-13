@@ -21,7 +21,7 @@ import {
   LOAD_NUMBERS_PUBLISHED,
 } from "../../services/graphql/plan";
 import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
-import { LOAD_ACCOUNTS_TRAVELER } from "../../services/graphql/account";
+import { LOAD_ACCOUNTS_TRAVELER, LOAD_NUMBERS_NEWEST_TRAVELER } from "../../services/graphql/account";
 import { Link } from "react-router-dom";
 
 const HomePage = () => {
@@ -37,14 +37,40 @@ const HomePage = () => {
       !loadingTravelers &&
       !errorTravelers &&
       dataTravelers &&
-      dataTravelers["accounts"]["nodes"]
+      dataTravelers["accounts"]["totalCount"]
     ) {
-      let res = dataTravelers.accounts.nodes.map(
-        ({ __typename, ...rest }) => rest
-      );
-      setTravelers(res.length);
+      // let res = dataTravelers.accounts.nodes.map(
+      //   ({ __typename, ...rest }) => rest
+      // );
+      setTravelers(dataTravelers.accounts.totalCount);
     }
   }, [dataTravelers, loadingTravelers, errorTravelers]);
+
+  const currentMonth = new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1);
+  const {
+    error: errorNewTravelers,
+    loading: loadingNewTravelers,
+    data: dataNewTravelers,
+    refetch: refetchNewTravelers,
+  } = useQuery(LOAD_NUMBERS_NEWEST_TRAVELER, {
+    variables: {
+      input: currentMonth.toISOString()
+    }
+  });
+  const [newTravelers, setNewTravelers] = useState(0);
+  useEffect(() => {
+    if (
+      !loadingNewTravelers &&
+      !errorNewTravelers &&
+      dataNewTravelers &&
+      dataNewTravelers["accounts"]["totalCount"]
+    ) {
+      // let res = dataTravelers.accounts.nodes.map(
+      //   ({ __typename, ...rest }) => rest
+      // );
+      setNewTravelers(dataNewTravelers.accounts.totalCount);
+    }
+  }, [dataNewTravelers, loadingNewTravelers, errorNewTravelers]);
 
   const {
     error: errDestinations,
@@ -112,31 +138,31 @@ const HomePage = () => {
     }
   }, [dataComplete, loadingComplete, errComplete]);
 
-  const {
-    error: errVeri,
-    loading: loadingVeri,
-    data: dataVeri,
-    refetch: refetchVeri,
-  } = useQuery(LOAD_NUMBERS_VERIFIED);
-  const [veri, setVeri] = useState(0);
-  useEffect(() => {
-    if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
-      setVeri(dataVeri["plans"].totalCount);
-    }
-  }, [dataVeri, loadingVeri, errVeri]);
+  // const {
+  //   error: errVeri,
+  //   loading: loadingVeri,
+  //   data: dataVeri,
+  //   refetch: refetchVeri,
+  // } = useQuery(LOAD_NUMBERS_VERIFIED);
+  // const [veri, setVeri] = useState(0);
+  // useEffect(() => {
+  //   if (!loadingVeri && !errVeri && dataVeri && dataVeri["plans"]) {
+  //     setVeri(dataVeri["plans"].totalCount);
+  //   }
+  // }, [dataVeri, loadingVeri, errVeri]);
 
-  const {
-    error: errPend,
-    loading: loadingPend,
-    data: dataPend,
-    refetch: refetchPending,
-  } = useQuery(LOAD_NUMBERS_PENDING);
-  const [pending, setPending] = useState(0);
-  useEffect(() => {
-    if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
-      setPending(dataPend["plans"].totalCount);
-    }
-  }, [dataPend, loadingPend, errPend]);
+  // const {
+  //   error: errPend,
+  //   loading: loadingPend,
+  //   data: dataPend,
+  //   refetch: refetchPending,
+  // } = useQuery(LOAD_NUMBERS_PENDING);
+  // const [pending, setPending] = useState(0);
+  // useEffect(() => {
+  //   if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
+  //     setPending(dataPend["plans"].totalCount);
+  //   }
+  // }, [dataPend, loadingPend, errPend]);
 
   const {
     errorTemp,
@@ -151,18 +177,18 @@ const HomePage = () => {
     }
   }, [dataTemp, loadingTemp, errorTemp]);
 
-  const {
-    error: errorFlawed,
-    loading: loadingFlawed,
-    data: dataFlawed,
-    refetch: refetchFlawed,
-  } = useQuery(LOAD_NUMBERS_FLAWED);
-  const [flawed, setFlawed] = useState(0);
-  useEffect(() => {
-    if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
-      setFlawed(dataFlawed["plans"].totalCount);
-    }
-  }, [dataFlawed, loadingFlawed, errorFlawed]);
+  // const {
+  //   error: errorFlawed,
+  //   loading: loadingFlawed,
+  //   data: dataFlawed,
+  //   refetch: refetchFlawed,
+  // } = useQuery(LOAD_NUMBERS_FLAWED);
+  // const [flawed, setFlawed] = useState(0);
+  // useEffect(() => {
+  //   if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
+  //     setFlawed(dataFlawed["plans"].totalCount);
+  //   }
+  // }, [dataFlawed, loadingFlawed, errorFlawed]);
 
   const {
     error: errorPublished,
@@ -211,12 +237,12 @@ const HomePage = () => {
               onClick={() => {
                 refetch();
                 refetchCancelled();
-                refetchFlawed();
+                // refetchFlawed();
                 refetchTemp();
                 refetchDestination();
                 refetchComplete();
-                refetchPending();
-                refetchVeri();
+                // refetchPending();
+                // refetchVeri();
                 refetchTravelers();
                 refetchPublished();
               }}
@@ -230,7 +256,7 @@ const HomePage = () => {
         <div className="item-list-plan">
           {/* <div className="item-container info">
             <div className="item-top">
-              <div className="item-title">Số kế hoạch ban đầu</div>
+                <div className="item-title">Số kế hoạch ban đầu</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans`} className="navigateButton">
@@ -382,7 +408,10 @@ const HomePage = () => {
           </div>
         </div>
         <hr style={{borderTop: "1px solid #e4e4e4", marginTop: "1rem"}}/>
-        <h2 className="item-list-title">Báo cáo hệ thống</h2>
+        <div className="item-list-title">
+        <h2 style={{display: "inline-block"}}>Báo cáo hệ thống</h2>
+        <span style={{fontSize: "1.3rem", float: "right"}}><em>*Tháng này đã có {newTravelers} người dùng mới đăng kí vào hệ thống</em></span>
+        </div>
         <div className="item-list-system">
           <div className="item-container info">
             <div className="item-top">

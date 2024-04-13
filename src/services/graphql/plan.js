@@ -140,8 +140,8 @@ export const LOAD_NUMBERS_CANCELED = gql`
 `;
 
 export const LOAD_NUMBERS_COMPLETED = gql`
-  query NumberOfComplete($searchTerm: String) {
-    plans(where: { status: { eq: COMPLETED } }, searchTerm: $searchTerm) {
+  query NumberOfComplete($searchTerm: String){
+    plans(where: { status: { in: [COMPLETED, FLAWED] } } searchTerm: $searchTerm) {
       edges {
         node {
           id

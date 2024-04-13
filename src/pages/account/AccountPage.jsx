@@ -27,6 +27,7 @@ const AccountPage = () => {
   const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchedTraveler, setSearchedTraveler] = useState(null);
+  const [isHavePlan, setHavePlan] = useState(true);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -35,16 +36,19 @@ const AccountPage = () => {
         if (searchTerm !== "") {
           setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
         }
+        setHavePlan(true);
         setSelectedStatus(accountRole[0]);
         refetch();
         break;
       case 1:
         setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+        setHavePlan(false);
         setSelectedStatus(accountRole[1]);
         refetch();
         break;
       case 2:
         setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+        setHavePlan(false);
         setSelectedStatus(accountRole[2]);
         refetch();
         break;
@@ -72,7 +76,8 @@ const AccountPage = () => {
     ) {
       let countTraveler = 0;
       for (const item of dataTotal["accounts"]["nodes"]) {
-        if (item["role"] === "TRAVELER") {
+        console.log(item["plans"]);
+        if (item["role"] === "TRAVELER" && item["plans"]) {
           countTraveler++;
         }
       }
@@ -100,7 +105,8 @@ const AccountPage = () => {
   const { error, loading, data, refetch } = useQuery(accountQuery, {
     variables: {
       role: selectedStatus,
-      searchTerm: searchTerm
+      searchTerm: searchTerm,
+      havePlan: isHavePlan
     },
   });
 
