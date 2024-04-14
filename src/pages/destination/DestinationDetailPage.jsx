@@ -31,6 +31,9 @@ import {
 import EmergencyTable from "../../components/tables/EmergencyTable";
 import MapIcon from "@mui/icons-material/Map";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PlanTable from "../../components/tables/PlanTable";
+import { LOAD_DESTINATION_PLANS } from "../../services/graphql/plan";
+import ProviderTable from "../../components/tables/ProviderTable";
 
 const DestinationDetailPage = () => {
   const initQuery = gql`
@@ -70,6 +73,8 @@ const DestinationDetailPage = () => {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState(null);
   const [emerQuery, setEmerQuery] = useState(initQuery);
+  const [plans, setPlans] = useState([]);
+  const [providers, setProviders] = useState([]);
 
   const containerStyle = {
     width: "950px",
@@ -235,6 +240,60 @@ const DestinationDetailPage = () => {
       setEmerQuery(query);
     }
   }, [data, loading, error]);
+
+  const { error: errorPlans, loading: loadingPlans, data: dataPlans, refetch: refetchPlans } = useQuery(LOAD_DESTINATION_PLANS, {
+    variables: {
+      id: parseInt(destinationId, 10)
+    }
+  });
+  useEffect(() => {
+    if (!loadingPlans && !errorPlans && dataPlans && dataPlans["plans"]["nodes"]) {
+      let res = dataPlans.plans.nodes.map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 };
+      });
+      setPlans(res);
+    }
+  }, [dataPlans, errorPlans, loadingPlans])
+
+  const providerQuery = gql`
+    query {
+      providers(
+          where: {
+          coordinate: {
+              distance: {
+              lte: 10000
+              geometry: { type: Point, coordinates: [${destination && destination.coordinate.coordinates[0]}, ${destination && destination.coordinate.coordinates[1]}] }
+              }
+          }
+          type: { in: [HOTEL, MOTEL, RESTAURANT, REPAIR, VEHICLE_RENTAL] }
+          }
+          order: { id: DESC }
+      ) {
+          nodes {
+            id
+            name
+            address
+            phone
+            imagePath
+            coordinate {
+                coordinates
+            }
+            isActive
+          }
+      }
+    }
+  `
+  const { error: errorProvi, loading: loadingProvi, data: dataProvi } = useQuery(providerQuery);
+  useEffect(() => {
+    if (!loadingProvi && !errorProvi && dataProvi && dataProvi["providers"]["nodes"]) {
+      let res = dataProvi.providers.nodes.map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 };
+      });
+      setProviders(res);
+    }
+  }, [dataProvi, errorProvi, loadingProvi])
 
   var settings = {
     dots: true,
@@ -460,7 +519,7 @@ const DestinationDetailPage = () => {
                   aria-controls="panel1-content"
                   id="panel1-header"
                 >
-                  Danh sách số khẩn cấp
+                  Danh sách liên lạc khẩn cấp
                 </AccordionSummary>
                 <AccordionDetails
                   sx={{
@@ -468,6 +527,56 @@ const DestinationDetailPage = () => {
                   }}
                 >
                   <EmergencyTable list={emergencies} />
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            <div className="bottom">
+              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+                <AccordionSummary
+                  sx={{
+                    fontSize: 24,
+                    backgroundColor: "#2c3d50",
+                    color: "white",
+                    borderRadius: "10px",
+                    fontWeight: "600",
+                  }}
+                  expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
+                  aria-controls="panel1-content"
+                  id="panel1-header"
+                >
+                  Danh sách kế hoạch đã được tạo
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{
+                    backgroundColor: "#f8f9f9",
+                  }}
+                >
+                  <PlanTable destinationPlans={plans}/>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            <div className="bottom">
+              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+                <AccordionSummary
+                  sx={{
+                    fontSize: 24,
+                    backgroundColor: "#2c3d50",
+                    color: "white",
+                    borderRadius: "10px",
+                    fontWeight: "600",
+                  }}
+                  expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
+                  aria-controls="panel1-content"
+                  id="panel1-header"
+                >
+                  Danh sách dịch vụ xung quanh
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{
+                    backgroundColor: "#f8f9f9",
+                  }}
+                >
+                  <ProviderTable providers={providers}/>
                 </AccordionDetails>
               </Accordion>
             </div>

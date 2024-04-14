@@ -224,7 +224,7 @@ const AccountPage = () => {
                   <ManageAccountsRoundedIcon sx={{ color: "#3498DB" }} />
                 )}
                 <span>
-                  {index === 0 && `Phượt thủ (${accountTravelers})`}
+                  {index === 0 && `Du khách (${accountTravelers})`}
                   {index === 1 && `Nhà cung cấp (${accountSuppliers})`}
                   {index === 2 && `Quản lý (${accountStaffs})`}
                 </span>

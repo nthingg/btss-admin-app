@@ -21,7 +21,7 @@ const DestinationTable = ({ destinations }) => {
 
   const handleEditClick = () => {
     // Logic for "Xác nhận" option
-    console.log("Xác nhận clicked");
+    navigate(`/destinations/update/${anchorId}`);
     // Add your specific code here
   };
 

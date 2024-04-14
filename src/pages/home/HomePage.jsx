@@ -13,18 +13,19 @@ import { useEffect, useState } from "react";
 import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
-  LOAD_NUMBERS_FLAWED,
-  LOAD_NUMBERS_PENDING,
+  LOAD_NUMBERS_ONGOING,
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
   LOAD_NUMBERS_VERIFIED,
   LOAD_NUMBERS_PUBLISHED,
+  LOAD_NUMBERS_TOTAL,
 } from "../../services/graphql/plan";
 import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER, LOAD_NUMBERS_NEWEST_TRAVELER } from "../../services/graphql/account";
 import { Link } from "react-router-dom";
 
 const HomePage = () => {
+  const [now, setNow] = useState(new Date());
   const {
     error: errorTravelers,
     loading: loadingTravelers,
@@ -151,25 +152,29 @@ const HomePage = () => {
   //   }
   // }, [dataVeri, loadingVeri, errVeri]);
 
-  // const {
-  //   error: errPend,
-  //   loading: loadingPend,
-  //   data: dataPend,
-  //   refetch: refetchPending,
-  // } = useQuery(LOAD_NUMBERS_PENDING);
-  // const [pending, setPending] = useState(0);
-  // useEffect(() => {
-  //   if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
-  //     setPending(dataPend["plans"].totalCount);
-  //   }
-  // }, [dataPend, loadingPend, errPend]);
+  const {
+    error: errTotal,
+    loading: loadingTotal,
+    data: dataTotal,
+    refetch: refetchTotal,
+  } = useQuery(LOAD_NUMBERS_TOTAL);
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    if (!loadingTotal && !errTotal && dataTotal && dataTotal["plans"]) {
+      setTotal(dataTotal["plans"].totalCount);
+    }
+  }, [dataTotal, loadingTotal, errTotal]);
 
   const {
     errorTemp,
     loadingTemp,
     data: dataTemp,
     refetch: refetchTemp,
-  } = useQuery(LOAD_NUMBERS_READY);
+  } = useQuery(LOAD_NUMBERS_READY, {
+    variables: {
+      dateTime: now.toUTCString()
+    }
+  });
   const [temp, setTemp] = useState(0);
   useEffect(() => {
     if (!loadingTemp && !errorTemp && dataTemp && dataTemp["plans"]) {
@@ -177,18 +182,22 @@ const HomePage = () => {
     }
   }, [dataTemp, loadingTemp, errorTemp]);
 
-  // const {
-  //   error: errorFlawed,
-  //   loading: loadingFlawed,
-  //   data: dataFlawed,
-  //   refetch: refetchFlawed,
-  // } = useQuery(LOAD_NUMBERS_FLAWED);
-  // const [flawed, setFlawed] = useState(0);
-  // useEffect(() => {
-  //   if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
-  //     setFlawed(dataFlawed["plans"].totalCount);
-  //   }
-  // }, [dataFlawed, loadingFlawed, errorFlawed]);
+  const {
+    error: errorOnGoing,
+    loading: loadingOnGoing,
+    data: dataOnGoing,
+    refetch: refetchOnGoing,
+  } = useQuery(LOAD_NUMBERS_ONGOING, {
+    variables: {
+      dateTime: now.toUTCString()
+    }
+  });
+  const [onGoing, setOnGoing] = useState(0);
+  useEffect(() => {
+    if (!loadingOnGoing && !errorOnGoing && dataOnGoing && dataOnGoing["plans"]) {
+      setOnGoing(dataOnGoing["plans"].totalCount);
+    }
+  }, [dataOnGoing, loadingOnGoing, errorOnGoing]);
 
   const {
     error: errorPublished,
@@ -237,11 +246,11 @@ const HomePage = () => {
               onClick={() => {
                 refetch();
                 refetchCancelled();
-                // refetchFlawed();
+                // refetchOnGoing();
                 refetchTemp();
                 refetchDestination();
                 refetchComplete();
-                // refetchPending();
+                refetchTotal();
                 // refetchVeri();
                 refetchTravelers();
                 refetchPublished();
@@ -254,13 +263,14 @@ const HomePage = () => {
         </div>
         <h2 className="item-list-title">Báo cáo kế hoạch</h2>
         <div className="item-list-plan">
-          {/* <div className="item-container info">
+          <div className="item-container total">
             <div className="item-top">
-                <div className="item-title">Số kế hoạch ban đầu</div>
+                <div className="item-title">Tổng số kế hoạch</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans`} className="navigateButton">
-                    <p>{pending}</p>
+                    {/* <p>{pending}</p> */}
+                    <p>{total}</p>
                   </Link>
                 </div>
                 <div className="right">
@@ -272,10 +282,10 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
           <div className="item-container temp">
             <div className="item-top">
-              <div className="item-title">Số kế hoạch chờ chốt</div>
+              <div className="item-title" style={{fontSize: "17px"}}>Kế hoạch chưa chốt thành viên</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans/sbs/1`} className="navigateButton">
@@ -294,7 +304,7 @@ const HomePage = () => {
           </div>
           <div className="item-container info">
             <div className="item-top">
-              <div className="item-title">Số kế hoạch đã sẵn sàng</div>
+              <div className="item-title">Kế hoạch sắp diễn ra</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans/sbs/2`} className="navigateButton">
@@ -311,18 +321,37 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          <div className="item-container success">
+          <div className="item-container info">
             <div className="item-top">
-              <div className="item-title">Số kế hoạch đã hoàn thành</div>
+              <div className="item-title">Kế hoạch đang diễn ra</div>
               <div className="item-body">
                 <div className="left">
-                  <Link to={`/plans/sbs/5`} className="navigateButton">
+                  <Link to={`/plans/sbs/2`} className="navigateButton">
+                    <p>{onGoing}</p>
+                  </Link>
+                </div>
+                <div className="right">
+                  <div className="btn info">
+                    <Link to={`/plans/sbs/2`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="item-container success">
+            <div className="item-top">
+              <div className="item-title">Kế hoạch đã hoàn thành</div>
+              <div className="item-body">
+                <div className="left">
+                  <Link to={`/plans/sbs/4`} className="navigateButton">
                     <p>{completed}</p>
                   </Link>
                 </div>
                 <div className="right">
                   <div className="btn success">
-                    <Link to={`/plans/sbs/5`} className="navigateButton">
+                    <Link to={`/plans/sbs/4`} className="navigateButton">
                       <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
                     </Link>
                   </div>
@@ -336,7 +365,7 @@ const HomePage = () => {
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans/sbs/6`} className="navigateButton">
-                    <p>{flawed}</p>
+                    <p>{OnGoing}</p>
                   </Link>
                 </div>
                 <div className="right">
@@ -349,25 +378,6 @@ const HomePage = () => {
               </div>
             </div>
           </div> */}
-          <div className="item-container cancel">
-            <div className="item-top">
-              <div className="item-title">Số kế hoạch đã hủy</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/4`} className="navigateButton">
-                    <p>{cancelled}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn cancel">
-                    <Link to={`/plans/sbs/4`} className="navigateButton">
-                      <CancelOutlinedIcon sx={{ color: "white" }} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
           {/* <div className="item-container checkIn">
             <div className="item-top">
               <div className="item-title">Số kế hoạch check-in</div>
@@ -389,7 +399,7 @@ const HomePage = () => {
           </div> */}
           <div className="item-container publish">
             <div className="item-top">
-              <div className="item-title">Số kế hoạch đã được chia sẻ</div>
+              <div className="item-title">Kế hoạch đã được chia sẻ</div>
               <div className="item-body">
                 <div className="left">
                   <Link to={`/plans/sbs/7`} className="navigateButton">
@@ -406,11 +416,30 @@ const HomePage = () => {
               </div>
             </div>
           </div>
+          <div className="item-container cancel">
+            <div className="item-top">
+              <div className="item-title">Kế hoạch đã hủy</div>
+              <div className="item-body">
+                <div className="left">
+                  <Link to={`/plans/sbs/6`} className="navigateButton">
+                    <p>{cancelled}</p>
+                  </Link>
+                </div>
+                <div className="right">
+                  <div className="btn cancel">
+                    <Link to={`/plans/sbs/6`} className="navigateButton">
+                      <CancelOutlinedIcon sx={{ color: "white" }} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <hr style={{borderTop: "1px solid #e4e4e4", marginTop: "1rem"}}/>
         <div className="item-list-title">
         <h2 style={{display: "inline-block"}}>Báo cáo hệ thống</h2>
-        <span style={{fontSize: "1.3rem", float: "right"}}><em>*Tháng này đã có {newTravelers} người dùng mới đăng kí vào hệ thống</em></span>
+        {/* <span style={{fontSize: "1.3rem", float: "right"}}><em>*Tháng này đã có {newTravelers} người dùng mới đăng kí vào hệ thống</em></span> */}
         </div>
         <div className="item-list-system">
           <div className="item-container info">
@@ -439,6 +468,25 @@ const HomePage = () => {
                 <div className="left">
                   <Link to={`/accounts`} className="navigateButton">
                     <p>{travelers}</p>
+                  </Link>
+                </div>
+                <div className="right">
+                  <div className="btn info">
+                    <Link to={`/accounts`} className="navigateButton">
+                      <InfoIcon sx={{ color: "white" }} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="item-container info">
+            <div className="item-top">
+              <div className="item-title">Người dùng mới tháng này</div>
+              <div className="item-body">
+                <div className="left">
+                  <Link to={`/accounts`} className="navigateButton">
+                    <p>{newTravelers}</p>
                   </Link>
                 </div>
                 <div className="right">

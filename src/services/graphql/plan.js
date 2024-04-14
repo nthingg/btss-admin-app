@@ -29,12 +29,45 @@ export const LOAD_PLANS_FILTER = gql`
   }
 `;
 
-export const LOAD_PLANS_PUBLISHED_FILTER = gql`
-  query LoadPlans($status: Boolean!, $searchTerm: String) {
+export const LOAD_TOTAL_PLAN = gql`
+  query LoadTotalPlans($searchTerm: String){
     plans(
       first: 100
       order: { id: DESC }
-      where: { isPublished: { eq: $status } }
+      where: {
+        status: {
+          in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
+        }
+      }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_PLANS_PUBLISHED_FILTER = gql`
+  query LoadPlans($searchTerm: String) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: { isPublished: { eq: true } }
       searchTerm: $searchTerm
     ) {
       nodes {
@@ -68,6 +101,66 @@ export const LOAD_PLANS = gql`
     }
   }
 `;
+
+export const LOAD_PLAN_READY = gql`
+  query ReadyPlans($searchTerm: String, $dateTime: DateTime) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_PLAN_ONGOING = gql`
+  query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
+    plans(
+      where: {
+        status: { in: [READY, VERIFIED] }
+        utcDepartAt: { lte: $dateTime }
+        utcEndAt: { gte: $dateTime }
+      }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        destination {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+      totalCount
+    }
+  }
+`
 
 export const LOAD_DETAIL_PLAN = gql`
   query GetPlanById($id: Int!) {
@@ -160,22 +253,16 @@ export const LOAD_NUMBERS_COMPLETED = gql`
   }
 `;
 
-export const LOAD_NUMBERS_FLAWED = gql`
-  query FlawedPlan($searchTerm: String) {
-    plans(where: { status: { eq: FLAWED } }, searchTerm: $searchTerm) {
-      edges {
-        node {
-          id
-          name
-          status
-        }
+export const LOAD_NUMBERS_ONGOING = gql`
+  query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
+    plans(
+      where: {
+        status: { in: [READY, VERIFIED] }
+        utcDepartAt: { lte: $dateTime }
+        utcEndAt: { gte: $dateTime }
       }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
+      searchTerm: $searchTerm
+    ) {
       totalCount
     }
   }
@@ -203,20 +290,14 @@ export const LOAD_NUMBERS_PENDING = gql`
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  query ReadyPlans($searchTerm: String) {
-    plans(where: { status: { eq: READY } }, searchTerm: $searchTerm) {
+  query ReadyPlans($searchTerm: String, $dateTime: DateTime) {
+    plans(where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
           name
           status
         }
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
       }
       totalCount
     }
@@ -285,3 +366,42 @@ export const LOAD_NUMBERS_PUBLISHED = gql`
     }
   }
 `;
+
+export const LOAD_NUMBERS_TOTAL = gql`
+  query {
+    plans(
+      where: {
+        status: {
+          in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
+        }
+      }
+    ) {
+      totalCount
+    }
+  }
+`
+
+export const LOAD_DESTINATION_PLANS = gql`
+  query LoadPlans($id: Int) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: { destinationId: { eq: $id }, status: { in: [REGISTERING, READY, COMPLETED, FLAWED, CANCELED] } }
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        utcDepartAt
+        startDate
+        memberCount
+        maxMemberCount
+        endDate
+        status
+      }
+      totalCount
+    }
+  }
+`

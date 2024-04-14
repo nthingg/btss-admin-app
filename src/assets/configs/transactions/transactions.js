@@ -14,13 +14,51 @@ export const transactionsColumns = [
   {
     field: "id",
     headerClassName: "prodHeader",
-    width: 70,
+    width: 100,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.id}</div>;
+      let idString = params.row.id.toString();
+      const zerosNeeded = Math.max(10 - idString.length, 0);
+      for (let i = 0; i < zerosNeeded; i++) {
+        idString = '0' + idString;
+      }
+
+      return <div>{idString}</div>;
     },
     renderHeader: () => <span>ID</span>,
+  },
+  {
+    field: "accountName",
+    headerName: "Trạng thái",
+    width: 180,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      const value = params.row;
+      if (value.account) {
+        return <div>{params.row.account.name}</div>;
+      } else if (value.provider) {
+        return <div>{params.row.provider.name}</div>;
+      }
+    },
+    renderHeader: () => <span>NGƯỜI TẠO</span>,
+  },
+  {
+    field: "createdBy",
+    headerName: "ROLE",
+    width: 150,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      const value = params.row;
+      if (value.account) {
+        return <div>Người dùng</div>;
+      } else if (value.provider) {
+        return <div>Nhà cung cấp</div>;
+      }
+    },
+    renderHeader: () => <span>VAI TRÒ</span>,
   },
   {
     field: "status",
@@ -45,7 +83,7 @@ export const transactionsColumns = [
     renderCell: (params) => {
       return <div>{params.row.gcoinAmount}</div>;
     },
-    renderHeader: () => <span>SỐ TIỀN</span>,
+    renderHeader: () => <span>SỐ GCOIN</span>,
   },
   {
     field: "gateway",
@@ -77,37 +115,5 @@ export const transactionsColumns = [
       return <div>{formattedDateTime}</div>;
     },
     renderHeader: () => <span>NGÀY TẠO</span>,
-  },
-  {
-    field: "accountName",
-    headerName: "Trạng thái",
-    width: 180,
-    align: "center",
-    headerAlign: "center",
-    renderCell: (params) => {
-      const value = params.row;
-      if (value.account) {
-        return <div>{params.row.account.name}</div>;
-      } else if (value.provider) {
-        return <div>{params.row.provider.name}</div>;
-      }
-    },
-    renderHeader: () => <span>NGƯỜI TẠO</span>,
-  },
-  {
-    field: "createdBy",
-    headerName: "ROLE",
-    width: 180,
-    align: "center",
-    headerAlign: "center",
-    renderCell: (params) => {
-      const value = params.row;
-      if (value.account) {
-        return <div>Người dùng</div>;
-      } else if (value.provider) {
-        return <div>Nhà cung cấp</div>;
-      }
-    },
-    renderHeader: () => <span>VAI TRÒ</span>,
   },
 ];

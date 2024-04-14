@@ -37,12 +37,12 @@ import TransactionTable from "../../components/tables/TransactionTable";
 
 const TransactionPage = () => {
   const topoType = [
-    "GIFT",
-    "ORDER",
-    "ORDER_REFUND",
     "PLAN_FUND",
     "PLAN_REFUND",
+    "ORDER",
+    "ORDER_REFUND",
     "TOPUP",
+    "GIFT",
   ];
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
@@ -277,12 +277,12 @@ const TransactionPage = () => {
                 {index === 6 && <ForestIcon sx={{ color: "#3498DB" }} />}
                 <span>
                   {index === 0 && `Tất cả`}
-                  {index === 1 && `Tặng quà (${gift})`}
-                  {index === 2 && `Đặt đơn (${order})`}
-                  {index === 3 && `Hủy đơn (${orderRefund})`}
-                  {index === 4 && `Đóng quỹ (${planFund})`}
-                  {index === 5 && `Rời quỹ (${planRefund})`}
-                  {index === 6 && `Nạp tiền (${topup})`}
+                  {index === 1 && `Đóng quỹ (${planFund})`}
+                  {index === 2 && `Hoàn quỹ (${planRefund})`}
+                  {index === 3 && `Đặt đơn (${order})`}
+                  {index === 4 && `Hoàn đơn (${orderRefund})`}
+                  {index === 5 && `Nạp tiền (${topup})`}
+                  {index === 6 && `Tặng quà (${gift})`}
                 </span>
               </div>
             ))}

@@ -7,8 +7,10 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { plansColumns } from "../../assets/configs/plans/plans";
 import { accountPlansColumns } from "../../assets/configs/accounts/accountPlans";
+import { destinationPlansColumns } from "../../assets/configs/destinations/destinationPlans";
+import { planTotalColumns } from "../../assets/configs/plans/planTotal";
 
-const PlanTable = ({ plans, accountPlans }) => {
+const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
   const navigate = useNavigate();
 
   const actionColumn = [
@@ -106,6 +108,35 @@ const PlanTable = ({ plans, accountPlans }) => {
           />
         </div>
       )}
+      {planTotal && (
+        <div className="planTable">
+          <DataGrid
+            rows={planTotal}
+            columns={planTotalColumns.concat(actionColumn)}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            // pageSizeOptions={8}
+            // autoHeight={true}
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2C3E50",
+                color: "white",
+                fontWeight: 600,
+                fontSize: 14,
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+              // ".MuiTablePagination-displayedRows": {
+              //   display: "none",
+              // },
+              boxShadow: 0.4,
+            }}
+          />
+        </div>
+      )}
       {accountPlans && (
         <div className="planAccountTable">
           <DataGrid
@@ -115,6 +146,30 @@ const PlanTable = ({ plans, accountPlans }) => {
             pagination
             autoPageSize={true}
             showColumnVerticalBorder={true}
+            sx={{
+              height: 320,
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2C3E50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
+      {destinationPlans && (
+        <div className="planDestinationTable">
+          <DataGrid
+            rows={destinationPlans}
+            columns={destinationPlansColumns}
+            rowSelection={false}
+            pagination
+            autoPageSize={true}
+            showColumnVerticalBorder={true}
+            pageSizeOptions={[5, 10, 15]}
             sx={{
               height: 320,
               "& .MuiDataGrid-columnHeader": {
