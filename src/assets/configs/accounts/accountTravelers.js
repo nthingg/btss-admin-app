@@ -1,6 +1,8 @@
 import { IconButton } from "@mui/material";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const accountTravelersColumn = [
   {
@@ -110,5 +112,21 @@ export const accountTravelersColumn = [
       return <div className="prestigePoint">{params.row.prestigePoint}</div>;
     },
     renderHeader: () => <span>ĐIỂM UY TÍN</span>,
+  },
+  {
+    field: "paymentType",
+    width: 200,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      if (params.row.plans.length > 0) {
+        return (
+          <div className="cellWithStatus AVAILABLE">{<CheckCircleIcon />}</div>
+        );
+      } else {
+        return <div className="cellWithStatus NONE">{<CancelIcon />}</div>;
+      }
+    },
+    renderHeader: () => <span>PHƯỢT THỦ</span>,
   },
 ];

@@ -10,7 +10,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import { Link, useParams } from "react-router-dom";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   LOAD_ACCOUNTS,
   LOAD_ACCOUNTS_FILTER,
@@ -18,7 +20,6 @@ import {
 } from "../../services/graphql/account";
 import AccountTable from "../../components/tables/AccountTable";
 import Slider from "react-slick";
-import AccountCreateTable from "../../components/tables/AccoutCreateTable";
 
 const AccountPage = () => {
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
@@ -27,7 +28,6 @@ const AccountPage = () => {
   const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchedTraveler, setSearchedTraveler] = useState(null);
-  const [isHavePlan, setHavePlan] = useState(true);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -36,19 +36,16 @@ const AccountPage = () => {
         if (searchTerm !== "") {
           setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
         }
-        setHavePlan(true);
         setSelectedStatus(accountRole[0]);
         refetch();
         break;
       case 1:
         setAccoutQuery(LOAD_ACCOUNTS_FILTER);
-        setHavePlan(false);
         setSelectedStatus(accountRole[1]);
         refetch();
         break;
       case 2:
         setAccoutQuery(LOAD_ACCOUNTS_FILTER);
-        setHavePlan(false);
         setSelectedStatus(accountRole[2]);
         refetch();
         break;
@@ -105,7 +102,6 @@ const AccountPage = () => {
     variables: {
       role: selectedStatus,
       searchTerm: searchTerm,
-      havePlan: isHavePlan
     },
   });
 
@@ -125,13 +121,13 @@ const AccountPage = () => {
 
   const handleSearchSubmit = () => {
     setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
-    let search = document.getElementById('floatingValue').value;
+    let search = document.getElementById("floatingValue").value;
     if (search.startsWith("0")) {
       search = "84" + search.substring(1);
     }
     setSearchTerm(search);
     refetch();
-  }
+  };
 
   useEffect(() => {
     if (searchedTraveler) {
@@ -141,7 +137,7 @@ const AccountPage = () => {
       }
       setTravelers(countTraveler);
     }
-  }, [searchedTraveler])
+  }, [searchedTraveler]);
 
   var settings = {
     dots: false,
@@ -168,22 +164,20 @@ const AccountPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleSearchSubmit();
               }
             }}
           />
-          <button className="link"
-            onClick={handleSearchSubmit}>
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
         <div className="right">
-          {/* <Link to="/accounts/add" className="link">
-              <AddCircleIcon />
-              <span>Thêm quản lý</span>
-            </Link> */}
-            <AccountCreateTable refetch={refetch} refetchTotal={refetchTotal} />
+          <Link to="/accounts/add" className="link">
+            <AddCircleIcon />
+            <span>Thêm quản lý</span>
+          </Link>
           <button className="link">
             <CloudDownloadIcon />
           </button>
@@ -209,8 +203,9 @@ const AccountPage = () => {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}

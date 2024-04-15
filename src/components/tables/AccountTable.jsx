@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const AccountTable = ({ travelers, suppliers, staffs }) => {
   const navigate = useNavigate();
-  
+
   const actionColumn = [
     {
       field: "action",
@@ -21,7 +21,7 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
         return (
           <Switch
             checked={params.row.isActive}
-            onChange={() => { }}
+            onChange={() => {}}
             inputProps={{ "aria-label": "controlled" }}
             sx={{
               "& .MuiSwitch-switchBase.Mui-checked": {
@@ -35,8 +35,9 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
         );
       },
       renderHeader: () => <span>TRẠNG THÁI</span>,
-    }
+    },
   ];
+
   const detailColumn = [
     {
       field: "details",
@@ -56,15 +57,17 @@ const AccountTable = ({ travelers, suppliers, staffs }) => {
         );
       },
       renderHeader: () => <span>CHI TIẾT</span>,
-    }
-  ]
+    },
+  ];
   return (
     <div>
       {travelers && (
         <div className="accountTable">
           <DataGrid
             rows={travelers}
-            columns={accountTravelersColumn.concat(actionColumn).concat(detailColumn)}
+            columns={accountTravelersColumn
+              .concat(actionColumn)
+              .concat(detailColumn)}
             rowSelection={false}
             pagination
             autoPageSize={true}

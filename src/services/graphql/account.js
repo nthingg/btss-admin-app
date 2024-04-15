@@ -5,11 +5,7 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
     accounts(
       first: 100
       order: { id: DESC }
-      where: {
-        role: { in: $role }
-        phone: { contains: $searchTerm }
-        plans: { any: true }
-      }
+      where: { role: { in: $role }, phone: { contains: $searchTerm } }
     ) {
       nodes {
         id
@@ -22,18 +18,17 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
         provider {
           name
         }
+        plans {
+          id
+        }
       }
     }
   }
 `;
 
 export const LOAD_ACCOUNTS_FILTER = gql`
-  query LoadAccounts($role: [Role!], $havePlan: Boolean) {
-    accounts(
-      first: 100
-      order: { id: DESC }
-      where: { role: { in: $role }, plans: { any: $havePlan } }
-    ) {
+  query LoadAccounts($role: [Role!]) {
+    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } }) {
       nodes {
         id
         name
@@ -44,6 +39,9 @@ export const LOAD_ACCOUNTS_FILTER = gql`
         prestigePoint
         provider {
           name
+        }
+        plans {
+          id
         }
       }
     }
@@ -129,13 +127,61 @@ export const LOAD_NUMBERS_NEWEST_TRAVELER = gql`
   }
 `;
 
-export const LOAD_PROVIDER = gql`
-  query {
-    providers(where: { isActive: { eq: true }, account: null }) {
-      nodes {
-        id
-        name
+export const LOAD_PROVIDER_INIT = gql`
+  query LoadProviders {
+    noAccountProviders(
+      first: 100
+      order: { id: DESC }
+      where: {
+        isActive: { eq: true }
+        type: { nin: [EMERGENCY, GROCERY, REPAIR, TAXI] }
       }
+    ) {
+      edges {
+        node {
+          id
+          name
+          address
+          type
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const LOAD_PROVIDER = gql`
+  query LoadProviders($cursor: String!) {
+    noAccountProviders(
+      first: 100
+      order: { id: DESC }
+      after: $cursor
+      where: {
+        isActive: { eq: true }
+        type: { nin: [EMERGENCY, GROCERY, REPAIR, TAXI] }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          address
+          type
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
@@ -228,6 +274,19 @@ export const LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT = gql`
         endCursor
       }
       totalCount
+    }
+  }
+`;
+
+export const GET_PROVIDER_BRIEF_BY_ID = gql`
+  query GetProvidersBrief($id: Int!) {
+    providers(where: { id: { eq: $id } }) {
+      nodes {
+        id
+        address
+        type
+        imagePath
+      }
     }
   }
 `;

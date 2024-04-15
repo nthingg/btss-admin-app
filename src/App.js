@@ -16,6 +16,7 @@ import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 import DestinationAddPage from "./pages/destination/DestinationAddPage";
 import DestinationUpdatePage from "./pages/destination/DestinationUpdatePage";
 import TransactionPage from "./pages/transactions/TransactionPage";
+import AccountCreatePage from "./pages/account/AccountCreatePage";
 
 const App = () => {
   const token = localStorage.getItem("adminToken");
@@ -65,10 +66,8 @@ const App = () => {
                 index
                 element={token ? <AccountPage /> : <Navigate to="/login" />}
               />
-              <Route
-                path=":accountId"
-                element={<AccountProfilePage />}
-              />
+              <Route path=":accountId" element={<AccountProfilePage />} />
+              <Route path="add" element={<AccountCreatePage />} />
             </Route>
             <Route path="transactions">
               <Route

@@ -17,6 +17,7 @@ import GolfCourseIcon from "@mui/icons-material/GolfCourse";
 import ForestIcon from "@mui/icons-material/Forest";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RowingIcon from "@mui/icons-material/Rowing";
+import PoolIcon from "@mui/icons-material/Pool";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   LOAD_DESTINATIONS,
@@ -28,6 +29,7 @@ import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import { Snackbar, Alert, Typography } from "@mui/material";
 import * as XLSX from "xlsx";
+import DestinationTotalTable from "../../components/tables/DestinationTotalTable";
 
 const DestinationPage = () => {
   const topoType = [
@@ -104,7 +106,7 @@ const DestinationPage = () => {
   const { error, loading, data, refetch } = useQuery(LOAD_DESTINATIONS_FILTER, {
     variables: {
       topo: selectedStatus,
-      searchTerm: searchTerm
+      searchTerm: searchTerm,
     },
   });
   const [destinations, setDestinations] = useState([]);
@@ -148,7 +150,7 @@ const DestinationPage = () => {
   useEffect(() => {
     if (searchedData && searchTerm) {
       initSlider(searchedData);
-    };
+    }
   }, [searchedData]);
 
   const initSlider = (dataArr) => {
@@ -228,7 +230,7 @@ const DestinationPage = () => {
     });
     sortedArr.unshift(0);
     setFilter(sortedArr);
-  }
+  };
 
   //#region Import excel
   const [add, { data: dataAdd, error: errorAdd }] = useMutation(
@@ -419,13 +421,13 @@ const DestinationPage = () => {
   };
 
   const handleSearchSubmit = async () => {
-    const search = document.getElementById('floatingValue').value;
+    const search = document.getElementById("floatingValue").value;
     setSearchTerm(search);
     const result = await refetch({
-      searchTerm: search
+      searchTerm: search,
     });
     setSearchedData(result["data"]["destinations"]["nodes"]);
-  }
+  };
 
   return (
     <div className="destination-page">
@@ -444,13 +446,12 @@ const DestinationPage = () => {
             name="value"
             placeholder="Tìm kiếm ..."
             onKeyDown={async (e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 await handleSearchSubmit();
               }
             }}
           />
-          <button className="link"
-            onClick={handleSearchSubmit}>
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -495,8 +496,9 @@ const DestinationPage = () => {
             {filter.map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -515,7 +517,7 @@ const DestinationPage = () => {
                 {index === 6 && <ForestIcon sx={{ color: "#3498DB" }} />}
                 {index === 7 && <RowingIcon sx={{ color: "#3498DB" }} />}
                 {index === 8 && <TerrainIcon sx={{ color: "#3498DB" }} />}
-                {index === 9 && <BikeScooter sx={{ color: "#3498DB" }} />}
+                {index === 9 && <PoolIcon sx={{ color: "#3498DB" }} />}
                 <span>
                   {index === 0 && `Tất cả`}
                   {index === 1 && `Bãi biển (${beach})`}
@@ -532,7 +534,11 @@ const DestinationPage = () => {
             ))}
           </Slider>
         </div>
-        <DestinationTable destinations={destinations} />
+
+        {selectedDiv !== 0 && <DestinationTable destinations={destinations} />}
+        {selectedDiv === 0 && (
+          <DestinationTotalTable destinations={destinations} />
+        )}
       </div>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
