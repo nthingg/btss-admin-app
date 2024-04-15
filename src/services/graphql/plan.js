@@ -30,7 +30,7 @@ export const LOAD_PLANS_FILTER = gql`
 `;
 
 export const LOAD_TOTAL_PLAN = gql`
-  query LoadTotalPlans($searchTerm: String){
+  query LoadTotalPlans($searchTerm: String) {
     plans(
       first: 100
       order: { id: DESC }
@@ -60,7 +60,7 @@ export const LOAD_TOTAL_PLAN = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_PLANS_PUBLISHED_FILTER = gql`
   query LoadPlans($searchTerm: String) {
@@ -129,7 +129,7 @@ export const LOAD_PLAN_READY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_PLAN_ONGOING = gql`
   query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
@@ -160,7 +160,7 @@ export const LOAD_PLAN_ONGOING = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_DETAIL_PLAN = gql`
   query GetPlanById($id: Int!) {
@@ -193,11 +193,13 @@ export const LOAD_DETAIL_PLAN = gql`
         startDate
         endDate
         gcoinBudgetPerCapita
-        savedContacts {
-          imagePath
-          name
-          phone
-          address
+        savedProviders {
+          provider {
+            imagePath
+            name
+            phone
+            address
+          }
         }
         orders {
           id
@@ -233,8 +235,11 @@ export const LOAD_NUMBERS_CANCELED = gql`
 `;
 
 export const LOAD_NUMBERS_COMPLETED = gql`
-  query NumberOfComplete($searchTerm: String){
-    plans(where: { status: { in: [COMPLETED, FLAWED] } } searchTerm: $searchTerm) {
+  query NumberOfComplete($searchTerm: String) {
+    plans(
+      where: { status: { in: [COMPLETED, FLAWED] } }
+      searchTerm: $searchTerm
+    ) {
       edges {
         node {
           id
@@ -291,7 +296,10 @@ export const LOAD_NUMBERS_PENDING = gql`
 
 export const LOAD_NUMBERS_READY = gql`
   query ReadyPlans($searchTerm: String, $dateTime: DateTime) {
-    plans(where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }, searchTerm: $searchTerm) {
+    plans(
+      where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }
+      searchTerm: $searchTerm
+    ) {
       edges {
         node {
           id
@@ -379,14 +387,17 @@ export const LOAD_NUMBERS_TOTAL = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_DESTINATION_PLANS = gql`
   query LoadPlans($id: Int) {
     plans(
       first: 100
       order: { id: DESC }
-      where: { destinationId: { eq: $id }, status: { in: [REGISTERING, READY, COMPLETED, FLAWED, CANCELED] } }
+      where: {
+        destinationId: { eq: $id }
+        status: { in: [REGISTERING, READY, COMPLETED, FLAWED, CANCELED] }
+      }
     ) {
       nodes {
         id
@@ -404,4 +415,4 @@ export const LOAD_DESTINATION_PLANS = gql`
       totalCount
     }
   }
-`
+`;

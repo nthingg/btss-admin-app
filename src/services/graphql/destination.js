@@ -21,10 +21,14 @@ export const LOAD_DETAIL_DESTINATION = gql`
           name
         }
         comments {
-          comment
-          createdAt
-          account {
-            name
+          edges {
+            node {
+              comment
+              createdAt
+              account {
+                name
+              }
+            }
           }
         }
       }

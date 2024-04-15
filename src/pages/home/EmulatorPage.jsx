@@ -452,20 +452,20 @@ const EmulatorPage = () => {
                 let tempCart = [];
                 let tempTotal = 0;
                 if (products.length > 0) {
-                  for (let l = 0; l < 4; l++) {
+                  for (let l = 0; l < 2; l++) {
                     let random = Math.floor(Math.random() * products.length);
 
                     let isExisted = false;
                     for (let m = 0; m < tempCart.length; m++) {
                       if (tempCart[m].key === products[random].id) {
-                        tempCart[m].value += 3;
+                        tempCart[m].value += 1;
                         isExisted = true;
                       }
                     }
                     if (!isExisted) {
-                      tempCart.push({ key: products[random].id, value: 3 });
+                      tempCart.push({ key: products[random].id, value: 1 });
                     }
-                    tempTotal += products[random].price * 3;
+                    tempTotal += products[random].price * 1;
                   }
                 }
 
