@@ -113,6 +113,7 @@ const AccountPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setAccounts(res);
+
       if (selectedStatus === accountRole[0]) {
         setSearchedTraveler(res);
       }
@@ -138,6 +139,17 @@ const AccountPage = () => {
       setTravelers(countTraveler);
     }
   }, [searchedTraveler]);
+
+  const fetchData = async () => {
+    console.log("im here");
+    setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+    setSearchTerm("");
+    refetchTotal();
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   var settings = {
     dots: false,
