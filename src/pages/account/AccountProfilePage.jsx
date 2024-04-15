@@ -3,15 +3,23 @@ import "../../assets/scss/loading.scss";
 import "../../assets/scss/shared.scss";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { IconButton, styled } from "@mui/material";
 import MapIcon from "@mui/icons-material/Map";
-import { LOAD_DETAIL_ACCOUNT } from "../../services/graphql/account";
-import { LOAD_TRAVELER_TRANSACTIONS } from "../../services/graphql/transaction";
+import {
+  LOAD_DETAIL_ACCOUNT,
+  LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT,
+  LOAD_TRANSACTIONS_TOTAL_INIT_BY_ACCOUNT,
+} from "../../services/graphql/account";
+import {
+  LOAD_TRANSACTIONS_TOTAL,
+  LOAD_TRANSACTIONS_TOTAL_INIT,
+  LOAD_TRAVELER_TRANSACTIONS,
+} from "../../services/graphql/transaction";
 import PlanTable from "../../components/tables/PlanTable";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import TransactionTable from "../../components/tables/TransactionTable";
@@ -21,6 +29,14 @@ const AccountProfilePage = () => {
   const [traveler, setTraveler] = useState(null);
   const [plans, setPlans] = useState([]);
   const [phone, setPhone] = useState("");
+  const transactionType = [
+    "PLAN_FUND",
+    "PLAN_REFUND",
+    "ORDER",
+    "ORDER_REFUND",
+    "TOPUP",
+    "GIFT",
+  ];
   // const [phoneHide, setPhoneHide] = useState("");
   // const [phoneVisibility, setPhoneVisibility] = useState(false);
   const [isActive, setIsActive] = useState("");
@@ -42,25 +58,60 @@ const AccountProfilePage = () => {
     },
   });
 
-  const {
-    error: errorTrans,
-    loading: loadingTrans,
-    data: dataTrans,
-    refetch: refetchTrans
-  } = useQuery(LOAD_TRAVELER_TRANSACTIONS, {
-    variables: {
-      id: parseInt(accountId, 10)
+  const [
+    getTransactions,
+    { error: errorTotal, loading: loadingTotal, data: dataTotal },
+  ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT);
+
+  const [
+    getInitTransactions,
+    { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
+  ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT_BY_ACCOUNT);
+
+  const fetchData = async (transactionType) => {
+    // Code to be executed on page load
+
+    const { data } = await getInitTransactions({
+      variables: { type: transactionType, accId: parseInt(accountId, 10) },
+    });
+
+    let transactionsData = data.transactions.edges;
+
+    if (data.transactions.pageInfo.hasNextPage === true) {
+      let check = true;
+      let currentEndCursor = data.transactions.pageInfo.endCursor;
+      while (check) {
+        const { data: dataRefetch } = await getTransactions({
+          variables: {
+            cursor: currentEndCursor,
+            type: transactionType,
+            accId: parseInt(accountId, 10),
+          },
+        });
+
+        transactionsData = transactionsData.concat(
+          dataRefetch.transactions.edges
+        );
+
+        if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
+          currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
+        } else {
+          check = false;
+        }
+      }
     }
-  })
+
+    let res = transactionsData.map((node, index) => {
+      const { __typename, ...rest } = node;
+      return { ...rest, index: index + 1 }; // Add the index to the object
+    });
+    setTransactions(res);
+    console.log("Component mounted!");
+  };
+
   useEffect(() => {
-    if (!loadingTrans && !errorTrans && dataTrans && dataTrans["transactions"]["nodes"]) {
-      let res = dataTrans.transactions.nodes.map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      });
-      setTransactions(res);
-    }
-  }, [dataTrans, loadingTrans, errorTrans])
+    fetchData(transactionType);
+  }, []);
 
   function formatPhoneNumberCen(phoneNumber) {
     // Replace leading "+84" with "0" (if present)
@@ -145,24 +196,24 @@ const AccountProfilePage = () => {
             <div className="navigation">
               <div className="left">
                 <div className="return-btn">
-                  {planId ?
+                  {planId ? (
                     <Link to={`/plans/${planId}`} className="navigateButton">
                       <ArrowCircleLeftIcon />
                       <p>Trở về</p>
                     </Link>
-                    :
+                  ) : (
                     <Link to={`/accounts`} className="navigateButton">
                       <ArrowCircleLeftIcon />
                       <p>Trở về</p>
-                    </Link>}
+                    </Link>
+                  )}
                 </div>
                 <div className="return-title">
-
                   <div className="return-header">
                     Thông tin chi tiết phượt thủ
                   </div>
 
-                  {planId ?
+                  {planId ? (
                     <div className="return-body">
                       <p>Danh sách kế hoạch</p>
                       <ArrowForwardIosIcon />
@@ -170,14 +221,13 @@ const AccountProfilePage = () => {
                       <ArrowForwardIosIcon />
                       <p>Thông tin phượt thủ</p>
                     </div>
-                    :
+                  ) : (
                     <div className="return-body">
                       <p>Danh sách tài khoản</p>
                       <ArrowForwardIosIcon />
                       <p>Thông tin phượt thủ</p>
                     </div>
-                  }
-
+                  )}
                 </div>
               </div>
             </div>
@@ -240,7 +290,7 @@ const AccountProfilePage = () => {
                 </div>
                 <div className="item">
                   <h1 className="itemTitle">Giao dịch gần đây</h1>
-                  <TransactionTable accountTransactions={transactions}/>
+                  <TransactionTable accountTransactions={transactions} />
                 </div>
               </div>
             </div>

@@ -32,10 +32,7 @@ export const LOAD_ACCOUNTS_FILTER = gql`
     accounts(
       first: 100
       order: { id: DESC }
-      where: {
-        role: { in: $role }
-        plans: { any: $havePlan }
-      }
+      where: { role: { in: $role }, plans: { any: $havePlan } }
     ) {
       nodes {
         id
@@ -130,7 +127,7 @@ export const LOAD_NUMBERS_NEWEST_TRAVELER = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_PROVIDER = gql`
   query {
@@ -148,6 +145,89 @@ export const CREATE_STAFF = gql`
     createStaff(dto: $dto) {
       id
       name
+    }
+  }
+`;
+
+export const LOAD_TRANSACTIONS_TOTAL_INIT_BY_ACCOUNT = gql`
+  query LoadTransactions($type: [TransactionType!], $accId: Int!) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: { type: { in: $type }, account: { id: { eq: $accId } } }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT = gql`
+  query LoadTransactions(
+    $type: [TransactionType!]
+    $cursor: String!
+    $accId: Int!
+  ) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      after: $cursor
+      where: { type: { in: $type }, account: { id: { eq: $accId } } }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
     }
   }
 `;
