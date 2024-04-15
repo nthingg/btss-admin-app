@@ -89,7 +89,6 @@ const DestinationTable = ({ refetch, destinations }) => {
           <Switch
             checked={params.row.isVisible}
             onChange={() => {
-              console.log("123");
               handleChangeStatus(params.row.id);
             }}
             inputProps={{ "aria-label": "controlled" }}

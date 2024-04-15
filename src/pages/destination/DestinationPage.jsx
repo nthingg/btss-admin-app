@@ -539,7 +539,10 @@ const DestinationPage = () => {
           <DestinationTable refetch={refetch} destinations={destinations} />
         )}
         {selectedDiv === 0 && (
-          <DestinationTotalTable destinations={destinations} />
+          <DestinationTotalTable
+            refetch={refetch}
+            destinations={destinations}
+          />
         )}
       </div>
       <Snackbar
