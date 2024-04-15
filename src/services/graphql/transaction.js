@@ -61,8 +61,12 @@ export const LOAD_TRAVELER_TRANSACTIONS = gql`
 `;
 
 export const LOAD_TRANSACTIONS_TOTAL_INIT = gql`
-  query LoadTransactions {
-    transactions(first: 100, order: { id: DESC }) {
+  query LoadTransactions($type: [TransactionType!]) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: { type: { in: $type } }
+    ) {
       edges {
         node {
           id
@@ -96,8 +100,13 @@ export const LOAD_TRANSACTIONS_TOTAL_INIT = gql`
 `;
 
 export const LOAD_TRANSACTIONS_TOTAL = gql`
-  query LoadTransactions($cursor: String!) {
-    transactions(first: 100, order: { id: DESC }, after: $cursor) {
+  query LoadTransactions($type: [TransactionType!], $cursor: String!) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      after: $cursor
+      where: { type: { in: $type } }
+    ) {
       edges {
         node {
           id

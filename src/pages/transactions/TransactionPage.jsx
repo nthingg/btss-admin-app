@@ -60,31 +60,31 @@ const TransactionPage = () => {
     switch (index) {
       case 0:
         setSelectedStatus(topoType);
-        refetch();
+        fetchData(topoType);
         break;
       case 1:
         setSelectedStatus(topoType[0]);
-        refetch();
+        fetchData([topoType[0]]);
         break;
       case 2:
         setSelectedStatus(topoType[1]);
-        refetch();
+        fetchData([topoType[1]]);
         break;
       case 3:
         setSelectedStatus(topoType[2]);
-        refetch();
+        fetchData([topoType[2]]);
         break;
       case 4:
         setSelectedStatus(topoType[3]);
-        refetch();
+        fetchData([topoType[3]]);
         break;
       case 5:
         setSelectedStatus(topoType[4]);
-        refetch();
+        fetchData([topoType[4]]);
         break;
       case 6:
         setSelectedStatus(topoType[5]);
-        refetch();
+        fetchData([topoType[5]]);
         break;
       default:
         break;
@@ -118,10 +118,12 @@ const TransactionPage = () => {
     { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
   ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
 
-  const fetchData = async () => {
+  const fetchData = async (transactionType) => {
     // Code to be executed on page load
 
-    const { data } = await getInitTransactions();
+    const { data } = await getInitTransactions({
+      variables: { type: transactionType },
+    });
 
     let transactionsData = data.transactions.edges;
 
@@ -130,7 +132,7 @@ const TransactionPage = () => {
       let currentEndCursor = data.transactions.pageInfo.endCursor;
       while (check) {
         const { data: dataRefetch } = await getTransactions({
-          variables: { cursor: currentEndCursor },
+          variables: { cursor: currentEndCursor, type: transactionType },
         });
 
         transactionsData = transactionsData.concat(
@@ -154,7 +156,7 @@ const TransactionPage = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(topoType);
   }, []);
 
   const {
