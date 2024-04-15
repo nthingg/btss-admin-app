@@ -18,10 +18,10 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      let idString = params.row.id.toString();
+      let idString = params.row.node.id.toString();
       const zerosNeeded = Math.max(10 - idString.length, 0);
       for (let i = 0; i < zerosNeeded; i++) {
-        idString = '0' + idString;
+        idString = "0" + idString;
       }
 
       return <div>{idString}</div>;
@@ -35,11 +35,11 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const value = params.row;
+      const value = params.row.node;
       if (value.account) {
-        return <div>{params.row.account.name}</div>;
+        return <div>{params.row.node.account.name}</div>;
       } else if (value.provider) {
-        return <div>{params.row.provider.name}</div>;
+        return <div>{params.row.node.provider.name}</div>;
       }
     },
     renderHeader: () => <span>NGƯỜI TẠO</span>,
@@ -51,7 +51,7 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const value = params.row;
+      const value = params.row.node;
       if (value.account) {
         return <div>Người dùng</div>;
       } else if (value.provider) {
@@ -67,11 +67,11 @@ export const transactionsColumns = [
     headerAlign: "center",
     renderCell: (params) => {
       const statusType = {
-        "PENDING": "Chờ xác nhận",
-        "ACCEPTED": "Thành công",
-        "ERROR": "Thất bại"
-      }
-      return <div>{statusType[params.row.status]}</div>;
+        PENDING: "Chờ xác nhận",
+        ACCEPTED: "Thành công",
+        ERROR: "Thất bại",
+      };
+      return <div>{statusType[params.row.node.status]}</div>;
     },
     renderHeader: () => <span>TRẠNG THÁI</span>,
   },
@@ -81,7 +81,7 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.gcoinAmount}</div>;
+      return <div>{params.row.node.gcoinAmount}</div>;
     },
     renderHeader: () => <span>SỐ GCOIN</span>,
   },
@@ -91,7 +91,7 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.gateway}</div>;
+      return <div>{params.row.node.gateway}</div>;
     },
     renderHeader: () => <span>CỔNG THANH TOÁN</span>,
   },
@@ -102,14 +102,14 @@ export const transactionsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.createdAt);
+      const date = new Date(params.row.node.createdAt);
 
       const formattedDateTime = date.toLocaleString("vi-VN", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
       });
 
       return <div>{formattedDateTime}</div>;

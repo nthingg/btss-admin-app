@@ -102,13 +102,14 @@ const TransactionTable = ({ transactions, accountTransactions }) => {
   return (
     <div>
       {transactions && (
-        <div className="destinationTable" >
+        <div className="destinationTable">
           <DataGrid
             rows={transactions}
             columns={transactionsColumns}
             rowSelection={false}
             pagination
             autoPageSize
+            getRowId={(row) => row.node.id}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
@@ -124,10 +125,14 @@ const TransactionTable = ({ transactions, accountTransactions }) => {
         </div>
       )}
       {accountTransactions && (
-        <div className="accountTransactionTable" style={{width: "fit-content", height: "23.28rem"}}>
+        <div
+          className="accountTransactionTable"
+          style={{ width: "fit-content", height: "23.28rem" }}
+        >
           <DataGrid
             rows={accountTransactions}
             columns={accounttransactionsColumns}
+            getRowId={(row) => row.node.id}
             rowSelection={false}
             pagination
             autoPageSize

@@ -58,15 +58,65 @@ export const LOAD_TRAVELER_TRANSACTIONS = gql`
       }
     }
   }
-`
+`;
 
-export const LOAD_TRANSACTIONS_TOTAL = gql`
-  query {
-    transactions {
+export const LOAD_TRANSACTIONS_TOTAL_INIT = gql`
+  query LoadTransactions {
+    transactions(first: 100, order: { id: DESC }) {
       edges {
         node {
           id
+          orderId
           type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const LOAD_TRANSACTIONS_TOTAL = gql`
+  query LoadTransactions($cursor: String!) {
+    transactions(first: 100, order: { id: DESC }, after: $cursor) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
         }
       }
       pageInfo {

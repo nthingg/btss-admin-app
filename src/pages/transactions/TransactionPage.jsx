@@ -5,7 +5,7 @@ import "../../assets/scss/filter.scss";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import DestinationTable from "../../components/tables/DestinationTable";
 import BeachAccessIcon from "@mui/icons-material/BeachAccess";
@@ -32,6 +32,7 @@ import {
   LOAD_TRANSACTIONS_PLAN_REFUND,
   LOAD_TRANSACTIONS_TOPUP,
   LOAD_TRANSACTIONS_TOTAL,
+  LOAD_TRANSACTIONS_TOTAL_INIT,
 } from "../../services/graphql/transaction";
 import TransactionTable from "../../components/tables/TransactionTable";
 
@@ -97,22 +98,64 @@ const TransactionPage = () => {
   });
 
   const [transactions, setTransactions] = useState([]);
-  useEffect(() => {
-    if (!loading && !error && data && data["transactions"]["nodes"]) {
-      let res = data.transactions.nodes.map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 }; // Add the index to the object
-      });
-      setTransactions(res);
-    }
-  }, [data, loading, error]);
+  // useEffect(() => {
+  //   if (!loading && !error && data && data["transactions"]["nodes"]) {
+  //     let res = data.transactions.nodes.map((node, index) => {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 }; // Add the index to the object
+  //     });
+  //     setTransactions(res);
+  //   }
+  // }, [data, loading, error]);
 
-  const {
-    error: errorTotal,
-    loading: loadingTotal,
-    data: dataTotal,
-    refetch: refetchTotal,
-  } = useQuery(LOAD_TRANSACTIONS_TOTAL);
+  const [
+    getTransactions,
+    { error: errorTotal, loading: loadingTotal, data: dataTotal },
+  ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL);
+
+  const [
+    getInitTransactions,
+    { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
+  ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
+
+  const fetchData = async () => {
+    // Code to be executed on page load
+
+    const { data } = await getInitTransactions();
+
+    let transactionsData = data.transactions.edges;
+
+    if (data.transactions.pageInfo.hasNextPage === true) {
+      let check = true;
+      let currentEndCursor = data.transactions.pageInfo.endCursor;
+      while (check) {
+        const { data: dataRefetch } = await getTransactions({
+          variables: { cursor: currentEndCursor },
+        });
+
+        transactionsData = transactionsData.concat(
+          dataRefetch.transactions.edges
+        );
+
+        if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
+          currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
+        } else {
+          check = false;
+        }
+      }
+    }
+
+    let res = transactionsData.map((node, index) => {
+      const { __typename, ...rest } = node;
+      return { ...rest, index: index + 1 }; // Add the index to the object
+    });
+    setTransactions(res);
+    console.log("Component mounted!");
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const {
     error: errGift,
