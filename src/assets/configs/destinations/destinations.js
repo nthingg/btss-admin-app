@@ -48,29 +48,4 @@ export const destinationsColumns = [
     },
     renderHeader: () => <span>ĐÁNH GIÁ</span>,
   },
-  {
-    field: "status",
-    headerName: "Trạng thái",
-    width: 140,
-    align: "center",
-    headerAlign: "center",
-    renderCell: (params) => {
-      return (
-        <Switch
-          checked={params.row.isVisible}
-          onChange={() => {}}
-          inputProps={{ "aria-label": "controlled" }}
-          sx={{
-            "& .MuiSwitch-switchBase.Mui-checked": {
-              color: "#2c3d50",
-            },
-            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-              backgroundColor: "#2c3d50",
-            },
-          }}
-        />
-      );
-    },
-    renderHeader: () => <span>TRẠNG THÁI</span>,
-  },
 ];

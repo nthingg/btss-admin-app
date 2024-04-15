@@ -35,7 +35,7 @@ export const destinationsTotalColumns = [
     renderHeader: () => <span>TỈNH</span>,
   },
   {
-    field: "comments",
+    field: "rating",
     width: 210,
     align: "center",
     headerAlign: "center",
@@ -49,7 +49,7 @@ export const destinationsTotalColumns = [
     renderHeader: () => <span>ĐÁNH GIÁ</span>,
   },
   {
-    field: "comments",
+    field: "topo",
     width: 210,
     align: "center",
     headerAlign: "center",

@@ -121,7 +121,7 @@ export const LOAD_DESTINATION_TRENDING = gql`
       }
     }
   }
-`
+`;
 
 export const ADD_DESTINATION = gql`
   mutation createDestination($dto: DestinationCreateInput!) {
@@ -153,6 +153,15 @@ export const LOAD_PROVINCES = gql`
 export const IMPORT_EXCEL_DESTINATION = gql`
   mutation createMultiDestination($input: [DestinationCreateInput!]!) {
     createMultiDestination(dtos: $input) {
+      id
+      name
+    }
+  }
+`;
+
+export const CHANGE_STATUS_DESTINATION = gql`
+  mutation changeStatusDes($id: Int!) {
+    changeDestinationStatus(destinationId: $id) {
       id
       name
     }

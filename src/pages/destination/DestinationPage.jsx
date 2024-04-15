@@ -535,7 +535,9 @@ const DestinationPage = () => {
           </Slider>
         </div>
 
-        {selectedDiv !== 0 && <DestinationTable destinations={destinations} />}
+        {selectedDiv !== 0 && (
+          <DestinationTable refetch={refetch} destinations={destinations} />
+        )}
         {selectedDiv === 0 && (
           <DestinationTotalTable destinations={destinations} />
         )}
