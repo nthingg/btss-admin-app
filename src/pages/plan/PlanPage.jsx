@@ -5,7 +5,7 @@ import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -17,15 +17,18 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import PublicIcon from "@mui/icons-material/Public";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
   LOAD_NUMBERS_READY,
   LOAD_NUMBERS_REGISTERING,
   LOAD_NUMBERS_PUBLISHED,
+  LOAD_NUMBERS_TOTAL,
   LOAD_PLANS_FILTER,
   LOAD_PLAN_READY,
   LOAD_TOTAL_PLAN,
+  LOAD_TOTAL_PLAN_INIT,
   LOAD_PLANS_PUBLISHED_FILTER,
   LOAD_PLAN_ONGOING,
   LOAD_NUMBERS_ONGOING,
@@ -36,6 +39,7 @@ import { useParams } from "react-router-dom";
 const PlanPage = () => {
   const { sbsNumber } = useParams();
   const [now, setNow] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
   const planStat = [
     "TOTAL",
     "REGISTERING",
@@ -79,18 +83,60 @@ const PlanPage = () => {
       }
     }
     else {
-      setPlanQuery(LOAD_TOTAL_PLAN);
+      // setPlanQuery(LOAD_TOTAL_PLAN);
+      fetchTotalPlan(null);
     }
+    setIsLoading(false);
   }, []);
 
   const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
   const [searchTerm, setSearchTerm] = useState(null);
+  const [totalPlan, setTotalPlan] = useState([]);
+  const [getTotalPlan, { refetch: refetchTotalPlan }] = useLazyQuery(LOAD_TOTAL_PLAN);
+  const [getInitTotalPlan, { refetch: refetchTotalPlanInit }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT);
+
+  const fetchTotalPlan = async (searchTerm) => {
+    const { data } = await getInitTotalPlan({
+      variables: {
+        searchTerm: searchTerm
+      }
+    });
+    let planData = data.plans.edges;
+    if (data.plans.pageInfo.hasNextPage === true) {
+      let check = true;
+      let endCursor = data.plans.pageInfo.endCursor;
+      while (check) {
+        const { data: dataRefetch } = await getTotalPlan({
+          variables: {
+            searchTerm: searchTerm,
+            endCursor: endCursor
+          }
+        });
+
+        planData = planData.concat(dataRefetch.plans.edges);
+
+        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+          endCursor = dataRefetch.plans.pageInfo.endCursor;
+        } else {
+          check = false;
+        }
+      }
+    }
+
+    let res = planData.map((node, index) => {
+      if (node) {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 };
+      }
+    });
+    setTotalPlan(res);
+    setIsLoading(false);
+  }
 
   const handleClick = (index) => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
-        setPlanQuery(LOAD_TOTAL_PLAN);
         setSelectedStatus(planStat[0]);
         refetch();
         break;
@@ -160,6 +206,23 @@ const PlanPage = () => {
       setPlans(res);
     }
   }, [data, loading, error]);
+
+  const {
+    error: errTotal,
+    loading: loadTotal,
+    data: dataTotal,
+    refetch: refetchTotal,
+  } = useQuery(LOAD_NUMBERS_TOTAL, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    if (!loadTotal && !errTotal && dataTotal && dataTotal["plans"]) {
+      setTotal(dataTotal["plans"].totalCount);
+    }
+  }, [dataTotal, errTotal, loadTotal]);
 
   const {
     error: errRegis,
@@ -326,47 +389,44 @@ const PlanPage = () => {
   const handleSearchSubmit = async () => {
     const search = document.getElementById('floatingValue').value;
     setSearchTerm(search);
-    const result = await refetch({
-      status: selectedStatus,
-      searchTerm: search
-    });
-    if (!result.loading && !result.error && result.data && result.data["plans"]["nodes"]) {
-      const totalCount = result.data.plans.totalCount;
-      switch (selectedStatus) {
-        // case planStat[0]: {
-        //   setPending(totalCount);
-        //   break;
-        // }
-        case planStat[1]: {
-          setRegistering(totalCount);
-          break;
-        }
-        case planStat[2]: {
-          setTemp(totalCount);
-          break;
-        }
-        case planStat[3]: {
-          setOngoing(totalCount);
-          break;
-        }
-        case planStat[4]: {
-          setCompleted(totalCount);
-          break;
-        }
-        // case planStat[5]: {
-        //   setCompleted(totalCount);
-        //   break;
-        // }
-        case planStat[6]: {
-          setCancelled(totalCount);
-          break;
-        }
-        case planStat[true]: {
-          setPublished(totalCount);
-          break;
-        }
-      }
-    }
+    refetch();
+    // if (!result.loading && !result.error && result.data && result.data["plans"]["nodes"]) {
+    //   const totalCount = result.data.plans.totalCount;
+    //   switch (selectedStatus) {
+    //     // case planStat[0]: {
+    //     //   setPending(totalCount);
+    //     //   break;
+    //     // }
+    //     case planStat[1]: {
+    //       setRegistering(totalCount);
+    //       break;
+    //     }
+    //     case planStat[2]: {
+    //       setTemp(totalCount);
+    //       break;
+    //     }
+    //     case planStat[3]: {
+    //       setOngoing(totalCount);
+    //       break;
+    //     }
+    //     case planStat[4]: {
+    //       setCompleted(totalCount);
+    //       break;
+    //     }
+    //     // case planStat[5]: {
+    //     //   setCompleted(totalCount);
+    //     //   break;
+    //     // }
+    //     case planStat[6]: {
+    //       setCancelled(totalCount);
+    //       break;
+    //     }
+    //     case planStat[true]: {
+    //       setPublished(totalCount);
+    //       break;
+    //     }
+    //   }
+    // }
   }
 
   return (
@@ -391,7 +451,12 @@ const PlanPage = () => {
               }
             }}
           />
-          <button className="link" onClick={handleSearchSubmit}>
+          <button className="link" onClick={() => {
+            handleSearchSubmit();
+            const search = document.getElementById('floatingValue').value;
+            setIsLoading(true);
+            fetchTotalPlan(search);
+          }}>
             <SearchIcon />
           </button>
         </div>
@@ -415,6 +480,8 @@ const PlanPage = () => {
               refetchComplete();
               refetchOngoing();
               refetchPublished();
+              setIsLoading(true);
+              fetchTotalPlan(null);
             }}
           >
             <RefreshIcon />
@@ -447,7 +514,7 @@ const PlanPage = () => {
                 {index === 5 && <PublicIcon sx={{ color: "#3498DB" }} />}
                 {index === 6 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 <span>
-                  {index === 0 && `Tất cả`}
+                  {index === 0 && `Tất cả (${total})`}
                   {index === 1 && `Chưa chốt (${registering})`}
                   {index === 2 && `Sắp diễn ra (${temp})`}
                   {index === 3 && `Đang diễn ra (${onGoing})`}
@@ -460,10 +527,19 @@ const PlanPage = () => {
             ))}
           </Slider>
         </div>
-        {
-          selectedStatus === planStat[0] ? 
-          <PlanTable planTotal={plans} /> :
-          <PlanTable plans={plans}/>
+        {isLoading && (
+          <div className="loading">
+            <RestartAltIcon
+              sx={{
+                fontSize: 80,
+                color: "#2c3d50",
+              }}
+            />
+          </div>
+        )}
+        {!isLoading && selectedStatus === planStat[0] ?
+          <PlanTable planTotal={totalPlan} /> :
+          <PlanTable plans={plans} />
         }
       </div>
     </div>

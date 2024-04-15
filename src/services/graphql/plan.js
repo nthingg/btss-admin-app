@@ -30,9 +30,10 @@ export const LOAD_PLANS_FILTER = gql`
 `;
 
 export const LOAD_TOTAL_PLAN = gql`
-  query LoadTotalPlans($searchTerm: String) {
+  query LoadTotalPlans($searchTerm: String, $endCursor: String) {
     plans(
       first: 100
+      after: $endCursor
       order: { id: DESC }
       where: {
         status: {
@@ -41,26 +42,73 @@ export const LOAD_TOTAL_PLAN = gql`
       }
       searchTerm: $searchTerm
     ) {
-      nodes {
-        id
-        name
-        account {
+      edges {
+        node {
+          id
           name
+          account {
+            name
+          }
+          destination {
+            name
+          }
+          utcDepartAt
+          startDate
+          memberCount
+          maxMemberCount
+          endDate
+          status
         }
-        destination {
-          name
-        }
-        utcDepartAt
-        startDate
-        memberCount
-        maxMemberCount
-        endDate
-        status
+      }
+      pageInfo {
+        hasNextPage
+        startCursor
+        endCursor
       }
       totalCount
     }
   }
-`;
+`
+export const LOAD_TOTAL_PLAN_INIT = gql`
+  query LoadTotalPlansInit($searchTerm: String, $endCursor: String) {
+    plans(
+      first: 100
+      after: $endCursor
+      order: { id: DESC }
+      where: {
+        status: {
+          in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
+        }
+      }
+      searchTerm: $searchTerm
+    ) {
+      edges {
+        node {
+          id
+          name
+          account {
+            name
+          }
+          destination {
+            name
+          }
+          utcDepartAt
+          startDate
+          memberCount
+          maxMemberCount
+          endDate
+          status
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+`
 
 export const LOAD_PLANS_PUBLISHED_FILTER = gql`
   query LoadPlans($searchTerm: String) {
@@ -103,11 +151,11 @@ export const LOAD_PLANS = gql`
 `;
 
 export const LOAD_PLAN_READY = gql`
-  query ReadyPlans($searchTerm: String, $dateTime: DateTime) {
+  query CommingSoon($searchTerm: String, $dateTime: DateTime) {
     plans(
       first: 100
       order: { id: DESC }
-      where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }
+      where: { utcDepartAt: { gte: $dateTime }, status: { eq: READY } }
       searchTerm: $searchTerm
     ) {
       nodes {
@@ -135,9 +183,13 @@ export const LOAD_PLAN_ONGOING = gql`
   query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
     plans(
       where: {
-        status: { in: [READY, VERIFIED] }
-        utcDepartAt: { lte: $dateTime }
-        utcEndAt: { gte: $dateTime }
+        or: [
+          {
+            status: { eq: READY }
+            utcDepartAt: { lte: $dateTime }
+          }
+          { status: { eq: VERIFIED }}
+        ]
       }
       searchTerm: $searchTerm
     ) {
@@ -193,14 +245,6 @@ export const LOAD_DETAIL_PLAN = gql`
         startDate
         endDate
         gcoinBudgetPerCapita
-        savedProviders {
-          provider {
-            imagePath
-            name
-            phone
-            address
-          }
-        }
         orders {
           id
           createdAt
@@ -262,9 +306,13 @@ export const LOAD_NUMBERS_ONGOING = gql`
   query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
     plans(
       where: {
-        status: { in: [READY, VERIFIED] }
-        utcDepartAt: { lte: $dateTime }
-        utcEndAt: { gte: $dateTime }
+        or: [
+          {
+            status: { eq: READY }
+            utcDepartAt: { lte: $dateTime }
+          }
+          { status: { eq: VERIFIED }}
+        ]
       }
       searchTerm: $searchTerm
     ) {
@@ -295,11 +343,8 @@ export const LOAD_NUMBERS_PENDING = gql`
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  query ReadyPlans($searchTerm: String, $dateTime: DateTime) {
-    plans(
-      where: { utcDepartAt: { gt: $dateTime }, status: { eq: READY } }
-      searchTerm: $searchTerm
-    ) {
+  query CommingSoon($searchTerm: String, $dateTime: DateTime) {
+    plans(where: { utcDepartAt: { gte: $dateTime }, status: { eq: READY } }, searchTerm: $searchTerm) {
       edges {
         node {
           id
@@ -376,13 +421,14 @@ export const LOAD_NUMBERS_PUBLISHED = gql`
 `;
 
 export const LOAD_NUMBERS_TOTAL = gql`
-  query {
+  query LoadTotalPlans($searchTerm: String) {
     plans(
       where: {
         status: {
           in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
         }
       }
+      searchTerm: $searchTerm
     ) {
       totalCount
     }

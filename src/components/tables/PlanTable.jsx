@@ -77,6 +77,70 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
       renderHeader: () => <span>CHI TIẾT</span>,
     },
   ];
+  const actionTotalColumn = [
+    {
+      field: "action",
+      width: 100,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        let check = params.row.node.status;
+        switch (check) {
+          case "READY":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.node.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          case "VERIFIED":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.node.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          case "FLAWED":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.node.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          case "COMPLETED":
+            return (
+              <IconButton
+                color="info"
+                onClick={() => {
+                  navigate(`/plans/${params.row.node.id}`);
+                }}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            );
+          default:
+            return (
+              <IconButton color="info" disabled={true}>
+                <VisibilityOffIcon />
+              </IconButton>
+            );
+        }
+      },
+      renderHeader: () => <span>CHI TIẾT</span>,
+    },
+  ];
   return (
     <div>
       {plans && (
@@ -112,10 +176,11 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
         <div className="planTable">
           <DataGrid
             rows={planTotal}
-            columns={planTotalColumns.concat(actionColumn)}
+            columns={planTotalColumns.concat(actionTotalColumn)}
             rowSelection={false}
             pagination
             autoPageSize
+            getRowId={(row) => row.node.id}
             // pageSizeOptions={8}
             // autoHeight={true}
             showColumnVerticalBorder={true}

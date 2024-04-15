@@ -7,6 +7,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { useQuery } from "@apollo/client";
 
 import { useEffect, useState } from "react";
@@ -20,12 +21,18 @@ import {
   LOAD_NUMBERS_PUBLISHED,
   LOAD_NUMBERS_TOTAL,
 } from "../../services/graphql/plan";
-import { LOAD_DESTINATIONS } from "../../services/graphql/destination";
+import { LOAD_DESTINATIONS, LOAD_DESTINATION_TRENDING } from "../../services/graphql/destination";
 import { LOAD_ACCOUNTS_TRAVELER, LOAD_NUMBERS_NEWEST_TRAVELER } from "../../services/graphql/account";
 import { Link } from "react-router-dom";
+import { TrendingDestinationChart } from "../../components/charts/TrendingDestinationChart";
+import Chart  from "chart.js/auto";
+import { CategoryScale } from "chart.js"
+
+Chart.register(CategoryScale);
 
 const HomePage = () => {
   const [now, setNow] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
   const {
     error: errorTravelers,
     loading: loadingTravelers,
@@ -44,6 +51,7 @@ const HomePage = () => {
       //   ({ __typename, ...rest }) => rest
       // );
       setTravelers(dataTravelers.accounts.totalCount);
+      setIsLoading(false);
     }
   }, [dataTravelers, loadingTravelers, errorTravelers]);
 
@@ -217,11 +225,21 @@ const HomePage = () => {
     }
   }, [dataPublished, loadingPublished, errorPublished]);
 
-  const [date, setDate] = useState(new Date());
+  const [trendingDest, setTrendingDest] = useState([]);
+  const { error: errTrendDest, loading: loadingTrendDest, data: dataTrendDest } = useQuery(LOAD_DESTINATION_TRENDING);
+  useEffect(() => {
+    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]["nodes"]) {
+      let res = dataTrendDest.trendingDestinations.nodes.map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 }; // Add the index to the object
+      });
+      setTrendingDest(res);
+    }
+  }, [errTrendDest, loadingTrendDest, dataTrendDest])
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setDate(new Date());
+      setNow(new Date());
     }, 1000); // Update every second
 
     return () => clearInterval(timer); // Cleanup function to stop the timer when the component unmounts
@@ -229,137 +247,153 @@ const HomePage = () => {
 
   return (
     <div className="home">
-      <div className="shared-title">
+      {isLoading && (
+        <div className="loading">
+          <RestartAltIcon
+            sx={{
+              fontSize: 80,
+              color: "#2c3d50",
+            }}
+          />
+        </div>
+      )}
+      {!isLoading && (
         <div>
-          <p className="title">Trang chủ</p>
-          <p className="sub-title">Thông tin hệ thống </p>
-        </div>
-      </div>
-      <div className="home_container">
-        <div className="refresh-container">
-          <div className="left">
-            <p>Hôm nay: {date.toLocaleString()}</p>
+          <div className="shared-title">
+            <div>
+              <p className="title">Trang chủ</p>
+              <p className="sub-title">Thông tin hệ thống </p>
+            </div>
           </div>
-          <div className="right">
-            <button
-              className="link"
-              onClick={() => {
-                refetch();
-                refetchCancelled();
-                // refetchOnGoing();
-                refetchTemp();
-                refetchDestination();
-                refetchComplete();
-                refetchTotal();
-                // refetchVeri();
-                refetchTravelers();
-                refetchPublished();
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <RefreshIcon />
-            </button>
-          </div>
-        </div>
-        <h2 className="item-list-title">Báo cáo kế hoạch</h2>
-        <div className="item-list-plan">
-          <div className="item-container total">
-            <div className="item-top">
-                <div className="item-title">Tổng số kế hoạch</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans`} className="navigateButton">
-                    {/* <p>{pending}</p> */}
-                    <p>{total}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/plans`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
+          <div className="home_container">
+            <div className="refresh-container">
+              <div className="left">
+                <p>Hôm nay: {now.toLocaleString()}</p>
+              </div>
+              <div className="right">
+                <button
+                  className="link"
+                  onClick={() => {
+                    setIsLoading(true);
+                    refetch();
+                    refetchCancelled();
+                    // refetchOnGoing();
+                    refetchTemp();
+                    refetchDestination();
+                    refetchComplete();
+                    refetchTotal();
+                    // refetchVeri();
+                    refetchTravelers();
+                    refetchPublished();
+                    setTimeout(() => {
+                      setIsLoading(false);
+                    }, 500);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <RefreshIcon />
+                </button>
+              </div>
+            </div>
+            <h2 className="item-list-title">Báo cáo kế hoạch</h2>
+            <div className="item-list-plan">
+              <div className="item-container total">
+                <div className="item-top">
+                  <div className="item-title">Tổng số kế hoạch</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans`} className="navigateButton">
+                        {/* <p>{pending}</p> */}
+                        <p>{total}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/plans`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="item-container temp">
-            <div className="item-top">
-              <div className="item-title" style={{fontSize: "17px"}}>Kế hoạch chưa chốt thành viên</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/1`} className="navigateButton">
-                    <p>{registering}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn temp">
-                    <Link to={`/plans/sbs/1`} className="navigateButton">
-                      <ErrorOutlineOutlinedIcon sx={{ color: "white" }} />
-                    </Link>
+              <div className="item-container temp">
+                <div className="item-top">
+                  <div className="item-title" style={{ fontSize: "17px" }}>Kế hoạch chưa chốt thành viên</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/1`} className="navigateButton">
+                        <p>{registering}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn temp">
+                        <Link to={`/plans/sbs/1`} className="navigateButton">
+                          <ErrorOutlineOutlinedIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="item-container info">
-            <div className="item-top">
-              <div className="item-title">Kế hoạch sắp diễn ra</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/2`} className="navigateButton">
-                    <p>{temp}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/plans/sbs/2`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Kế hoạch sắp diễn ra</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/2`} className="navigateButton">
+                        <p>{temp}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/plans/sbs/2`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="item-container info">
-            <div className="item-top">
-              <div className="item-title">Kế hoạch đang diễn ra</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/2`} className="navigateButton">
-                    <p>{onGoing}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/plans/sbs/2`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Kế hoạch đang diễn ra</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/2`} className="navigateButton">
+                        <p>{onGoing}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/plans/sbs/2`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="item-container success">
-            <div className="item-top">
-              <div className="item-title">Kế hoạch đã hoàn thành</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/4`} className="navigateButton">
-                    <p>{completed}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn success">
-                    <Link to={`/plans/sbs/4`} className="navigateButton">
-                      <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
-                    </Link>
+              <div className="item-container success">
+                <div className="item-top">
+                  <div className="item-title">Kế hoạch đã hoàn thành</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/4`} className="navigateButton">
+                        <p>{completed}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn success">
+                        <Link to={`/plans/sbs/4`} className="navigateButton">
+                          <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          {/* <div className="item-container info">
+              {/* <div className="item-container info">
             <div className="item-top">
               <div className="item-title">Số kế hoạch lỗi</div>
               <div className="item-body">
@@ -378,7 +412,7 @@ const HomePage = () => {
               </div>
             </div>
           </div> */}
-          {/* <div className="item-container checkIn">
+              {/* <div className="item-container checkIn">
             <div className="item-top">
               <div className="item-title">Số kế hoạch check-in</div>
               <div className="item-body">
@@ -397,112 +431,124 @@ const HomePage = () => {
               </div>
             </div>
           </div> */}
-          <div className="item-container publish">
-            <div className="item-top">
-              <div className="item-title">Kế hoạch đã được chia sẻ</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/7`} className="navigateButton">
-                    <p>{published}</p>
-                  </Link>
+              <div className="item-container publish">
+                <div className="item-top">
+                  <div className="item-title">Kế hoạch đã được chia sẻ</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/7`} className="navigateButton">
+                        <p>{published}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/plans/sbs/7`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/plans/sbs/7`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
+              </div>
+              <div className="item-container cancel">
+                <div className="item-top">
+                  <div className="item-title">Kế hoạch đã hủy</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/plans/sbs/6`} className="navigateButton">
+                        <p>{cancelled}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn cancel">
+                        <Link to={`/plans/sbs/6`} className="navigateButton">
+                          <CancelOutlinedIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="item-container cancel">
-            <div className="item-top">
-              <div className="item-title">Kế hoạch đã hủy</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/plans/sbs/6`} className="navigateButton">
-                    <p>{cancelled}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn cancel">
-                    <Link to={`/plans/sbs/6`} className="navigateButton">
-                      <CancelOutlinedIcon sx={{ color: "white" }} />
-                    </Link>
+            <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
+            <div className="item-list-title">
+              <h2 style={{ display: "inline-block" }}>Báo cáo hệ thống</h2>
+              {/* <span style={{fontSize: "1.3rem", float: "right"}}><em>*Tháng này đã có {newTravelers} người dùng mới đăng kí vào hệ thống</em></span> */}
+            </div>
+            <div className="item-list-system">
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Số địa điểm trong hệ thống</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/destinations`} className="navigateButton">
+                        <p>{destinations}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/destinations`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Số người dùng hiện tại</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/accounts`} className="navigateButton">
+                        <p>{travelers}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/accounts`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Người dùng mới tháng này</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/accounts`} className="navigateButton">
+                        <p>{newTravelers}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/accounts`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
+            <div className="item-list-title">
+              <h2 style={{ display: "inline-block" }}>Địa điểm nổi bật</h2>
+              <span style={{fontSize: "1.1rem", float: "right"}}><em>*Dữ liệu được lấy từ thứ 2 gần nhất trở về 30 ngày trước đó.</em></span>
+            </div>
+            <div className="item-list-trending">
+              <div className="item-container info">
+                <TrendingDestinationChart chartData={trendingDest}/>
+              </div>
+              <div className="item-container info" style={{ border: "none" }}></div>
+              <div className="item-container info" style={{ border: "none" }}></div>
             </div>
           </div>
         </div>
-        <hr style={{borderTop: "1px solid #e4e4e4", marginTop: "1rem"}}/>
-        <div className="item-list-title">
-        <h2 style={{display: "inline-block"}}>Báo cáo hệ thống</h2>
-        {/* <span style={{fontSize: "1.3rem", float: "right"}}><em>*Tháng này đã có {newTravelers} người dùng mới đăng kí vào hệ thống</em></span> */}
-        </div>
-        <div className="item-list-system">
-          <div className="item-container info">
-            <div className="item-top">
-              <div className="item-title">Số địa điểm trong hệ thống</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/destinations`} className="navigateButton">
-                    <p>{destinations}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/destinations`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="item-container info">
-            <div className="item-top">
-              <div className="item-title">Số người dùng hiện tại</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/accounts`} className="navigateButton">
-                    <p>{travelers}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/accounts`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="item-container info">
-            <div className="item-top">
-              <div className="item-title">Người dùng mới tháng này</div>
-              <div className="item-body">
-                <div className="left">
-                  <Link to={`/accounts`} className="navigateButton">
-                    <p>{newTravelers}</p>
-                  </Link>
-                </div>
-                <div className="right">
-                  <div className="btn info">
-                    <Link to={`/accounts`} className="navigateButton">
-                      <InfoIcon sx={{ color: "white" }} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="item-container info" style={{ border: "none" }}></div>
-          <div className="item-container info" style={{ border: "none" }}></div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

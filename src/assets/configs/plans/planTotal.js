@@ -13,11 +13,12 @@ export const planTotalColumns = [
   },
   {
     field: "id",
+    headerClassName: "prodHeader",
     width: 80,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.id}</div>;
+      return <div>{params.row.node.id}</div>;
     },
     renderHeader: () => <span>ID</span>,
   },
@@ -25,7 +26,7 @@ export const planTotalColumns = [
     field: "name",
     width: 200,
     renderCell: (params) => {
-      return <div>{params.row.name}</div>;
+      return <div>{params.row.node.name}</div>;
     },
     renderHeader: () => <span>KẾ HOẠCH</span>,
   },
@@ -33,15 +34,15 @@ export const planTotalColumns = [
     field: "status",
     width: 150,
     renderCell: (params) => {
-        const statusType = {
-            "COMPLETED": "Đã hoàn thành",
-            "CANCELED": "Đã hủy",
-            "READY": "Sắp diễn ra",
-            "FLAWED": "Đã hoàn thành",
-            "VERIFIED": "Đang diễn ra",
-            "REGISTERING": "Chưa chốt"
-        }
-      return <div>{statusType[params.row.status]}</div>;
+      const statusType = {
+        "COMPLETED": "Đã hoàn thành",
+        "CANCELED": "Đã hủy",
+        "READY": "Sắp diễn ra",
+        "FLAWED": "Đã hoàn thành",
+        "VERIFIED": "Đang diễn ra",
+        "REGISTERING": "Chưa chốt"
+      }
+      return <div>{statusType[params.row.node.status]}</div>;
     },
     renderHeader: () => <span>TRẠNG THÁI</span>,
   },
@@ -52,7 +53,7 @@ export const planTotalColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.account.name}</div>;
+      return <div>{params.row.node.account.name}</div>;
     },
     renderHeader: () => <span>TRƯỞNG NHÓM</span>,
   },
@@ -63,7 +64,7 @@ export const planTotalColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.destination.name}</div>;
+      return <div>{params.row.node.destination.name}</div>;
     },
     renderHeader: () => <span>ĐỊA ĐIỂM</span>,
   },
@@ -76,7 +77,7 @@ export const planTotalColumns = [
     renderCell: (params) => {
       return (
         <div>
-          {params.row.memberCount} / {params.row.maxMemberCount}
+          {params.row.node.memberCount} / {params.row.node.maxMemberCount}
         </div>
       );
     },
@@ -88,7 +89,7 @@ export const planTotalColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.utcDepartAt);
+      const date = new Date(params.row.node.utcDepartAt);
 
       const formattedDateTime = date.toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -110,7 +111,7 @@ export const planTotalColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.endDate);
+      const date = new Date(params.row.node.endDate);
 
       const dateOnly = date.toLocaleDateString("vi-VN", {
         timeZone: "UTC",

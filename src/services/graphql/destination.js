@@ -111,6 +111,18 @@ export const LOAD_DESTINATIONS_FILTER = gql`
   }
 `;
 
+export const LOAD_DESTINATION_TRENDING = gql`
+  query {
+    trendingDestinations(first: 10) {
+      nodes {
+        id
+        name
+        planCount
+      }
+    }
+  }
+`
+
 export const ADD_DESTINATION = gql`
   mutation createDestination($dto: DestinationCreateInput!) {
     createDestination(dto: $dto) {
