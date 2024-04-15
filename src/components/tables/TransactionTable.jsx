@@ -1,4 +1,4 @@
-import "../../assets/scss/destinations.scss";
+import "../../assets/scss/transactions.scss";
 import "../../assets/scss/header.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,13 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { transactionsColumns } from "../../assets/configs/transactions/transactions";
 import { accounttransactionsColumns } from "../../assets/configs/accounts/accountTransaction";
+import { transactionsTotalColumns } from "../../assets/configs/transactions/transactionsTotal";
 
-const TransactionTable = ({ transactions, accountTransactions }) => {
+const TransactionTable = ({
+  totalTransactions,
+  transactions,
+  accountTransactions,
+}) => {
   const navigate = useNavigate();
   const [anchorId, setAnchorId] = useState(null);
   const [anchor, setAnchor] = useState(null);
@@ -102,10 +107,33 @@ const TransactionTable = ({ transactions, accountTransactions }) => {
   return (
     <div>
       {transactions && (
-        <div className="destinationTable">
+        <div className="transactionsTable">
           <DataGrid
             rows={transactions}
             columns={transactionsColumns}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            getRowId={(row) => row.node.id}
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2c3d50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
+      {totalTransactions && (
+        <div className="transactionsTable">
+          <DataGrid
+            rows={totalTransactions}
+            columns={transactionsTotalColumns}
             rowSelection={false}
             pagination
             autoPageSize

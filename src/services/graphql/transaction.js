@@ -42,6 +42,7 @@ export const LOAD_TRAVELER_TRANSACTIONS = gql`
         orderId
         type
         status
+        type
         gcoinAmount
         gateway
         bankTransCode
@@ -182,6 +183,26 @@ export const LOAD_TRANSACTIONS_ORDER = gql`
 export const LOAD_TRANSACTIONS_ORDER_REFUND = gql`
   query {
     transactions(where: { type: { eq: ORDER_REFUND } }) {
+      edges {
+        node {
+          id
+          type
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const LOAD_TRANSACTIONS_TOTAL_COUNT = gql`
+  query {
+    transactions {
       edges {
         node {
           id

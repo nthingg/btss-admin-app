@@ -1,4 +1,4 @@
-export const transactionsColumns = [
+export const transactionsTotalColumns = [
   {
     field: "index",
     headerClassName: "prodHeader",
@@ -59,6 +59,24 @@ export const transactionsColumns = [
       }
     },
     renderHeader: () => <span>VAI TRÒ</span>,
+  },
+  {
+    field: "type",
+    width: 180,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      const type = {
+        GIFT: "Tặng quà",
+        ORDER: "Đặt đơn",
+        ORDER_REFUND: "Hoàn đơn",
+        PLAN_FUND: "Đóng quỹ",
+        PLAN_REFUND: "Hoàn quỹ",
+        TOPUP: "Nạp tiền",
+      };
+      return <div>{type[params.row.node.type]}</div>;
+    },
+    renderHeader: () => <span>LOẠI</span>,
   },
   {
     field: "status",

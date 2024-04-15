@@ -136,6 +136,7 @@ const DestinationPage = () => {
   const [lake, setLake] = useState(0);
   const [mountain, setMountain] = useState(0);
   const [waterfall, setWaterfall] = useState(0);
+  const [total, setTotal] = useState(0);
   useEffect(() => {
     if (
       !loadingTotal &&
@@ -144,6 +145,7 @@ const DestinationPage = () => {
       dataTotal["destinations"]["nodes"]
     ) {
       initSlider(dataTotal["destinations"]["nodes"]);
+      setTotal(dataTotal["destinations"]["nodes"].length);
     }
   }, [dataTotal, loadingTotal, errorTotal, searchedData]);
 
@@ -519,7 +521,7 @@ const DestinationPage = () => {
                 {index === 8 && <TerrainIcon sx={{ color: "#3498DB" }} />}
                 {index === 9 && <PoolIcon sx={{ color: "#3498DB" }} />}
                 <span>
-                  {index === 0 && `Tất cả`}
+                  {index === 0 && `Tất cả (${total})`}
                   {index === 1 && `Bãi biển (${beach})`}
                   {index === 2 && `Suối (${brook})`}
                   {index === 3 && `Hang động (${cave})`}

@@ -32,6 +32,7 @@ import {
   LOAD_TRANSACTIONS_PLAN_REFUND,
   LOAD_TRANSACTIONS_TOPUP,
   LOAD_TRANSACTIONS_TOTAL,
+  LOAD_TRANSACTIONS_TOTAL_COUNT,
   LOAD_TRANSACTIONS_TOTAL_INIT,
 } from "../../services/graphql/transaction";
 import TransactionTable from "../../components/tables/TransactionTable";
@@ -204,6 +205,24 @@ const TransactionPage = () => {
   }, [dataOrderRefund, loadGift, errOrderRefund]);
 
   const {
+    error: errTotal,
+    loading: loadTotal,
+    data: dataTransacTotal,
+    refetch: refetchTotal,
+  } = useQuery(LOAD_TRANSACTIONS_TOTAL_COUNT);
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    if (
+      !loadTotal &&
+      !errTotal &&
+      dataTransacTotal &&
+      dataTransacTotal["transactions"]
+    ) {
+      setTotal(dataTransacTotal["transactions"].totalCount);
+    }
+  }, [dataTransacTotal, loadTotal, errTotal]);
+
+  const {
     error: errPlanFund,
     loading: loadPlanFund,
     data: dataPlanFund,
@@ -321,7 +340,7 @@ const TransactionPage = () => {
                 {index === 5 && <GolfCourseIcon sx={{ color: "#3498DB" }} />}
                 {index === 6 && <ForestIcon sx={{ color: "#3498DB" }} />}
                 <span>
-                  {index === 0 && `Tất cả`}
+                  {index === 0 && `Tất cả (${total})`}
                   {index === 1 && `Đóng quỹ (${planFund})`}
                   {index === 2 && `Hoàn quỹ (${planRefund})`}
                   {index === 3 && `Đặt đơn (${order})`}
@@ -333,7 +352,11 @@ const TransactionPage = () => {
             ))}
           </Slider>
         </div>
-        <TransactionTable transactions={transactions} />
+
+        {selectedDiv === 0 && (
+          <TransactionTable totalTransactions={transactions} />
+        )}
+        {selectedDiv !== 0 && <TransactionTable transactions={transactions} />}
       </div>
     </div>
   );
