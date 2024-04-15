@@ -49,10 +49,14 @@ export const LOAD_DESTINATIONS = gql`
           name
         }
         comments {
-          comment
-          createdAt
-          account {
-            name
+          edges {
+            node {
+              comment
+              createdAt
+              account {
+                name
+              }
+            }
           }
         }
         coordinate {
@@ -64,7 +68,7 @@ export const LOAD_DESTINATIONS = gql`
 `;
 
 export const LOAD_DESTINATIONS_FILTER = gql`
-  query LoadDestinations($topo: [Topographic!], , $searchTerm: String) {
+  query LoadDestinations($topo: [Topographic!], $searchTerm: String) {
     destinations(
       first: 100
       order: { id: DESC }
@@ -85,10 +89,14 @@ export const LOAD_DESTINATIONS_FILTER = gql`
           name
         }
         comments {
-          comment
-          createdAt
-          account {
-            name
+          edges {
+            node {
+              comment
+              createdAt
+              account {
+                name
+              }
+            }
           }
         }
         coordinate {
