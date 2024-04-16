@@ -26,7 +26,7 @@ export const transactionsTotalColumns = [
 
       return <div>{idString}</div>;
     },
-    renderHeader: () => <span>ID</span>,
+    renderHeader: () => <span>MÃ ĐƠN</span>,
   },
   {
     field: "accountName",

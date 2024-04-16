@@ -294,7 +294,7 @@ const TransactionPage = () => {
             className={"form-control"}
             id="floatingValue"
             name="value"
-            placeholder="Tìm kiếm ..."
+            placeholder="Nhập mã giao dịch..."
           />
           <button className="link">
             <SearchIcon />

@@ -444,7 +444,7 @@ const PlanPage = () => {
             className={"form-control"}
             id="floatingValue"
             name="value"
-            placeholder="Tìm kiếm ..."
+            placeholder="Nhập tên kế hoạch..."
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleSearchSubmit();

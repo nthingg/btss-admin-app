@@ -446,7 +446,7 @@ const DestinationPage = () => {
             className={"form-control"}
             id="floatingValue"
             name="value"
-            placeholder="Tìm kiếm ..."
+            placeholder="Nhập tên địa điểm..."
             onKeyDown={async (e) => {
               if (e.key === "Enter") {
                 await handleSearchSubmit();
