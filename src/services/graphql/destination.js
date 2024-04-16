@@ -113,12 +113,14 @@ export const LOAD_DESTINATIONS_FILTER = gql`
 
 export const LOAD_DESTINATION_TRENDING = gql`
   query {
-    trendingDestinations(first: 10) {
-      nodes {
+    trendingDestinations {
+      destinations {
         id
         name
         planCount
       }
+      from
+      to
     }
   }
 `;

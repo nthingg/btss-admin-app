@@ -5,7 +5,7 @@ export const TrendingDestinationChart = ({ chartData }) => {
     let labels = [];
     let dataChart = [];
 
-    chartData.forEach((node, index) => {
+    chartData.destinations.forEach((node, index) => {
         labels.push(node.name);
         dataChart.push(node.planCount);
     });
@@ -28,27 +28,24 @@ export const TrendingDestinationChart = ({ chartData }) => {
             }
         ]
     }
-    const config = {
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Địa điểm nổi bật'
-                }
-            }
-        },
-    }
 
     return (
         <div className="chart-container">
             <h2 style={{ textAlign: "center" }}>Thống kê top 10 địa điểm nổi bật</h2>
-            <Bar 
+            <Bar
                 data={data}
-                options={config}
+                options={{
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'left',
+                        }
+                        // title: {
+                        //     display: true,
+                        //     text: 'Địa điểm nổi bật'
+                        // }
+                    }
+                }}
             />
         </div>
     );
