@@ -228,12 +228,12 @@ const HomePage = () => {
   const [trendingDest, setTrendingDest] = useState([]);
   const { error: errTrendDest, loading: loadingTrendDest, data: dataTrendDest } = useQuery(LOAD_DESTINATION_TRENDING);
   useEffect(() => {
-    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]["nodes"]) {
-      let res = dataTrendDest.trendingDestinations.nodes.map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 }; // Add the index to the object
-      });
-      setTrendingDest(res);
+    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]["destinations"]) {
+      // let res = dataTrendDest.trendingDestinations.destinations.map((node, index) => {
+      //   const { __typename, ...rest } = node;
+      //   return { ...rest, index: index + 1 }; // Add the index to the object
+      // });
+      setTrendingDest(dataTrendDest.trendingDestinations);
     }
   }, [errTrendDest, loadingTrendDest, dataTrendDest])
 
@@ -537,7 +537,7 @@ const HomePage = () => {
             <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
             <div className="item-list-title">
               <h2 style={{ display: "inline-block" }}>Địa điểm nổi bật</h2>
-              <span style={{fontSize: "1.1rem", float: "right"}}><em>*Dữ liệu được lấy từ thứ 2 gần nhất trở về 30 ngày trước đó.</em></span>
+              <span style={{fontSize: "1.1rem", float: "right"}}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN", )} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>
             </div>
             <div className="item-list-trending">
               <div className="item-container info">
