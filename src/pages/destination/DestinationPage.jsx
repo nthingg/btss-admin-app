@@ -19,6 +19,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RowingIcon from "@mui/icons-material/Rowing";
 import PoolIcon from "@mui/icons-material/Pool";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   LOAD_DESTINATIONS,
   LOAD_DESTINATIONS_FILTER,
@@ -54,6 +55,7 @@ const DestinationPage = () => {
   const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   const [searchTerm, setSearchTerm] = useState(null);
   const [searchedData, setSearchedData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -117,6 +119,7 @@ const DestinationPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setDestinations(res);
+      setIsLoading(false);
     }
   }, [data, loading, error]);
 
@@ -125,7 +128,11 @@ const DestinationPage = () => {
     loading: loadingTotal,
     data: dataTotal,
     refetch: refetchTotal,
-  } = useQuery(LOAD_DESTINATIONS);
+  } = useQuery(LOAD_DESTINATIONS, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
 
   const [beach, setBeach] = useState(0);
   const [brook, setBrook] = useState(0);
@@ -423,6 +430,7 @@ const DestinationPage = () => {
   };
 
   const handleSearchSubmit = async () => {
+    setIsLoading(true);
     const search = document.getElementById("floatingValue").value;
     setSearchTerm(search);
     const result = await refetch({
@@ -485,7 +493,11 @@ const DestinationPage = () => {
             onClick={() => {
               setSearchTerm(null);
               setSearchedData(null);
+              setIsLoading(true);
               refetch();
+              setTimeout(() => {
+                setIsLoading(false);
+              }, 300);
             }}
           >
             <RefreshIcon />
@@ -537,10 +549,20 @@ const DestinationPage = () => {
           </Slider>
         </div>
 
-        {selectedDiv !== 0 && (
+        {isLoading && (
+          <div className="loading">
+            <RestartAltIcon
+              sx={{
+                fontSize: 80,
+                color: "#2c3d50",
+              }}
+            />
+          </div>
+        )}
+        {!isLoading && selectedDiv !== 0 && (
           <DestinationTable refetch={refetch} destinations={destinations} />
         )}
-        {selectedDiv === 0 && (
+        {!isLoading && selectedDiv === 0 && (
           <DestinationTotalTable
             refetch={refetch}
             destinations={destinations}

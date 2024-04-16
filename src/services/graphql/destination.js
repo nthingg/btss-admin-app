@@ -37,8 +37,8 @@ export const LOAD_DETAIL_DESTINATION = gql`
 `;
 
 export const LOAD_DESTINATIONS = gql`
-  {
-    destinations(first: 100, order: { id: ASC }) {
+  query Destinations($searchTerm: String) {
+    destinations(first: 100, order: { id: ASC } searchTerm: $searchTerm) {
       nodes {
         id
         name

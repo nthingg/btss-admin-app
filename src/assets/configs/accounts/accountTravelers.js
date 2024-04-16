@@ -119,7 +119,7 @@ export const accountTravelersColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      if (params.row.plans.length > 0) {
+      if (params.row.isPro > 0) {
         return (
           <div className="cellWithStatus AVAILABLE">{<CheckCircleIcon />}</div>
         );

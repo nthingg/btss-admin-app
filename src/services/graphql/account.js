@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
-  query LoadAccounts($role: [Role!], $searchTerm: String) {
+  query LoadAccounts($role: [Role!], $searchTerm: String, $phone: String) {
     accounts(
       first: 100
       order: { id: DESC }
-      where: { role: { in: $role }, phone: { contains: $searchTerm } }
+      where: { role: { in: $role }, phone: { contains: $phone } }
+      searchTerm: $searchTerm
     ) {
       nodes {
         id
@@ -21,14 +22,15 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
         plans {
           id
         }
+        isPro
       }
     }
   }
 `;
 
 export const LOAD_ACCOUNTS_FILTER = gql`
-  query LoadAccounts($role: [Role!]) {
-    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } }) {
+  query LoadAccounts($role: [Role!], $searchTerm: String) {
+    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } } searchTerm: $searchTerm) {
       nodes {
         id
         name
@@ -43,14 +45,15 @@ export const LOAD_ACCOUNTS_FILTER = gql`
         plans {
           id
         }
+        isPro
       }
     }
   }
 `;
 
 export const LOAD_ACCOUNTS = gql`
-  {
-    accounts(first: 100, order: { id: ASC }) {
+  query LoadAccount($searchTerm: String) {
+    accounts(first: 100, order: { id: ASC } searchTerm: $searchTerm) {
       nodes {
         id
         role
@@ -95,17 +98,21 @@ export const LOAD_DETAIL_ACCOUNT = gql`
   }
 `;
 
+export const LOAD_ACCOUNT_USERS = gql`
+  {
+    accounts(
+      where: { role: { eq: TRAVELER } }
+    ) {
+      totalCount
+    }
+  }
+`
+
 export const LOAD_ACCOUNTS_TRAVELER = gql`
   {
     accounts(
-      first: 100
-      order: { id: ASC }
       where: { role: { eq: TRAVELER }, plans: { any: true } }
     ) {
-      nodes {
-        id
-        role
-      }
       totalCount
     }
   }
@@ -114,8 +121,6 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
 export const LOAD_NUMBERS_NEWEST_TRAVELER = gql`
   query QueryNewAccounts($input: DateTime) {
     accounts(
-      first: 100
-      order: { id: ASC }
       where: {
         role: { eq: TRAVELER }
         plans: { any: true }

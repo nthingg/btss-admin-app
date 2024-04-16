@@ -5,7 +5,6 @@ export const TrendingDestinationChart = ({ chartData }) => {
     let labels = [];
     let dataChart = [];
 
-    console.log(chartData);
     chartData.destinations.forEach((node, index) => {
         labels.push(node.name);
         dataChart.push(node.planCount);

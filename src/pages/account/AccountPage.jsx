@@ -13,6 +13,7 @@ import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import { Link, useParams } from "react-router-dom";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   LOAD_ACCOUNTS,
   LOAD_ACCOUNTS_FILTER,
@@ -27,7 +28,9 @@ const AccountPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(accountRole[0]);
   const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
   const [searchTerm, setSearchTerm] = useState("");
+  const [phoneSearchTerm, setPhoneSearchTerm] = useState("");
   const [searchedTraveler, setSearchedTraveler] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -59,7 +62,11 @@ const AccountPage = () => {
     loading: loadingTotal,
     data: dataTotal,
     refetch: refetchTotal,
-  } = useQuery(LOAD_ACCOUNTS);
+  } = useQuery(LOAD_ACCOUNTS, {
+    variables: {
+      searchTerm: searchTerm
+    }
+  });
 
   const [accountTravelers, setTravelers] = useState(0);
   const [accountSuppliers, setSuppliers] = useState(0);
@@ -71,37 +78,43 @@ const AccountPage = () => {
       dataTotal &&
       dataTotal["accounts"]["nodes"]
     ) {
-      let countTraveler = 0;
-      for (const item of dataTotal["accounts"]["nodes"]) {
-        if (item["role"] === "TRAVELER" && item["plans"]) {
-          countTraveler++;
-        }
-      }
-
-      let countSupplier = 0;
-      for (const item of dataTotal["accounts"]["nodes"]) {
-        if (item["role"] === "PROVIDER") {
-          countSupplier++;
-        }
-      }
-
-      let countStaff = 0;
-      for (const item of dataTotal["accounts"]["nodes"]) {
-        if (item["role"] === "STAFF") {
-          countStaff++;
-        }
-      }
-
-      setTravelers(countTraveler);
-      setSuppliers(countSupplier);
-      setStaffs(countStaff);
+      fetchNumberAccount(dataTotal["accounts"]["nodes"]);
+      setIsLoading(false);
     }
   }, [dataTotal, loadingTotal, errorTotal]);
+
+  const fetchNumberAccount = (data) => {
+    let countTraveler = 0;
+    for (const item of data) {
+      if (item["role"] === "TRAVELER" && item["plans"]) {
+        countTraveler++;
+      }
+    }
+
+    let countSupplier = 0;
+    for (const item of data) {
+      if (item["role"] === "PROVIDER") {
+        countSupplier++;
+      }
+    }
+
+    let countStaff = 0;
+    for (const item of data) {
+      if (item["role"] === "STAFF") {
+        countStaff++;
+      }
+    }
+
+    setTravelers(countTraveler);
+    setSuppliers(countSupplier);
+    setStaffs(countStaff);
+  }
 
   const { error, loading, data, refetch } = useQuery(accountQuery, {
     variables: {
       role: selectedStatus,
       searchTerm: searchTerm,
+      phone: phoneSearchTerm
     },
   });
 
@@ -113,20 +126,23 @@ const AccountPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setAccounts(res);
-
-      if (selectedStatus === accountRole[0]) {
-        setSearchedTraveler(res);
-      }
     }
   }, [data, loading, error]);
 
   const handleSearchSubmit = () => {
-    setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+    setIsLoading(true);
     let search = document.getElementById("floatingValue").value;
-    if (search.startsWith("0")) {
-      search = "84" + search.substring(1);
+    //isNaN(num): returns true if the variable does NOT contain a valid number
+    if (isNaN(search)) {
+      setSearchTerm(search);
+    } else {
+      if (search.startsWith("0")) {
+        search = "84" + search.substring(1);
+      }
+      setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+      setSearchTerm("");
+      setPhoneSearchTerm(search);
     }
-    setSearchTerm(search);
     refetch();
   };
 
@@ -141,9 +157,9 @@ const AccountPage = () => {
   }, [searchedTraveler]);
 
   const fetchData = async () => {
-    console.log("im here");
     setAccoutQuery(LOAD_ACCOUNTS_FILTER);
     setSearchTerm("");
+    setPhoneSearchTerm("");
     refetchTotal();
   };
 
@@ -201,6 +217,8 @@ const AccountPage = () => {
             onClick={() => {
               setAccoutQuery(LOAD_ACCOUNTS_FILTER);
               setSearchTerm("");
+              setPhoneSearchTerm("");
+              setIsLoading(true);
               refetch();
               refetchTotal();
             }}
@@ -215,9 +233,8 @@ const AccountPage = () => {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -239,9 +256,19 @@ const AccountPage = () => {
             ))}
           </Slider>
         </div>
-        {selectedStatus === "TRAVELER" && <AccountTable travelers={accounts} />}
-        {selectedStatus === "PROVIDER" && <AccountTable suppliers={accounts} />}
-        {selectedStatus === "STAFF" && <AccountTable staffs={accounts} />}
+        {isLoading && (
+          <div className="loading">
+            <RestartAltIcon
+              sx={{
+                fontSize: 80,
+                color: "#2c3d50",
+              }}
+            />
+          </div>
+        )}
+        {!isLoading && selectedStatus === "TRAVELER" && <AccountTable travelers={accounts} />}
+        {!isLoading && selectedStatus === "PROVIDER" && <AccountTable suppliers={accounts} />}
+        {!isLoading && selectedStatus === "STAFF" && <AccountTable staffs={accounts} />}
       </div>
     </div>
   );

@@ -448,6 +448,9 @@ const PlanPage = () => {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleSearchSubmit();
+                const search = document.getElementById('floatingValue').value;
+                setIsLoading(true);
+                fetchTotalPlan(search);
               }
             }}
           />

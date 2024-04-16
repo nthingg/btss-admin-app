@@ -21,11 +21,18 @@ import {
   LOAD_NUMBERS_PUBLISHED,
   LOAD_NUMBERS_TOTAL,
 } from "../../services/graphql/plan";
-import { LOAD_DESTINATIONS, LOAD_DESTINATION_TRENDING } from "../../services/graphql/destination";
-import { LOAD_ACCOUNTS_TRAVELER, LOAD_NUMBERS_NEWEST_TRAVELER } from "../../services/graphql/account";
+import {
+  LOAD_DESTINATIONS,
+  LOAD_DESTINATION_TRENDING
+} from "../../services/graphql/destination";
+import {
+  LOAD_ACCOUNTS_TRAVELER,
+  LOAD_ACCOUNT_USERS,
+  LOAD_NUMBERS_NEWEST_TRAVELER
+} from "../../services/graphql/account";
 import { Link } from "react-router-dom";
 import { TrendingDestinationChart } from "../../components/charts/TrendingDestinationChart";
-import Chart  from "chart.js/auto";
+import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js"
 
 Chart.register(CategoryScale);
@@ -33,6 +40,25 @@ Chart.register(CategoryScale);
 const HomePage = () => {
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    error: errUsers,
+    loading: loadUsers,
+    data: dataUsers,
+    refetch: refetchUsers,
+  } = useQuery(LOAD_ACCOUNT_USERS);
+  const [users, setUsers] = useState(0);
+  useEffect(() => {
+    if (
+      !loadUsers &&
+      !errUsers &&
+      dataUsers &&
+      dataUsers["accounts"]["totalCount"]
+    ) {
+      setUsers(dataUsers.accounts.totalCount);
+    }
+  }, [dataUsers, loadUsers, errUsers]);
+  
   const {
     error: errorTravelers,
     loading: loadingTravelers,
@@ -51,7 +77,6 @@ const HomePage = () => {
       //   ({ __typename, ...rest }) => rest
       // );
       setTravelers(dataTravelers.accounts.totalCount);
-      setIsLoading(false);
     }
   }, [dataTravelers, loadingTravelers, errorTravelers]);
 
@@ -229,11 +254,8 @@ const HomePage = () => {
   const { error: errTrendDest, loading: loadingTrendDest, data: dataTrendDest } = useQuery(LOAD_DESTINATION_TRENDING);
   useEffect(() => {
     if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]["destinations"]) {
-      // let res = dataTrendDest.trendingDestinations.destinations.map((node, index) => {
-      //   const { __typename, ...rest } = node;
-      //   return { ...rest, index: index + 1 }; // Add the index to the object
-      // });
       setTrendingDest(dataTrendDest.trendingDestinations);
+      setIsLoading(false);
     }
   }, [errTrendDest, loadingTrendDest, dataTrendDest])
 
@@ -437,7 +459,7 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/7`} className="navigateButton">
-                        <p>{published}</p>
+                        <p>{published} / {completed}</p>
                       </Link>
                     </div>
                     <div className="right">
@@ -501,6 +523,25 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/accounts`} className="navigateButton">
+                        <p>{users}</p>
+                      </Link>
+                    </div>
+                    <div className="right">
+                      <div className="btn info">
+                        <Link to={`/accounts`} className="navigateButton">
+                          <InfoIcon sx={{ color: "white" }} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="item-container info">
+                <div className="item-top">
+                  <div className="item-title">Số phượt thủ hiện tại</div>
+                  <div className="item-body">
+                    <div className="left">
+                      <Link to={`/accounts`} className="navigateButton">
                         <p>{travelers}</p>
                       </Link>
                     </div>
@@ -537,11 +578,11 @@ const HomePage = () => {
             <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
             <div className="item-list-title">
               <h2 style={{ display: "inline-block" }}>Địa điểm nổi bật</h2>
-              <span style={{fontSize: "1.1rem", float: "right"}}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN", )} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>
+              <span style={{ fontSize: "1.1rem", float: "right" }}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN",)} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>
             </div>
             <div className="item-list-trending">
               <div className="item-container info">
-                <TrendingDestinationChart chartData={trendingDest}/>
+                <TrendingDestinationChart chartData={trendingDest} />
               </div>
               <div className="item-container info" style={{ border: "none" }}></div>
               <div className="item-container info" style={{ border: "none" }}></div>

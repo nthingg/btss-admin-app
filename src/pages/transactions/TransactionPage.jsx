@@ -16,6 +16,7 @@ import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import GolfCourseIcon from "@mui/icons-material/GolfCourse";
 import ForestIcon from "@mui/icons-material/Forest";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RowingIcon from "@mui/icons-material/Rowing";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { BikeScooter } from "@mui/icons-material";
@@ -54,6 +55,7 @@ const TransactionPage = () => {
   const [successMsg, setSucessMsg] = useState(false);
   const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6]);
 
   const handleClick = (index) => {
@@ -146,6 +148,8 @@ const TransactionPage = () => {
           check = false;
         }
       }
+
+      setIsLoading(false);
     }
 
     let res = transactionsData.map((node, index) => {
@@ -294,7 +298,7 @@ const TransactionPage = () => {
             className={"form-control"}
             id="floatingValue"
             name="value"
-            placeholder="Nhập mã giao dịch..."
+            placeholder="Nhập mã đơn hàng..."
           />
           <button className="link">
             <SearchIcon />
@@ -307,7 +311,11 @@ const TransactionPage = () => {
           <button
             className="link"
             onClick={() => {
+              setIsLoading(true);
               refetch();
+              setTimeout(() => {
+                setIsLoading(false);
+              }, 300);
             }}
           >
             <RefreshIcon />
@@ -353,10 +361,20 @@ const TransactionPage = () => {
           </Slider>
         </div>
 
-        {selectedDiv === 0 && (
+        {isLoading && (
+          <div className="loading">
+            <RestartAltIcon
+              sx={{
+                fontSize: 80,
+                color: "#2c3d50",
+              }}
+            />
+          </div>
+        )}
+        {!isLoading && selectedDiv === 0 && (
           <TransactionTable totalTransactions={transactions} />
         )}
-        {selectedDiv !== 0 && <TransactionTable transactions={transactions} />}
+        {!isLoading && selectedDiv !== 0 && <TransactionTable transactions={transactions} />}
       </div>
     </div>
   );
