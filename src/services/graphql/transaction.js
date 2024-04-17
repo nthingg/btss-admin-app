@@ -140,6 +140,34 @@ export const LOAD_TRANSACTIONS_TOTAL = gql`
   }
 `;
 
+export const LOAD_TRANSACTION_SEARCH = gql`
+  query SearchTransactions($type: [TransactionType!], $id: Int) {
+    transactions(where: { type: { in: $type }, id: { eq: $id } }) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 export const LOAD_TRANSACTIONS_GIFT = gql`
   query {
     transactions(where: { type: { eq: GIFT } }) {

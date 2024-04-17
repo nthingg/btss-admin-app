@@ -58,7 +58,7 @@ const HomePage = () => {
       setUsers(dataUsers.accounts.totalCount);
     }
   }, [dataUsers, loadUsers, errUsers]);
-  
+
   const {
     error: errorTravelers,
     loading: loadingTravelers,
@@ -250,13 +250,13 @@ const HomePage = () => {
     }
   }, [dataPublished, loadingPublished, errorPublished]);
 
-  const [trendingDest, setTrendingDest] = useState([]);
+  const [trendingDest, setTrendingDest] = useState(null);
   const { error: errTrendDest, loading: loadingTrendDest, data: dataTrendDest } = useQuery(LOAD_DESTINATION_TRENDING);
   useEffect(() => {
-    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]["destinations"]) {
+    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]) {
       setTrendingDest(dataTrendDest.trendingDestinations);
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }, [errTrendDest, loadingTrendDest, dataTrendDest])
 
   useEffect(() => {
@@ -459,7 +459,10 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/7`} className="navigateButton">
-                        <p>{published} / {completed}</p>
+                        {published == 0 ?
+                          <p>{published} </p> :
+                          <p>{published} / {completed}</p>
+                        }
                       </Link>
                     </div>
                     <div className="right">
@@ -578,14 +581,18 @@ const HomePage = () => {
             <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
             <div className="item-list-title">
               <h2 style={{ display: "inline-block" }}>Địa điểm nổi bật</h2>
-              <span style={{ fontSize: "1.1rem", float: "right" }}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN",)} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>
+              {trendingDest &&
+                <span style={{ fontSize: "1.1rem", float: "right" }}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN",)} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>}
             </div>
             <div className="item-list-trending">
               <div className="item-container info">
-                <TrendingDestinationChart chartData={trendingDest} />
+                {trendingDest ?
+                  <TrendingDestinationChart chartData={trendingDest} /> :
+                  <div>
+                    <span style={{fontSize: "1.3rem", fontStyle: "italic"}}>Không có dữ liệu.</span>
+                  </div>
+                }
               </div>
-              <div className="item-container info" style={{ border: "none" }}></div>
-              <div className="item-container info" style={{ border: "none" }}></div>
             </div>
           </div>
         </div>

@@ -5,21 +5,14 @@ import "../../assets/scss/filter.scss";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import DestinationTable from "../../components/tables/DestinationTable";
-import BeachAccessIcon from "@mui/icons-material/BeachAccess";
-import WaterIcon from "@mui/icons-material/Water";
-import HikingIcon from "@mui/icons-material/Hiking";
-import TerrainIcon from "@mui/icons-material/Terrain";
-import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
-import GolfCourseIcon from "@mui/icons-material/GolfCourse";
-import ForestIcon from "@mui/icons-material/Forest";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import RowingIcon from "@mui/icons-material/Rowing";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { BikeScooter } from "@mui/icons-material";
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AddCardIcon from '@mui/icons-material/AddCard';
+import { CurrencyExchange, ReceiptLong, Sell } from "@mui/icons-material";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import { Snackbar, Alert, Typography } from "@mui/material";
@@ -35,16 +28,17 @@ import {
   LOAD_TRANSACTIONS_TOTAL,
   LOAD_TRANSACTIONS_TOTAL_COUNT,
   LOAD_TRANSACTIONS_TOTAL_INIT,
+  LOAD_TRANSACTION_SEARCH,
 } from "../../services/graphql/transaction";
 import TransactionTable from "../../components/tables/TransactionTable";
 
 const TransactionPage = () => {
   const topoType = [
+    "TOPUP",
     "PLAN_FUND",
     "PLAN_REFUND",
     "ORDER",
     "ORDER_REFUND",
-    "TOPUP",
     "GIFT",
   ];
   const [vertical, setVertical] = useState("top");
@@ -56,6 +50,7 @@ const TransactionPage = () => {
   const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState(null);
   const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6]);
 
   const handleClick = (index) => {
@@ -63,31 +58,31 @@ const TransactionPage = () => {
     switch (index) {
       case 0:
         setSelectedStatus(topoType);
-        fetchData(topoType);
+        searchTerm ? searchData(topoType, searchTerm) : fetchData(topoType);
         break;
       case 1:
         setSelectedStatus(topoType[0]);
-        fetchData([topoType[0]]);
+        searchTerm ? searchData(topoType[0], searchTerm) : fetchData([topoType[0]]);
         break;
       case 2:
         setSelectedStatus(topoType[1]);
-        fetchData([topoType[1]]);
+        searchTerm ? searchData(topoType[1], searchTerm) : fetchData([topoType[1]]);
         break;
       case 3:
         setSelectedStatus(topoType[2]);
-        fetchData([topoType[2]]);
+        searchTerm ? searchData(topoType[2], searchTerm) : fetchData([topoType[2]]);
         break;
       case 4:
         setSelectedStatus(topoType[3]);
-        fetchData([topoType[3]]);
+        searchTerm ? searchData(topoType[3], searchTerm) : fetchData([topoType[3]]);
         break;
       case 5:
         setSelectedStatus(topoType[4]);
-        fetchData([topoType[4]]);
+        searchTerm ? searchData(topoType[4], searchTerm) : fetchData([topoType[4]]);
         break;
       case 6:
         setSelectedStatus(topoType[5]);
-        fetchData([topoType[5]]);
+        searchTerm ? searchData(topoType[5], searchTerm) : fetchData([topoType[5]]);
         break;
       default:
         break;
@@ -121,6 +116,8 @@ const TransactionPage = () => {
     { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
   ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
 
+  const [searchTransactions, { }] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
+
   const fetchData = async (transactionType) => {
     // Code to be executed on page load
 
@@ -148,8 +145,6 @@ const TransactionPage = () => {
           check = false;
         }
       }
-
-      setIsLoading(false);
     }
 
     let res = transactionsData.map((node, index) => {
@@ -157,8 +152,67 @@ const TransactionPage = () => {
       return { ...rest, index: index + 1 }; // Add the index to the object
     });
     setTransactions(res);
-    console.log("Component mounted!");
+    setIsLoading(false);
   };
+
+  const searchData = async (transactionType, searchTerm) => {
+    if (searchTerm) {
+      const { data } = await searchTransactions({
+        variables: {
+          type: transactionType,
+          id: searchTerm
+        }
+      });
+
+      const transactions = data.transactions.edges;
+
+      let res = transactions.map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 }; // Add the index to the object
+      });
+      setTransactions(res);
+      setIsLoading(false);
+      return res;
+    }
+  }
+
+  const setNumberTransaction = (type) => {
+    setPlanFund(0);
+    setPlanRefund(0);
+    setOrder(0);
+    setOrderRefund(0);
+    setTopup(0);
+    setGift(0);
+
+    if (type) {
+      switch (type) {
+        case topoType[0]: {
+          setTopup(1);
+          break;
+        }
+        case topoType[1]: {
+          setPlanFund(1);
+          break;
+        }
+        case topoType[2]: {
+          setPlanRefund(1);
+          break;
+        }
+        case topoType[3]: {
+          setOrder(1);
+          break;
+        }
+        case topoType[4]: {
+          setOrderRefund(1);
+          break;
+        }
+        case topoType[5]: {
+          setGift(1);
+          break;
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     fetchData(topoType);
@@ -175,7 +229,7 @@ const TransactionPage = () => {
     if (!loadGift && !errGift && dataGift && dataGift["transactions"]) {
       setGift(dataGift["transactions"].totalCount);
     }
-  }, [dataGift, loadGift, errGift]);
+  }, [dataGift, loadGift, errGift, searchTerm]);
 
   const {
     error: errOrder,
@@ -188,7 +242,7 @@ const TransactionPage = () => {
     if (!loadOrder && !errOrder && dataOrder && dataOrder["transactions"]) {
       setOrder(dataOrder["transactions"].totalCount);
     }
-  }, [dataOrder, loadOrder, errOrder]);
+  }, [dataOrder, loadOrder, errOrder, searchTerm]);
 
   const {
     error: errOrderRefund,
@@ -206,7 +260,7 @@ const TransactionPage = () => {
     ) {
       setOrderRefund(dataOrderRefund["transactions"].totalCount);
     }
-  }, [dataOrderRefund, loadGift, errOrderRefund]);
+  }, [dataOrderRefund, loadGift, errOrderRefund, searchTerm]);
 
   const {
     error: errTotal,
@@ -224,7 +278,7 @@ const TransactionPage = () => {
     ) {
       setTotal(dataTransacTotal["transactions"].totalCount);
     }
-  }, [dataTransacTotal, loadTotal, errTotal]);
+  }, [dataTransacTotal, loadTotal, errTotal, searchTerm]);
 
   const {
     error: errPlanFund,
@@ -242,7 +296,7 @@ const TransactionPage = () => {
     ) {
       setPlanFund(dataPlanFund["transactions"].totalCount);
     }
-  }, [dataPlanFund, loadPlanFund, errPlanFund]);
+  }, [dataPlanFund, loadPlanFund, errPlanFund, searchTerm]);
 
   const {
     error: errPlanRefund,
@@ -260,7 +314,7 @@ const TransactionPage = () => {
     ) {
       setPlanRefund(dataPlanRefund["transactions"].totalCount);
     }
-  }, [dataPlanRefund, loadPlanRefund, errPlanRefund]);
+  }, [dataPlanRefund, loadPlanRefund, errPlanRefund, searchTerm]);
 
   const {
     error: errTopup,
@@ -273,7 +327,30 @@ const TransactionPage = () => {
     if (!loadTopup && !errTopup && dataTopup && dataTopup["transactions"]) {
       setTopup(dataTopup["transactions"].totalCount);
     }
-  }, [dataTopup, loadTopup, errTopup]);
+  }, [dataTopup, loadTopup, errTopup, searchTerm]);
+
+  const handleSearchSubmit = async () => {
+    setIsLoading(true);
+    const searchTerm = document.getElementById('floatingValue').value;
+    if (!searchTerm) {
+      setIsLoading(false);
+      return;
+    };
+    if (!isNaN(searchTerm)) {
+      const searchId = parseInt(searchTerm, 10);
+      setSearchTerm(searchId);
+      const res = await searchData(selectedStatus, searchId);
+      setTotal(0);
+      console.log(res);
+      if (res[0]) {
+        setTotal(1);
+        const trans = res[0].node;
+        setNumberTransaction(trans.type);
+      } else {
+        setNumberTransaction(null);
+      }
+    }
+  }
 
   var settings = {
     dots: false,
@@ -299,8 +376,13 @@ const TransactionPage = () => {
             id="floatingValue"
             name="value"
             placeholder="Nhập mã đơn hàng..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchSubmit();
+              }
+            }}
           />
-          <button className="link">
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -312,7 +394,10 @@ const TransactionPage = () => {
             className="link"
             onClick={() => {
               setIsLoading(true);
+              setSearchTerm(null);
               refetch();
+              fetchData(topoType);
+              // refetchTotal();
               setTimeout(() => {
                 setIsLoading(false);
               }, 300);
@@ -328,9 +413,8 @@ const TransactionPage = () => {
             {filter.map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -339,21 +423,21 @@ const TransactionPage = () => {
                 {index === 0 && (
                   <FormatListBulletedIcon sx={{ color: "#3498DB" }} />
                 )}
-                {index === 1 && <BeachAccessIcon sx={{ color: "#3498DB" }} />}
-                {index === 2 && <WaterIcon sx={{ color: "#3498DB" }} />}
-                {index === 3 && <HikingIcon sx={{ color: "#3498DB" }} />}
+                {index === 1 && <AddCardIcon sx={{ color: "#3498DB" }} />}
+                {index === 2 && <AccountBalanceWalletIcon sx={{ color: "#3498DB" }} />}
+                {index === 3 && <CurrencyExchange sx={{ color: "#3498DB" }} />}
                 {index === 4 && (
-                  <DirectionsBikeIcon sx={{ color: "#3498DB" }} />
+                  <ReceiptIcon sx={{ color: "#3498DB" }} />
                 )}
-                {index === 5 && <GolfCourseIcon sx={{ color: "#3498DB" }} />}
-                {index === 6 && <ForestIcon sx={{ color: "#3498DB" }} />}
+                {index === 5 && <ReceiptLong sx={{ color: "#3498DB" }} />}
+                {index === 6 && <Sell sx={{ color: "#3498DB" }} />}
                 <span>
                   {index === 0 && `Tất cả (${total})`}
-                  {index === 1 && `Đóng quỹ (${planFund})`}
-                  {index === 2 && `Hoàn quỹ (${planRefund})`}
-                  {index === 3 && `Đặt đơn (${order})`}
-                  {index === 4 && `Hoàn đơn (${orderRefund})`}
-                  {index === 5 && `Nạp tiền (${topup})`}
+                  {index === 1 && `Nạp tiền (${topup})`}
+                  {index === 2 && `Đóng quỹ (${planFund})`}
+                  {index === 3 && `Hoàn quỹ (${planRefund})`}
+                  {index === 4 && `Đặt đơn (${order})`}
+                  {index === 5 && `Hoàn đơn (${orderRefund})`}
                   {index === 6 && `Tặng quà (${gift})`}
                 </span>
               </div>

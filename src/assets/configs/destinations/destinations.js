@@ -43,7 +43,7 @@ export const destinationsColumns = [
       if (params.row.comments.edges.length === 0) {
         return <div>Không có dữ liệu</div>;
       } else {
-        return <div>{params.row.comments.edges.length}</div>;
+        return <div>{params.row.comments.edges.length} / 5</div>;
       }
     },
     renderHeader: () => <span>ĐÁNH GIÁ</span>,

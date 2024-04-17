@@ -87,10 +87,10 @@ export const LOAD_DETAIL_ACCOUNT = gql`
             name
           }
           utcDepartAt
-          startDate
+          utcStartAt
           maxMemberCount
           memberCount
-          endDate
+          utcEndAt
           status
         }
       }
@@ -109,10 +109,8 @@ export const LOAD_ACCOUNT_USERS = gql`
 `
 
 export const LOAD_ACCOUNTS_TRAVELER = gql`
-  {
-    accounts(
-      where: { role: { eq: TRAVELER }, plans: { any: true } }
-    ) {
+  query {
+    accounts(where: { plans: { some: { isPublished: { eq: true } } } }) {
       totalCount
     }
   }
@@ -120,13 +118,7 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
 
 export const LOAD_NUMBERS_NEWEST_TRAVELER = gql`
   query QueryNewAccounts($input: DateTime) {
-    accounts(
-      where: {
-        role: { eq: TRAVELER }
-        plans: { any: true }
-        createdAt: { gte: $input }
-      }
-    ) {
+    accounts(where: { role: { eq: TRAVELER }, createdAt: { gte: $input } }) {
       totalCount
     }
   }

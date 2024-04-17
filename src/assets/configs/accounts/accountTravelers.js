@@ -114,7 +114,7 @@ export const accountTravelersColumn = [
     renderHeader: () => <span>ĐIỂM UY TÍN</span>,
   },
   {
-    field: "paymentType",
+    field: "IsTraveler",
     width: 200,
     align: "center",
     headerAlign: "center",

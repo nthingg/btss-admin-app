@@ -22,8 +22,8 @@ export const TrendingDestinationChart = ({ chartData }) => {
                 //     'rgba(255, 255, 255, 0.6)',
                 //     'rgba(255, 255, 255, 0.6)'
                 // ],
-                backgroundColor: '#1e242a',
-                BorderColor: "#1e242a",
+                backgroundColor: '#2c3d50',
+                BorderColor: "#2c3d50",
                 borderWidth: 2,
             }
         ]

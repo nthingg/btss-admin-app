@@ -18,10 +18,10 @@ export const LOAD_PLANS_FILTER = gql`
           name
         }
         utcDepartAt
-        startDate
+        utcStartAt
         memberCount
         maxMemberCount
-        endDate
+        utcEndAt
         status
       }
       totalCount
@@ -53,10 +53,10 @@ export const LOAD_TOTAL_PLAN = gql`
             name
           }
           utcDepartAt
-          startDate
+          utcStartAt
           memberCount
           maxMemberCount
-          endDate
+          utcEndAt
           status
         }
       }
@@ -93,10 +93,10 @@ export const LOAD_TOTAL_PLAN_INIT = gql`
             name
           }
           utcDepartAt
-          startDate
+          utcStartAt
           memberCount
           maxMemberCount
-          endDate
+          utcEndAt
           status
         }
         cursor
@@ -128,10 +128,10 @@ export const LOAD_PLANS_PUBLISHED_FILTER = gql`
           name
         }
         utcDepartAt
-        startDate
+        utcStartAt
         memberCount
         maxMemberCount
-        endDate
+        utcEndAt
         status
       }
       totalCount
@@ -168,10 +168,10 @@ export const LOAD_PLAN_READY = gql`
           name
         }
         utcDepartAt
-        startDate
+        utcStartAt
         memberCount
         maxMemberCount
-        endDate
+        utcEndAt
         status
       }
       totalCount
@@ -203,10 +203,10 @@ export const LOAD_PLAN_ONGOING = gql`
           name
         }
         utcDepartAt
-        startDate
+        utcStartAt
         memberCount
         maxMemberCount
-        endDate
+        utcEndAt
         status
       }
       totalCount
@@ -242,8 +242,8 @@ export const LOAD_DETAIL_PLAN = gql`
             coordinates
           }
         }
-        startDate
-        endDate
+        utcStartAt
+        utcEndAt
         gcoinBudgetPerCapita
         orders {
           id
@@ -452,10 +452,10 @@ export const LOAD_DESTINATION_PLANS = gql`
           name
         }
         utcDepartAt
-        startDate
+        utcStartAt
         memberCount
         maxMemberCount
-        endDate
+        utcEndAt
         status
       }
       totalCount

@@ -106,12 +106,12 @@ export const planTotalColumns = [
     renderHeader: () => <span>KHỞI HÀNH</span>,
   },
   {
-    field: "endDate",
+    field: "utcEndAt",
     width: 140,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.node.endDate);
+      const date = new Date(params.row.node.utcEndAt);
 
       const dateOnly = date.toLocaleDateString("vi-VN", {
         timeZone: "UTC",

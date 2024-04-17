@@ -41,10 +41,9 @@ const PlanPage = () => {
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
   const planStat = [
-    "TOTAL",
     "REGISTERING",
     "READY",
-    "ONGOING",
+    "VERIFIED",
     "COMPLETED",
     "FLAWED",
     "CANCELED",
@@ -53,7 +52,7 @@ const PlanPage = () => {
     sbsNumber ? parseInt(sbsNumber, 10) : 0
   );
   const [selectedStatus, setSelectedStatus] = useState(
-    planStat[sbsNumber ? parseInt(sbsNumber, 10) : 0]
+    sbsNumber ? planStat[parseInt(sbsNumber, 10)] : planStat
   );
 
   useEffect(() => {
@@ -61,29 +60,33 @@ const PlanPage = () => {
       switch (sbsNumber) {
         case "2": {
           setPlanQuery(LOAD_PLAN_READY);
-          setSelectedStatus(planStat[2])
+          setSelectedStatus(planStat[1])
           break;
         }
         case "3": {
           setPlanQuery(LOAD_PLAN_ONGOING);
-          setSelectedStatus(planStat[3]);
+          setSelectedStatus(planStat[2]);
           break;
         }
         case "4": {
           setPlanQuery(LOAD_PLANS_FILTER);
-          setSelectedStatus([planStat[4], planStat[5]]);
+          setSelectedStatus([planStat[3], planStat[4]]);
+          break;
+        }
+        case "6": {
+          setPlanQuery(LOAD_PLANS_FILTER);
+          setSelectedStatus(planStat[5]);
           break;
         }
         case "7": {
           setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
           setSelectedStatus(true);
-          refetch();
           break;
         }
       }
     }
     else {
-      // setPlanQuery(LOAD_TOTAL_PLAN);
+      setSelectedStatus(planStat);
       fetchTotalPlan(null);
     }
     setIsLoading(false);
@@ -92,8 +95,8 @@ const PlanPage = () => {
   const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
   const [searchTerm, setSearchTerm] = useState(null);
   const [totalPlan, setTotalPlan] = useState([]);
-  const [getTotalPlan, { refetch: refetchTotalPlan }] = useLazyQuery(LOAD_TOTAL_PLAN);
-  const [getInitTotalPlan, { refetch: refetchTotalPlanInit }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT);
+  const [getTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN);
+  const [getInitTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT);
 
   const fetchTotalPlan = async (searchTerm) => {
     const { data } = await getInitTotalPlan({
@@ -137,27 +140,27 @@ const PlanPage = () => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
-        setSelectedStatus(planStat[0]);
+        setSelectedStatus(planStat);
         refetch();
         break;
       case 1:
         setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[1]);
+        setSelectedStatus(planStat[0]);
         refetch();
         break;
       case 2:
         setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[2]);
+        setSelectedStatus(planStat[1]);
         refetch();
         break;
       case 3:
         setPlanQuery(LOAD_PLAN_ONGOING);
-        setSelectedStatus(planStat[3]);
+        setSelectedStatus(planStat[2]);
         refetch();
         break;
       case 4:
         setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus([planStat[4], planStat[5]]);
+        setSelectedStatus([planStat[3], planStat[4]]);
         refetch();
         break;
       case 5:
@@ -167,7 +170,7 @@ const PlanPage = () => {
         break;
       case 6:
         setPlanQuery(LOAD_PLANS_FILTER);
-        setSelectedStatus(planStat[6]);
+        setSelectedStatus(planStat[5]);
         refetch();
         break;
       // case 7:
