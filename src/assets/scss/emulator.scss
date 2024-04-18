@@ -29,6 +29,24 @@
             }
         }
 
+        .btn-emulator {
+            display: flex;
+            align-items: center;
+
+            .loading-result {
+                margin: 20px 0 0 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #2c3d50;
+
+                .btn {
+                    height: 24px;
+                    margin-right: 4px;
+                }
+            }
+        }
+
         .response-table {
             display: flex;
             justify-content: space-between;

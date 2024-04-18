@@ -66,6 +66,12 @@ export const LOAD_PLANS_SIMULATOR = gql`
         joinMethod
         schedule
         utcStartAt
+        members {
+          account {
+            id
+          }
+          status
+        }
         tempOrders {
           uuid
           cart
