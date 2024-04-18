@@ -431,7 +431,7 @@ const EmulatorPage = () => {
     let countLatest = 0;
     const { data: latest } = await refetchLatest();
     if (latest.plans.nodes.length === 0) {
-      countLatest = 1;
+      countLatest = 0;
     } else {
       const latestPlan = latest.plans.nodes[0].name;
       const parts = latestPlan.split("-");
