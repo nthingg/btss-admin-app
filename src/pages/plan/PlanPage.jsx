@@ -66,7 +66,7 @@ const PlanPage = () => {
         }
         case "2": {
           setPlanQuery(LOAD_PLAN_READY);
-          setSelectedStatus(planStat[1])
+          setSelectedStatus(planStat[1]);
           break;
         }
         case "3": {
@@ -90,8 +90,7 @@ const PlanPage = () => {
           break;
         }
       }
-    }
-    else {
+    } else {
       setSelectedStatus(planStat);
       fetchTotalPlan(null);
     }
@@ -101,15 +100,20 @@ const PlanPage = () => {
   const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
   const [searchTerm, setSearchTerm] = useState(null);
   const [totalPlan, setTotalPlan] = useState([]);
-  const [getTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN);
-  const [getInitTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT);
+  const [getTotalPlan, {}] = useLazyQuery(LOAD_TOTAL_PLAN, {
+    fetchPolicy: "no-cache",
+  });
+  const [getInitTotalPlan, {}] = useLazyQuery(LOAD_TOTAL_PLAN_INIT, {
+    fetchPolicy: "no-cache",
+  });
 
   const fetchTotalPlan = async (searchTerm) => {
     const { data } = await getInitTotalPlan({
       variables: {
-        searchTerm: searchTerm
-      }
+        searchTerm: searchTerm,
+      },
     });
+    console.log(data);
     let planData = data.plans.edges;
     if (data.plans.pageInfo.hasNextPage === true) {
       let check = true;
@@ -118,8 +122,8 @@ const PlanPage = () => {
         const { data: dataRefetch } = await getTotalPlan({
           variables: {
             searchTerm: searchTerm,
-            endCursor: endCursor
-          }
+            endCursor: endCursor,
+          },
         });
 
         planData = planData.concat(dataRefetch.plans.edges);
@@ -140,7 +144,7 @@ const PlanPage = () => {
     });
     setTotalPlan(res);
     setIsLoading(false);
-  }
+  };
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -201,7 +205,7 @@ const PlanPage = () => {
     variables: {
       status: selectedStatus,
       searchTerm: searchTerm,
-      dateTime: now.toUTCString()
+      dateTime: now.toUTCString(),
     },
   });
 
@@ -223,8 +227,8 @@ const PlanPage = () => {
     refetch: refetchTotal,
   } = useQuery(LOAD_NUMBERS_TOTAL, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
   const [total, setTotal] = useState(0);
   useEffect(() => {
@@ -240,8 +244,8 @@ const PlanPage = () => {
     refetch: refetchRegis,
   } = useQuery(LOAD_NUMBERS_REGISTERING, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
   const [registering, setRegistering] = useState(0);
   useEffect(() => {
@@ -258,8 +262,8 @@ const PlanPage = () => {
     refetch: refetchCancelled,
   } = useQuery(LOAD_NUMBERS_CANCELED, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
   const [cancelled, setCancelled] = useState(0);
   useEffect(() => {
@@ -280,8 +284,8 @@ const PlanPage = () => {
     refetch: refetchComplete,
   } = useQuery(LOAD_NUMBERS_COMPLETED, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
   const [completed, setCompleted] = useState(0);
   useEffect(() => {
@@ -303,8 +307,8 @@ const PlanPage = () => {
   } = useQuery(LOAD_NUMBERS_ONGOING, {
     variables: {
       searchTerm: searchTerm,
-      dateTime: now.toUTCString()
-    }
+      dateTime: now.toUTCString(),
+    },
   });
   const [onGoing, setOngoing] = useState(0);
   useEffect(() => {
@@ -312,23 +316,6 @@ const PlanPage = () => {
       setOngoing(dataOngoing["plans"].totalCount);
     }
   }, [dataOngoing, loadingOngoing, errOngoing]);
-
-  // const {
-  //   error: errPend,
-  //   loading: loadingPend,
-  //   data: dataPend,
-  //   refetch: refetchPending,
-  // } = useQuery(LOAD_NUMBERS_PENDING, {
-  //   variables: {
-  //     searchTerm: searchTerm
-  //   }
-  // });
-  // const [pending, setPending] = useState(0);
-  // useEffect(() => {
-  //   if (!loadingPend && !errPend && dataPend && dataPend["plans"]) {
-  //     setPending(dataPend["plans"].totalCount);
-  //   }
-  // }, [dataPend, loadingPend, errPend]);
 
   const {
     errorTemp,
@@ -338,8 +325,8 @@ const PlanPage = () => {
   } = useQuery(LOAD_NUMBERS_READY, {
     variables: {
       searchTerm: searchTerm,
-      dateTime: now.toUTCString()
-    }
+      dateTime: now.toUTCString(),
+    },
   });
   const [temp, setTemp] = useState(0);
   useEffect(() => {
@@ -348,23 +335,6 @@ const PlanPage = () => {
     }
   }, [dataTemp, loadingTemp, errorTemp]);
 
-  // const {
-  //   error: errorFlawed,
-  //   loading: loadingFlawed,
-  //   data: dataFlawed,
-  //   refetch: refetchFlawed,
-  // } = useQuery(LOAD_NUMBERS_FLAWED, {
-  //   variables: {
-  //     searchTerm: searchTerm
-  //   }
-  // });
-  // const [flawed, setFlawed] = useState(0);
-  // useEffect(() => {
-  //   if (!loadingFlawed && !errorFlawed && dataFlawed && dataFlawed["plans"]) {
-  //     setFlawed(dataFlawed["plans"].totalCount);
-  //   }
-  // }, [dataFlawed, loadingFlawed, errorFlawed]);
-
   const {
     error: errorPublished,
     loading: loadingPublished,
@@ -372,8 +342,8 @@ const PlanPage = () => {
     refetch: refetchPublished,
   } = useQuery(LOAD_NUMBERS_PUBLISHED, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
   const [published, setPublished] = useState(0);
   useEffect(() => {
@@ -396,47 +366,10 @@ const PlanPage = () => {
   };
 
   const handleSearchSubmit = async () => {
-    const search = document.getElementById('floatingValue').value;
+    const search = document.getElementById("floatingValue").value;
     setSearchTerm(search);
     refetch();
-    // if (!result.loading && !result.error && result.data && result.data["plans"]["nodes"]) {
-    //   const totalCount = result.data.plans.totalCount;
-    //   switch (selectedStatus) {
-    //     // case planStat[0]: {
-    //     //   setPending(totalCount);
-    //     //   break;
-    //     // }
-    //     case planStat[1]: {
-    //       setRegistering(totalCount);
-    //       break;
-    //     }
-    //     case planStat[2]: {
-    //       setTemp(totalCount);
-    //       break;
-    //     }
-    //     case planStat[3]: {
-    //       setOngoing(totalCount);
-    //       break;
-    //     }
-    //     case planStat[4]: {
-    //       setCompleted(totalCount);
-    //       break;
-    //     }
-    //     // case planStat[5]: {
-    //     //   setCompleted(totalCount);
-    //     //   break;
-    //     // }
-    //     case planStat[6]: {
-    //       setCancelled(totalCount);
-    //       break;
-    //     }
-    //     case planStat[true]: {
-    //       setPublished(totalCount);
-    //       break;
-    //     }
-    //   }
-    // }
-  }
+  };
 
   return (
     <div className="plan">
@@ -455,20 +388,23 @@ const PlanPage = () => {
             name="value"
             placeholder="Nhập tên kế hoạch..."
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleSearchSubmit();
-                const search = document.getElementById('floatingValue').value;
+                const search = document.getElementById("floatingValue").value;
                 setIsLoading(true);
                 fetchTotalPlan(search);
               }
             }}
           />
-          <button className="link" onClick={() => {
-            handleSearchSubmit();
-            const search = document.getElementById('floatingValue').value;
-            setIsLoading(true);
-            fetchTotalPlan(search);
-          }}>
+          <button
+            className="link"
+            onClick={() => {
+              handleSearchSubmit();
+              const search = document.getElementById("floatingValue").value;
+              setIsLoading(true);
+              fetchTotalPlan(search);
+            }}
+          >
             <SearchIcon />
           </button>
         </div>
@@ -488,7 +424,7 @@ const PlanPage = () => {
               refetchRegis();
               // refetchPending();
               refetchCancelled();
-              // refetchFlawed();
+              refetchTotal();
               refetchTemp();
               refetchComplete();
               refetchOngoing();
@@ -506,8 +442,9 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -549,10 +486,11 @@ const PlanPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedStatus.toString() === planStat.toString() ?
-          <PlanTable planTotal={totalPlan} /> :
+        {!isLoading && selectedStatus.toString() === planStat.toString() ? (
+          <PlanTable planTotal={totalPlan} />
+        ) : (
           <PlanTable plans={plans} />
-        }
+        )}
       </div>
     </div>
   );

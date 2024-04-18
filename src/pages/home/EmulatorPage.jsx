@@ -3,7 +3,7 @@ import "../../assets/scss/emulator.scss";
 import "../../assets/scss/shared.scss";
 import Select from "react-select";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Alert, Snackbar, TextField } from "@mui/material";
 import {
   CANCEL_PLAN_SIMULATOR,
@@ -14,6 +14,7 @@ import {
   CONFIRM_PLAN_SIMULATOR,
   CREATE_PLAN_SIMULATOR,
   GEN_MEM_SIMULATOR,
+  GET_NEWEST_NAME,
   INVITE_PLANS_SIMULATOR,
   JOIN_PLAN_SIMULATOR,
   LOAD_PLANS_BY_ID_SIMULATOR,
@@ -193,6 +194,9 @@ const EmulatorPage = () => {
   const [checkIn, { data: dataCheckIn, error: errorCheckIn }] = useMutation(
     VERIFY_PLAN_SIMULATOR
   );
+
+  const [getLatest, { data: dataLatest, error: errLatest }] =
+    useLazyQuery(GET_NEWEST_NAME);
 
   const {
     error: errorPending,
@@ -2342,6 +2346,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn tạo 50 kế hoạch giả lập`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2356,6 +2361,7 @@ const EmulatorPage = () => {
                         const msg = `Thời gian tạo kế hoạch phải cách 7 ngày kể từ hôm nay`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2369,6 +2375,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2379,6 +2386,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng kế hoạch đang chờ vượt quá kế hoạch hiện có (${limitPending})`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                           return;
                         }
                         simulateJoinAndChangeMethodPlan(
@@ -2404,6 +2412,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2414,6 +2423,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                           return;
                         }
                         simulateMassJoinPlan(
@@ -2436,6 +2446,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                           return;
                         }
 
@@ -2455,6 +2466,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                           return;
                         }
 
@@ -2471,6 +2483,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn 50 phượt thủ giả lập`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2478,6 +2491,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsEmulatorLoading(false);
                         return;
                       }
 
@@ -2490,6 +2504,7 @@ const EmulatorPage = () => {
                           const msg = `Không có kế hoạch nào thuộc ID: ${joinId}`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                         } else {
                           simulateJoinPlanByID(
                             plan,
@@ -2540,6 +2555,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
                           setErrMsg(msg);
                           handleClick();
+                          setIsEmulatorLoading(false);
                           return;
                         }
 

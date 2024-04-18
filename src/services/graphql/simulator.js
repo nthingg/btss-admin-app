@@ -263,3 +263,18 @@ export const CHECK_NUMBERS_READY_PLANS = gql`
     }
   }
 `;
+
+export const GET_NEWEST_NAME = gql`
+  query GetLatestTestPlan {
+    plans(
+      first: 1
+      order: { id: DESC }
+      where: { name: { startsWith: "test-plan-" } }
+    ) {
+      nodes {
+        id
+        name
+      }
+    }
+  }
+`;
