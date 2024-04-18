@@ -2208,14 +2208,10 @@ const EmulatorPage = () => {
                     setPlanOrderNum("");
                   } else if (parseInt(e.target.value) <= 0) {
                     setPlanOrderNum(1);
-                    if (massPlanJoinNum !== "") {
-                      setSelectLoading(false);
-                    }
+                    setSelectLoading(false);
                   } else if (parseInt(e.target.value) > 0) {
                     setPlanOrderNum(e.target.value);
-                    if (massPlanJoinNum !== "") {
-                      setSelectLoading(false);
-                    }
+                    setSelectLoading(false);
                   }
                 }}
                 fullWidth
