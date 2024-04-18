@@ -22,7 +22,7 @@ export const planData = [
       [
         {
           type: "CHECKIN",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-in và nhận phòng",
           shortDescription: "Check-in tại khách sạn.",
@@ -46,7 +46,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
@@ -56,7 +56,7 @@ export const planData = [
       [
         {
           type: "VISIT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Ngắm cảnh",
           shortDescription: "Ngắm cảnh đêm tại địa điểm du lịch.",
@@ -64,7 +64,7 @@ export const planData = [
         },
         {
           type: "EAT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: true,
           description: "Dùng bữa tại nhà hàng",
           shortDescription: "Dùng bữa tại nhà hàng 3*",
@@ -72,7 +72,7 @@ export const planData = [
         },
         {
           type: "FREE",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Nghỉ ngơi",
           shortDescription: "Nghỉ ngơi với buổi tối tự túc.",
@@ -80,7 +80,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
@@ -106,7 +106,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Tham quan, giải trí",
           shortDescription: "Chụp hình vị trí tham quan.",
@@ -114,7 +114,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
@@ -124,7 +124,7 @@ export const planData = [
       [
         {
           type: "CHECKIN",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-in và nhận phòng",
           shortDescription: "Check-in tại nhà nghỉ.",
@@ -148,7 +148,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
@@ -158,7 +158,7 @@ export const planData = [
       [
         {
           type: "CHECKIN",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-in và nhận phòng",
           shortDescription: "Check-in tại nhà nghỉ.",
@@ -182,7 +182,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
@@ -192,7 +192,7 @@ export const planData = [
       [
         {
           type: "CHECKIN",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-in và nhận phòng",
           shortDescription: "Check-in khách sạn.",
@@ -216,7 +216,7 @@ export const planData = [
         },
         {
           type: "CHECKOUT",
-          duration: "00:30:00",
+          duration: "01:30:00",
           isStarred: false,
           description: "Check-out và đi về",
           shortDescription: "Trả phòng và kết thúc chuyến đi.",
