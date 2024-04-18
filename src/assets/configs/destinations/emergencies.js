@@ -31,6 +31,28 @@ export const emergenciesColumns = [
     renderHeader: () => <span>TÊN</span>,
   },
   {
+    field: "type",
+    width: 100,
+    align: "center",
+    renderCell: (params) => {
+      const providerType = {
+        "EMERGENCY": "Cứu hộ",
+        "FOOD_STALL": "Quán ăn",
+        "GROCERY": "Tạp hóa",
+        "HOTEL": "Khách sạn",
+        "MOTEL": "Nhà nghỉ",
+        "REPAIR": "Sửa xe",
+        "RESTAURANT": "Nhà hàng",
+        "TAXI": "Taxi",
+        "VEHICLE_RENTAL": "Thuê xe"
+      }
+      return (
+        <div>{providerType[params.row.type]}</div>
+      );
+    },
+    renderHeader: () => <span>LOẠI DỊCH VỤ</span>,
+  },
+  {
     field: "host",
     width: 180,
     align: "center",

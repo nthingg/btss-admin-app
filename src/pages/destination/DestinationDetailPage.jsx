@@ -11,7 +11,6 @@ import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   LOAD_DETAIL_DESTINATION,
-  LOAD_PROVIDERS_BY_LOC,
 } from "../../services/graphql/destination";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -34,6 +33,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlanTable from "../../components/tables/PlanTable";
 import { LOAD_DESTINATION_PLANS } from "../../services/graphql/plan";
 import ProviderTable from "../../components/tables/ProviderTable";
+import ReadMore from "../../components/others/ReadMoreComponent";
 
 const DestinationDetailPage = () => {
   const initQuery = gql`
@@ -74,7 +74,6 @@ const DestinationDetailPage = () => {
   const [position, setPosition] = useState(null);
   const [emerQuery, setEmerQuery] = useState(initQuery);
   const [plans, setPlans] = useState([]);
-  const [providers, setProviders] = useState([]);
 
   const containerStyle = {
     width: "950px",
@@ -142,7 +141,7 @@ const DestinationDetailPage = () => {
       ) {
         switch (data["destinations"]["nodes"][0]["activities"][index]) {
           case "BATHING":
-            acts += "Tắm rửa, ";
+            acts += "Tắm, ";
             break;
           case "CAMPING":
             acts += "Cắm trại, ";
@@ -220,7 +219,6 @@ const DestinationDetailPage = () => {
                   }
                 }
               }
-              type: { eq: EMERGENCY }
             }
             order: {id: DESC}
           ) {
@@ -233,6 +231,7 @@ const DestinationDetailPage = () => {
               coordinate {
                 coordinates
               }
+              type
             }
           }
         }
@@ -284,16 +283,16 @@ const DestinationDetailPage = () => {
       }
     }
   `
-  const { error: errorProvi, loading: loadingProvi, data: dataProvi } = useQuery(providerQuery);
-  useEffect(() => {
-    if (!loadingProvi && !errorProvi && dataProvi && dataProvi["providers"]["nodes"]) {
-      let res = dataProvi.providers.nodes.map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      });
-      setProviders(res);
-    }
-  }, [dataProvi, errorProvi, loadingProvi])
+  // const { error: errorProvi, loading: loadingProvi, data: dataProvi } = useQuery(providerQuery);
+  // useEffect(() => {
+  //   if (!loadingProvi && !errorProvi && dataProvi && dataProvi["providers"]["nodes"]) {
+  //     let res = dataProvi.providers.nodes.map((node, index) => {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 };
+  //     });
+  //     setProviders(res);
+  //   }
+  // }, [dataProvi, errorProvi, loadingProvi])
 
   var settings = {
     dots: true,
@@ -350,8 +349,15 @@ const DestinationDetailPage = () => {
             </div>
           </div>
           <div className="detailContainer">
-            <div className="prodTitle">
-              <p>{destination?.name}</p>
+            <div className="destination-header">
+              <div className="prodTitle">
+                <p>{destination?.name}</p>
+              </div>
+
+              <div className="destination-status">
+                {!destination?.isVisible && <p className="status cancelled">Tạm ẩn</p>}
+                {destination?.isVisible && <p className="status confirmed">Đang hiển thị</p>}
+              </div>
             </div>
 
             <div className="destinationDetail">
@@ -383,7 +389,7 @@ const DestinationDetailPage = () => {
                       </IconButton>
                     </span>
                   </div>
-                  <div className="detailItem">
+                  {/* <div className="detailItem">
                     <span className="itemKey">Trạng thái:</span>
                     <span className="itemValue">
                       {(() => {
@@ -397,7 +403,7 @@ const DestinationDetailPage = () => {
                         }
                       })()}
                     </span>
-                  </div>
+                  </div> */}
                   <div className="detailItem">
                     <span className="itemKey">Tỉnh:</span>
                     <span className="itemValue">
@@ -434,11 +440,11 @@ const DestinationDetailPage = () => {
                     </span>
                   </div>
                   <div className="detailItem">
-                    <span className="itemKey">Loại hình giải tri:</span>
+                    <span className="itemKey">Hoạt động khuyến nghị:</span>
                     <span className="itemValue">{activities}</span>
                   </div>
                   <div className="detailItem">
-                    <span className="itemKey">Mùa:</span>
+                    <span className="itemKey">Thời điểm lí tưởng:</span>
                     <span className="itemValue">
                       {/* {destination?.seasons.map((season) => (
                       <div
@@ -466,6 +472,12 @@ const DestinationDetailPage = () => {
                       {seasons}
                     </span>
                   </div>
+                  <div className="detailItem">
+                    <span className="itemKey">Mô tả:</span>
+                    <span className="itemValue" style={{wordWrap: "break-word", whiteSpace: "normal"}}>
+                      <ReadMore children={destination?.description} />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -480,7 +492,7 @@ const DestinationDetailPage = () => {
             </div>
           </div>
         </div> */}
-            <div className="bottom">
+            {/* <div className="bottom">
               <Accordion sx={{ boxShadow: "none", width: 1400 }}>
                 <AccordionSummary
                   sx={{
@@ -504,7 +516,7 @@ const DestinationDetailPage = () => {
                   {destination?.description}
                 </AccordionDetails>
               </Accordion>
-            </div>
+            </div> */}
             <div className="bottom">
               <Accordion sx={{ boxShadow: "none", width: 1400 }}>
                 <AccordionSummary
@@ -519,7 +531,7 @@ const DestinationDetailPage = () => {
                   aria-controls="panel1-content"
                   id="panel1-header"
                 >
-                  Danh sách liên lạc khẩn cấp
+                  Danh sách dịch vụ xung quanh
                 </AccordionSummary>
                 <AccordionDetails
                   sx={{
@@ -551,11 +563,11 @@ const DestinationDetailPage = () => {
                     backgroundColor: "#f8f9f9",
                   }}
                 >
-                  <PlanTable destinationPlans={plans}/>
+                  <PlanTable destinationPlans={plans} />
                 </AccordionDetails>
               </Accordion>
             </div>
-            <div className="bottom">
+            {/* <div className="bottom">
               <Accordion sx={{ boxShadow: "none", width: 1400 }}>
                 <AccordionSummary
                   sx={{
@@ -576,10 +588,10 @@ const DestinationDetailPage = () => {
                     backgroundColor: "#f8f9f9",
                   }}
                 >
-                  <ProviderTable providers={providers}/>
+                  <ProviderTable providers={providers} />
                 </AccordionDetails>
               </Accordion>
-            </div>
+            </div> */}
           </div>
           <Dialog
             open={open}

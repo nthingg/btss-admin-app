@@ -23,6 +23,7 @@ export const LOAD_PLANS_FILTER = gql`
         maxMemberCount
         utcEndAt
         status
+        isPublished
       }
       totalCount
     }
@@ -58,6 +59,7 @@ export const LOAD_TOTAL_PLAN = gql`
           maxMemberCount
           utcEndAt
           status
+          isPublished
         }
       }
       pageInfo {
@@ -98,6 +100,7 @@ export const LOAD_TOTAL_PLAN_INIT = gql`
           maxMemberCount
           utcEndAt
           status
+          isPublished
         }
         cursor
       }
@@ -133,6 +136,7 @@ export const LOAD_PLANS_PUBLISHED_FILTER = gql`
         maxMemberCount
         utcEndAt
         status
+        isPublished
       }
       totalCount
     }
@@ -173,6 +177,7 @@ export const LOAD_PLAN_READY = gql`
         maxMemberCount
         utcEndAt
         status
+        isPublished
       }
       totalCount
     }
@@ -208,6 +213,7 @@ export const LOAD_PLAN_ONGOING = gql`
         maxMemberCount
         utcEndAt
         status
+        isPublished
       }
       totalCount
     }

@@ -21,6 +21,18 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
       headerAlign: "center",
       renderCell: (params) => {
         let check = params.row.status;
+        if (params.row.isPublished === true) {
+          return (
+            <IconButton
+              color="info"
+              onClick={() => {
+                navigate(`/plans/${params.row.id}`);
+              }}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          );
+        }
         switch (check) {
           case "READY":
             return (
@@ -85,6 +97,18 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
       headerAlign: "center",
       renderCell: (params) => {
         let check = params.row.node.status;
+        if (params.row.node.isPublished === true) {
+          return (
+            <IconButton
+              color="info"
+              onClick={() => {
+                navigate(`/plans/${params.row.node.id}`);
+              }}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          );
+        }
         switch (check) {
           case "READY":
             return (

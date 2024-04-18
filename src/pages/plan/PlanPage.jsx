@@ -11,7 +11,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import NoCrashIcon from "@mui/icons-material/NoCrash";
-import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PlanTable from "../../components/tables/PlanTable";
@@ -79,14 +78,14 @@ const PlanPage = () => {
           setSelectedStatus([planStat[3], planStat[4]]);
           break;
         }
+        case "5": {
+          setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
+          setSelectedStatus(true);
+          break;
+        }
         case "6": {
           setPlanQuery(LOAD_PLANS_FILTER);
           setSelectedStatus(planStat[5]);
-          break;
-        }
-        case "7": {
-          setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
-          setSelectedStatus(true);
           break;
         }
       }
@@ -143,6 +142,9 @@ const PlanPage = () => {
       }
     });
     setTotalPlan(res);
+    console.log(res);
+    console.log(planData);
+    console.log("setting");
     setIsLoading(false);
   };
 
@@ -486,11 +488,11 @@ const PlanPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedStatus.toString() === planStat.toString() ? (
-          <PlanTable planTotal={totalPlan} />
-        ) : (
-          <PlanTable plans={plans} />
-        )}
+        {!isLoading && selectedStatus.toString() === planStat.toString() &&
+          <PlanTable planTotal={totalPlan} />}
+
+        {!isLoading && selectedStatus.toString() !== planStat.toString() &&
+          <PlanTable plans={plans} />}
       </div>
     </div>
   );

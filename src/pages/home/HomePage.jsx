@@ -411,13 +411,13 @@ const HomePage = () => {
                   <div className="item-title">Kế hoạch đang diễn ra</div>
                   <div className="item-body">
                     <div className="left">
-                      <Link to={`/plans/sbs/2`} className="navigateButton">
+                      <Link to={`/plans/sbs/3`} className="navigateButton">
                         <p>{onGoing}</p>
                       </Link>
                     </div>
                     <div className="right">
                       <div className="btn info">
-                        <Link to={`/plans/sbs/2`} className="navigateButton">
+                        <Link to={`/plans/sbs/3`} className="navigateButton">
                           <InfoIcon sx={{ color: "white" }} />
                         </Link>
                       </div>
@@ -489,7 +489,7 @@ const HomePage = () => {
                   <div className="item-title">Kế hoạch đã được chia sẻ</div>
                   <div className="item-body">
                     <div className="left">
-                      <Link to={`/plans/sbs/7`} className="navigateButton">
+                      <Link to={`/plans/sbs/5`} className="navigateButton">
                         {published == 0 ? (
                           <p>{published} </p>
                         ) : (
@@ -501,7 +501,7 @@ const HomePage = () => {
                     </div>
                     <div className="right">
                       <div className="btn info">
-                        <Link to={`/plans/sbs/7`} className="navigateButton">
+                        <Link to={`/plans/sbs/5`} className="navigateButton">
                           <InfoIcon sx={{ color: "white" }} />
                         </Link>
                       </div>

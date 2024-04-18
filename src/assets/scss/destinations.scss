@@ -60,45 +60,74 @@
         overflow: auto;
         padding: 10px 0 30px 10px;
 
-        .prodTitle {
-            padding: 20px 0 0 30px;
-            font-size: 38px;
-            font-weight: 600;
+        .destination-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: #2c3d50;
+            width: 100%;
 
-            p {
-                margin-bottom: 10px;
-            }
-
-            .link {
-                text-decoration: none;
-                color: white;
-                background-color: #2ecc71;
-                font-size: 16px;
-                padding: 10px;
-                border-radius: 5px;
-                cursor: pointer;
+            .prodTitle {
+                padding: 20px 0 0 30px;
+                font-size: 38px;
+                font-weight: 600;
                 display: flex;
-                justify-content: center;
-
-                svg {
-                    margin-right: 6px;
-                }
+                align-items: center;
+                justify-content: space-between;
+                color: #2c3d50;
 
                 p {
-                    margin: 0;
+                    margin-bottom: 10px;
+                }
+
+                .link {
+                    text-decoration: none;
+                    color: white;
+                    background-color: #2ecc71;
+                    font-size: 16px;
+                    padding: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: center;
+
+                    svg {
+                        margin-right: 6px;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+                }
+
+                .link:hover {
+                    background-color: #27ae60;
+
+                    p {
+                        color: white;
+                    }
                 }
             }
 
-            .link:hover {
-                background-color: #27ae60;
+            .status {
+                margin-left: 30px;
+                font-weight: normal;
+                font-size: 18px;
+                padding: 10px;
 
-                p {
-                    color: white;
-                }
+                color: white;
+                border-radius: 10px;
+            }
+
+            .confirmed {
+                background-color: #28b463;
+                font-size: 16px;
+                margin-right: 2rem;
+            }
+
+            .cancelled {
+                background-color: #e74c3c;
+                font-size: 16px;
+                margin-right: 2rem;
             }
         }
 
@@ -140,7 +169,7 @@
                     margin-right: 5px;
                     font-size: 18px;
                     display: inline-block;
-                    width: 160px;
+                    width: 190px;
                     color: #2c3d50;
                 }
 
