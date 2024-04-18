@@ -8,9 +8,11 @@ import { Alert, Snackbar, TextField } from "@mui/material";
 import {
   CANCEL_PLAN_SIMULATOR,
   CHANGE_JOIN_METHOD_SIMULATOR,
+  CHECK_NUMBERS_COMPLETED_PLANS,
   CHECK_NUMBERS_PENDING_PLANS,
   CHECK_NUMBERS_READY_PLANS,
   CHECK_NUMBERS_REGISTERING_PLANS,
+  CHECK_NUMBERS_VERIFIED_PLANS,
   CONFIRM_PLAN_SIMULATOR,
   CREATE_PLAN_SIMULATOR,
   GEN_MEM_SIMULATOR,
@@ -20,6 +22,7 @@ import {
   LOAD_PLANS_BY_ID_SIMULATOR,
   LOAD_PLANS_SIMULATOR,
   ORDER_CREATE_SIMULATOR,
+  PUBLISH_PLAN_SIMULATOR,
   REQUEST_AUTH_SIMULATOR,
   REQUEST_OTP_SIMULATOR,
   RESET_TIME_SIMULATOR,
@@ -68,6 +71,7 @@ const EmulatorPage = () => {
       }
     }
   `;
+
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -75,7 +79,7 @@ const EmulatorPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [responseMsg, setResponseMsg] = useState([]);
   const [loadingState, setLoading] = useState(true);
-  const [selectState, setSelectLoading] = useState(true);
+  const [selectState, setSelectLoading] = useState(false);
   const [ini, setIni] = useState(true);
   const [selectedSimulator, setSelectedSimulator] = useState(0);
   const [idInputVisible, setIdInputVisible] = useState(false);
@@ -91,6 +95,7 @@ const EmulatorPage = () => {
   const [planReadyNum, setPlanReadyNum] = useState(1);
   const [planOrderNum, setPlanOrderNum] = useState(1);
   const [planVerifyNum, setPlanVerifyNum] = useState(1);
+  const [planPublishNum, setPlanPublishNum] = useState(1);
   const [dateVisible, setDateVisible] = useState(false);
   const [planNumVisible, setPlanNumVisible] = useState(false);
   const [dateSimulator, setDateSimulator] = useState("");
@@ -100,6 +105,7 @@ const EmulatorPage = () => {
   const [readyNumVisible, setReadyNumVisible] = useState(false);
   const [orderNumVisible, setOrderNumVisible] = useState(false);
   const [verifyNumVisible, setVerifyNumVisible] = useState(false);
+  const [publishNumVisible, setPublishNumVisible] = useState(false);
   const [loginMsg, setLoginMsg] = useState("");
   const [isEmulatorLoading, setIsEmulatorLoading] = useState(true);
   const [isLoadingVisible, setIsLoadingVisible] = useState(false);
@@ -158,6 +164,10 @@ const EmulatorPage = () => {
       value: 8,
       label: "Giả lập check-in kế hoạch.",
     },
+    {
+      value: 9,
+      label: "Giả lập chia sẻ kế hoạch.",
+    },
   ];
 
   const handleClick = () => {
@@ -170,6 +180,10 @@ const EmulatorPage = () => {
 
   const [planConfirm, { data: dataConfirm, error: errorConfirm }] = useMutation(
     CONFIRM_PLAN_SIMULATOR
+  );
+
+  const [publish, { data: dataPublish, error: errorPublish }] = useMutation(
+    PUBLISH_PLAN_SIMULATOR
   );
 
   const {
@@ -222,6 +236,13 @@ const EmulatorPage = () => {
     data: dataReady,
     refetch: refetchReady,
   } = useQuery(CHECK_NUMBERS_READY_PLANS);
+
+  const {
+    error: errorVeri,
+    loading: loadingVeri,
+    data: dataVeri,
+    refetch: refetchVeri,
+  } = useQuery(CHECK_NUMBERS_COMPLETED_PLANS);
 
   const {
     error: errorLoadPlans,
@@ -811,6 +832,7 @@ const EmulatorPage = () => {
               id: currentPlans[j].id,
               planName: currentPlans[j].name,
             };
+            count++;
             log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
             const resCancel = await handleCancelPlan(
               cancelData,
@@ -1528,6 +1550,104 @@ const EmulatorPage = () => {
     localStorage.setItem("checkIsUserCall", "no");
   };
 
+  const handlePublishPlan = async (dto, count, acc, planName) => {
+    try {
+      const { data } = await publish({
+        variables: {
+          id: dto.planId,
+        },
+      });
+      const response = {
+        userName: acc.name,
+        action: "Chia sẻ kế hoạch",
+        detail: `[${acc.name}] chia sẻ kế hoạch [${planName}]`,
+        status: true,
+        id: count,
+      };
+      return response;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClick();
+      localStorage.removeItem("errorMsg");
+      const response = {
+        userName: acc.name,
+        action: "Chia sẻ kế hoạch",
+        detail: `${msg}`,
+        status: false,
+        id: count,
+      };
+      return response;
+    }
+  };
+
+  const simulatePublishPlan = async (publishNum) => {
+    const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
+
+    let response = [];
+    let count = 0;
+    let successCount = 0;
+    let log = "";
+    let limitPublish = 1;
+    for (let i = 0; i < loggedAcc?.length; i++) {
+      localStorage.setItem("checkIsUserCall", "no");
+
+      let currentPlans = [];
+      try {
+        const { data } = await refetchLoadPlans({
+          id: loggedAcc[i].id, // Always refetches a new list,
+          status: "COMPLETED",
+        });
+        currentPlans = data["plans"]["nodes"];
+      } catch (error) {
+        console.log(error);
+        const msg = localStorage.getItem("errorMsg");
+        setErrMsg(msg);
+        handleClick();
+        localStorage.removeItem("errorMsg");
+      }
+
+      localStorage.setItem("checkIsUserCall", "yes");
+      localStorage.setItem("userToken", loggedAcc[i].token);
+
+      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+
+      if (currentPlans.length > 0) {
+        for (let j = 0; j < currentPlans?.length; j++) {
+          if (limitPublish > publishNum) {
+            break;
+          }
+
+          count++;
+          log += `[Chia sẻ kế hoạch] ${loggedAcc[i].name} \n`;
+
+          const publishData = {
+            planId: currentPlans[j].id,
+          };
+
+          const res = await handlePublishPlan(
+            publishData,
+            count,
+            loggedAcc[i],
+            currentPlans[j].name
+          );
+          if (res.status) {
+            successCount++;
+          }
+          response.push(res);
+          setLoginMsg(log);
+          setResponseMsg(response);
+          limitPublish++;
+        }
+      }
+    }
+    setTotalMsg(count);
+    setSuccessMsg(successCount);
+    setIsEmulatorLoading(false);
+    localStorage.setItem("checkIsUserCall", "no");
+  };
+
   return (
     <div>
       <div className="emulator">
@@ -1556,7 +1676,6 @@ const EmulatorPage = () => {
                   setIsLoadingVisible(false);
                   if (e != null) {
                     setSelectedSimulator(e.value);
-                    setSelectLoading(false);
                     //reset value
                     setJoinId("");
                     setJoinNum("");
@@ -1570,7 +1689,7 @@ const EmulatorPage = () => {
                     setCompanionsHostJoinNum("");
                     setCompanionsJoinNum("");
                     setCompanionsMassJoinNum("");
-                    setSelectLoading(true);
+                    setPlanPublishNum("");
                     //
                     if (e.value === 0) {
                       setIdInputVisible(true);
@@ -1581,6 +1700,7 @@ const EmulatorPage = () => {
                       setMassJoinVisible(false);
                       setVerifyNumVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 1) {
                       setPlanNumVisible(true);
                       setIdInputVisible(false);
@@ -1590,6 +1710,7 @@ const EmulatorPage = () => {
                       setMassJoinVisible(false);
                       setVerifyNumVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 2) {
                       setRegisterVisible(true);
                       setIdInputVisible(false);
@@ -1599,6 +1720,7 @@ const EmulatorPage = () => {
                       setMassJoinVisible(false);
                       setOrderNumVisible(false);
                       setVerifyNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 3) {
                       setMassJoinVisible(true);
                       setIdInputVisible(false);
@@ -1608,6 +1730,7 @@ const EmulatorPage = () => {
                       setRegisterVisible(false);
                       setVerifyNumVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 4) {
                       setReadyNumVisible(true);
                       setMassJoinVisible(false);
@@ -1617,6 +1740,7 @@ const EmulatorPage = () => {
                       setRegisterVisible(false);
                       setVerifyNumVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 5) {
                       setOrderNumVisible(true);
                       setReadyNumVisible(false);
@@ -1626,6 +1750,7 @@ const EmulatorPage = () => {
                       setDateVisible(false);
                       setPlanNumVisible(false);
                       setRegisterVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 6) {
                       setDateVisible(true);
                       setVerifyNumVisible(false);
@@ -1635,7 +1760,9 @@ const EmulatorPage = () => {
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     } else if (e.value === 8) {
+                      setSelectLoading(false);
                       setVerifyNumVisible(true);
                       setDateVisible(false);
                       setReadyNumVisible(false);
@@ -1644,6 +1771,17 @@ const EmulatorPage = () => {
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
+                    } else if (e.value === 9) {
+                      setPublishNumVisible(true);
+                      setRegisterVisible(false);
+                      setIdInputVisible(false);
+                      setDateVisible(false);
+                      setReadyNumVisible(false);
+                      setPlanNumVisible(false);
+                      setMassJoinVisible(false);
+                      setOrderNumVisible(false);
+                      setVerifyNumVisible(false);
                     } else {
                       setIdInputVisible(false);
                       setVerifyNumVisible(false);
@@ -1653,9 +1791,9 @@ const EmulatorPage = () => {
                       setRegisterVisible(false);
                       setMassJoinVisible(false);
                       setOrderNumVisible(false);
+                      setPublishNumVisible(false);
                     }
                   } else {
-                    setSelectLoading(true);
                     setVerifyNumVisible(false);
                     setIdInputVisible(false);
                     setReadyNumVisible(false);
@@ -1664,6 +1802,7 @@ const EmulatorPage = () => {
                     setPlanNumVisible(false);
                     setMassJoinVisible(false);
                     setOrderNumVisible(false);
+                    setPublishNumVisible(false);
                   }
                 }}
                 theme={(theme) => ({
@@ -2293,6 +2432,57 @@ const EmulatorPage = () => {
                 }}
               />
 
+              {/* number of plan publish */}
+              <TextField
+                style={
+                  publishNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text ml-2"
+                type="number"
+                value={planPublishNum}
+                placeholder="Số lượng kế hoạch được chia sẻ"
+                size="small"
+                name="numPublish"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setSelectLoading(true);
+                    setPlanPublishNum("");
+                  } else if (parseInt(e.target.value) <= 0) {
+                    setPlanPublishNum(1);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  } else if (parseInt(e.target.value) > 0) {
+                    setPlanPublishNum(e.target.value);
+                    if (massPlanJoinNum !== "") {
+                      setSelectLoading(false);
+                    }
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "21%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+
               {/* date change system time */}
               <TextField
                 id="outlined-disabled"
@@ -2365,7 +2555,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn tạo 50 kế hoạch giả lập`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2380,7 +2570,7 @@ const EmulatorPage = () => {
                         const msg = `Thời gian tạo kế hoạch phải cách 7 ngày kể từ hôm nay`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2394,7 +2584,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2405,7 +2595,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng kế hoạch đang chờ vượt quá kế hoạch hiện có (${limitPending})`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                           return;
                         }
                         simulateJoinAndChangeMethodPlan(
@@ -2424,6 +2614,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn 50 phượt thủ giả lập`;
                         setErrMsg(msg);
                         handleClick();
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2431,7 +2622,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2442,7 +2633,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                           return;
                         }
                         simulateMassJoinPlan(
@@ -2465,7 +2656,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitRegistering} kế hoạch đang đăng ký)`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                           return;
                         }
 
@@ -2485,7 +2676,7 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                           return;
                         }
 
@@ -2502,7 +2693,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn 50 phượt thủ giả lập`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2510,7 +2701,7 @@ const EmulatorPage = () => {
                         const msg = `Giới hạn thành viên đi kèm 20 người`;
                         setErrMsg(msg);
                         handleClick();
-                        setIsEmulatorLoading(false);
+                        setIsLoadingVisible(false);
                         return;
                       }
 
@@ -2523,7 +2714,7 @@ const EmulatorPage = () => {
                           const msg = `Không có kế hoạch nào thuộc ID: ${joinId}`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                         } else {
                           simulateJoinPlanByID(
                             plan,
@@ -2574,11 +2765,33 @@ const EmulatorPage = () => {
                           const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
                           setErrMsg(msg);
                           handleClick();
-                          setIsEmulatorLoading(false);
+                          setIsLoadingVisible(false);
                           return;
                         }
 
                         simulateVerifyPlan(planVerifyNum);
+                      } catch (error) {
+                        console.log(error);
+                        const msg = localStorage.getItem("errorMsg");
+                        setErrMsg(msg);
+                        handleClick();
+                        localStorage.removeItem("errorMsg");
+                      }
+                    } else if (selectedSimulator === 9) {
+                      console.log("123");
+
+                      try {
+                        const { data } = await refetchVeri();
+                        const limitVerify = data.plans.totalCount;
+                        if (planPublishNum > limitVerify) {
+                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch đã check-in)`;
+                          setErrMsg(msg);
+                          handleClick();
+                          setIsLoadingVisible(false);
+                          return;
+                        }
+
+                        simulatePublishPlan(planPublishNum);
                       } catch (error) {
                         console.log(error);
                         const msg = localStorage.getItem("errorMsg");

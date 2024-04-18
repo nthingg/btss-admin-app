@@ -137,6 +137,14 @@ export const CONFIRM_PLAN_SIMULATOR = gql`
   }
 `;
 
+export const PUBLISH_PLAN_SIMULATOR = gql`
+  mutation publishedPlan($id: Int!) {
+    changePlanPublishStatus(planId: $id) {
+      id
+    }
+  }
+`;
+
 export const LOAD_REGISTERING_PLANS_SIMULATOR = gql`
   query plan($id: Int!) {
     plans(
@@ -244,6 +252,32 @@ export const CHECK_NUMBERS_READY_PLANS = gql`
       where: {
         account: { name: { startsWith: "test-account" } }
         status: { eq: READY }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const CHECK_NUMBERS_COMPLETED_PLANS = gql`
+  query {
+    plans(
+      where: {
+        account: { name: { startsWith: "test-account" } }
+        status: { eq: COMPLETED }
       }
     ) {
       edges {
