@@ -428,11 +428,16 @@ const EmulatorPage = () => {
   const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
+    let countLatest = 0;
     const { data: latest } = await refetchLatest();
-    const latestPlan = latest.plans.nodes[0].name;
-    const parts = latestPlan.split("-");
-    const number = parseInt(parts[parts.length - 1], 10);
-    let countLatest = number;
+    if (latest.plans.nodes.length === 0) {
+      countLatest = 1;
+    } else {
+      const latestPlan = latest.plans.nodes[0].name;
+      const parts = latestPlan.split("-");
+      const number = parseInt(parts[parts.length - 1], 10);
+      countLatest = number;
+    }
 
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
