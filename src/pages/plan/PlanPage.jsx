@@ -477,7 +477,7 @@ const PlanPage = () => {
           </Slider>
         </div>
         {isLoading && (
-          <div className="loading">
+          <div className="tbl-loading">
             <RestartAltIcon
               sx={{
                 fontSize: 80,
