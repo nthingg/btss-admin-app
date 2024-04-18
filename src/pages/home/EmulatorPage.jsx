@@ -43,35 +43,6 @@ import { companionData } from "../../assets/constants/companions";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const EmulatorPage = () => {
-  const initQuery = gql`
-    {
-      providers(
-        where: {
-          coordinate: {
-            distance: {
-              geometry: { type: Point, coordinates: [0, 0], crs: 4326 }
-              buffer: 0.09138622285234489
-              eq: 0
-            }
-          }
-          type: { eq: EMERGENCY }
-        }
-        order: { id: DESC }
-      ) {
-        nodes {
-          id
-          name
-          address
-          phone
-          imagePath
-          coordinate {
-            coordinates
-          }
-        }
-      }
-    }
-  `;
-
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -1331,7 +1302,6 @@ const EmulatorPage = () => {
     localStorage.setItem("checkIsUserCall", "no");
   };
 
-  //add logic change test account if already join plan
   const simulateJoinPlanByID = async (currentPlan, numJoin, companionsNum) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
@@ -1947,6 +1917,7 @@ const EmulatorPage = () => {
                   },
                 }}
               />
+
               {/* number of traveler join to specific plan id*/}
               <TextField
                 style={
@@ -2004,7 +1975,7 @@ const EmulatorPage = () => {
                 className="basic-text ml-2"
                 type="number"
                 value={companionsJoinNum}
-                InputProps={{ inputProps: { min: 1 } }}
+                InputProps={{ inputProps: { min: 0 } }}
                 placeholder="Số lượng thành viên đi kèm"
                 size="small"
                 name="numberJoin"
@@ -2012,11 +1983,14 @@ const EmulatorPage = () => {
                   if (!e.target.value) {
                     setCompanionsJoinNum("");
                     setSelectLoading(true);
-                  } else if (parseInt(e.target.value) <= 0) {
-                    setCompanionsJoinNum(1);
+                  } else if (parseInt(e.target.value) < 0) {
+                    setCompanionsJoinNum(0);
                     setSelectLoading(false);
                   } else if (parseInt(e.target.value) > 0) {
                     setCompanionsJoinNum(e.target.value);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) === 0) {
+                    setCompanionsJoinNum(0);
                     setSelectLoading(false);
                   }
                 }}
@@ -2099,7 +2073,7 @@ const EmulatorPage = () => {
                 className="basic-text ml-2"
                 type="number"
                 value={companionsHostJoinNum}
-                InputProps={{ inputProps: { min: 1 } }}
+                InputProps={{ inputProps: { min: 0 } }}
                 placeholder="Số lượng thành viên đi kèm"
                 size="small"
                 name="numberJoin"
@@ -2107,11 +2081,14 @@ const EmulatorPage = () => {
                   if (!e.target.value) {
                     setCompanionsHostJoinNum("");
                     setSelectLoading(true);
-                  } else if (parseInt(e.target.value) <= 0) {
-                    setCompanionsHostJoinNum(1);
+                  } else if (parseInt(e.target.value) < 0) {
+                    setCompanionsHostJoinNum(0);
                     setSelectLoading(false);
                   } else if (parseInt(e.target.value) > 0) {
                     setCompanionsHostJoinNum(e.target.value);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) === 0) {
+                    setCompanionsHostJoinNum(0);
                     setSelectLoading(false);
                   }
                 }}
@@ -2248,7 +2225,7 @@ const EmulatorPage = () => {
                 className="basic-text ml-2"
                 type="number"
                 value={companionsMassJoinNum}
-                InputProps={{ inputProps: { min: 1 } }}
+                InputProps={{ inputProps: { min: 0 } }}
                 placeholder="Số lượng thành viên đi kèm"
                 size="small"
                 name="numberJoin"
@@ -2256,11 +2233,14 @@ const EmulatorPage = () => {
                   if (!e.target.value) {
                     setCompanionsMassJoinNum("");
                     setSelectLoading(true);
-                  } else if (parseInt(e.target.value) <= 0) {
-                    setCompanionsMassJoinNum(1);
+                  } else if (parseInt(e.target.value) < 0) {
+                    setCompanionsMassJoinNum(0);
                     setSelectLoading(false);
                   } else if (parseInt(e.target.value) > 0) {
                     setCompanionsMassJoinNum(e.target.value);
+                    setSelectLoading(false);
+                  } else if (parseInt(e.target.value) === 0) {
+                    setCompanionsMassJoinNum(0);
                     setSelectLoading(false);
                   }
                 }}
@@ -2580,8 +2560,8 @@ const EmulatorPage = () => {
 
                       simulateCreatePlans(planNum, formatted);
                     } else if (selectedSimulator === 2) {
-                      if (companionsHostJoinNum > 20) {
-                        const msg = `Giới hạn thành viên đi kèm 20 người`;
+                      if (companionsHostJoinNum > 5) {
+                        const msg = `Giới hạn thành viên đi kèm 5 người`;
                         setErrMsg(msg);
                         handleClick();
                         setIsLoadingVisible(false);
@@ -2618,8 +2598,8 @@ const EmulatorPage = () => {
                         return;
                       }
 
-                      if (companionsHostJoinNum > 20) {
-                        const msg = `Giới hạn thành viên đi kèm 20 người`;
+                      if (companionsHostJoinNum > 5) {
+                        const msg = `Giới hạn thành viên đi kèm 5 người`;
                         setErrMsg(msg);
                         handleClick();
                         setIsLoadingVisible(false);
@@ -2697,8 +2677,8 @@ const EmulatorPage = () => {
                         return;
                       }
 
-                      if (companionsJoinNum > 20) {
-                        const msg = `Giới hạn thành viên đi kèm 20 người`;
+                      if (companionsJoinNum > 5) {
+                        const msg = `Giới hạn thành viên đi kèm 5 người`;
                         setErrMsg(msg);
                         handleClick();
                         setIsLoadingVisible(false);
