@@ -58,6 +58,12 @@ const PlanPage = () => {
   useEffect(() => {
     if (sbsNumber) {
       switch (sbsNumber) {
+        case "1": {
+          setPlanQuery(LOAD_PLANS_FILTER);
+          setSelectedStatus(planStat[0]);
+          refetch();
+          break;
+        }
         case "2": {
           setPlanQuery(LOAD_PLAN_READY);
           setSelectedStatus(planStat[1])
@@ -141,7 +147,7 @@ const PlanPage = () => {
     switch (index) {
       case 0:
         setSelectedStatus(planStat);
-        refetch();
+        fetchTotalPlan(null);
         break;
       case 1:
         setPlanQuery(LOAD_PLANS_FILTER);
@@ -476,6 +482,7 @@ const PlanPage = () => {
           <button
             className="link"
             onClick={() => {
+              setIsLoading(true);
               setSearchTerm(null);
               refetch();
               refetchRegis();
@@ -486,7 +493,6 @@ const PlanPage = () => {
               refetchComplete();
               refetchOngoing();
               refetchPublished();
-              setIsLoading(true);
               fetchTotalPlan(null);
             }}
           >
@@ -543,7 +549,7 @@ const PlanPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedStatus === planStat[0] ?
+        {!isLoading && selectedStatus.toString() === planStat.toString() ?
           <PlanTable planTotal={totalPlan} /> :
           <PlanTable plans={plans} />
         }
