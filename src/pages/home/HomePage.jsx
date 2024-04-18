@@ -23,17 +23,17 @@ import {
 } from "../../services/graphql/plan";
 import {
   LOAD_DESTINATIONS,
-  LOAD_DESTINATION_TRENDING
+  LOAD_DESTINATION_TRENDING,
 } from "../../services/graphql/destination";
 import {
   LOAD_ACCOUNTS_TRAVELER,
   LOAD_ACCOUNT_USERS,
-  LOAD_NUMBERS_NEWEST_TRAVELER
+  LOAD_NUMBERS_NEWEST_TRAVELER,
 } from "../../services/graphql/account";
 import { Link } from "react-router-dom";
 import { TrendingDestinationChart } from "../../components/charts/TrendingDestinationChart";
 import Chart from "chart.js/auto";
-import { CategoryScale } from "chart.js"
+import { CategoryScale } from "chart.js";
 
 Chart.register(CategoryScale);
 
@@ -80,7 +80,11 @@ const HomePage = () => {
     }
   }, [dataTravelers, loadingTravelers, errorTravelers]);
 
-  const currentMonth = new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1);
+  const currentMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1
+  );
   const {
     error: errorNewTravelers,
     loading: loadingNewTravelers,
@@ -88,8 +92,8 @@ const HomePage = () => {
     refetch: refetchNewTravelers,
   } = useQuery(LOAD_NUMBERS_NEWEST_TRAVELER, {
     variables: {
-      input: currentMonth.toISOString()
-    }
+      input: currentMonth.toISOString(),
+    },
   });
   const [newTravelers, setNewTravelers] = useState(0);
   useEffect(() => {
@@ -199,14 +203,14 @@ const HomePage = () => {
   }, [dataTotal, loadingTotal, errTotal]);
 
   const {
-    errorTemp,
-    loadingTemp,
+    error: errorTemp,
+    loading: loadingTemp,
     data: dataTemp,
     refetch: refetchTemp,
   } = useQuery(LOAD_NUMBERS_READY, {
     variables: {
-      dateTime: now.toUTCString()
-    }
+      dateTime: now.toUTCString(),
+    },
   });
   const [temp, setTemp] = useState(0);
   useEffect(() => {
@@ -222,12 +226,17 @@ const HomePage = () => {
     refetch: refetchOnGoing,
   } = useQuery(LOAD_NUMBERS_ONGOING, {
     variables: {
-      dateTime: now.toUTCString()
-    }
+      dateTime: now.toUTCString(),
+    },
   });
   const [onGoing, setOnGoing] = useState(0);
   useEffect(() => {
-    if (!loadingOnGoing && !errorOnGoing && dataOnGoing && dataOnGoing["plans"]) {
+    if (
+      !loadingOnGoing &&
+      !errorOnGoing &&
+      dataOnGoing &&
+      dataOnGoing["plans"]
+    ) {
       setOnGoing(dataOnGoing["plans"].totalCount);
     }
   }, [dataOnGoing, loadingOnGoing, errorOnGoing]);
@@ -251,17 +260,35 @@ const HomePage = () => {
   }, [dataPublished, loadingPublished, errorPublished]);
 
   const [trendingDest, setTrendingDest] = useState(null);
-  const { error: errTrendDest, loading: loadingTrendDest, data: dataTrendDest } = useQuery(LOAD_DESTINATION_TRENDING);
+  const {
+    error: errTrendDest,
+    loading: loadingTrendDest,
+    data: dataTrendDest,
+  } = useQuery(LOAD_DESTINATION_TRENDING);
   useEffect(() => {
-    if (!loadingTrendDest && !errTrendDest && dataTrendDest && dataTrendDest["trendingDestinations"]) {
+    if (
+      !loadingTrendDest &&
+      !errTrendDest &&
+      dataTrendDest &&
+      dataTrendDest["trendingDestinations"]
+    ) {
       setTrendingDest(dataTrendDest.trendingDestinations);
     }
     setIsLoading(false);
-  }, [errTrendDest, loadingTrendDest, dataTrendDest])
+  }, [errTrendDest, loadingTrendDest, dataTrendDest]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(new Date());
+      refetch();
+      refetchCancelled();
+      refetchOnGoing();
+      refetchTemp();
+      refetchDestination();
+      refetchComplete();
+      refetchTotal();
+      refetchTravelers();
+      refetchPublished();
     }, 1000); // Update every second
 
     return () => clearInterval(timer); // Cleanup function to stop the timer when the component unmounts
@@ -299,7 +326,7 @@ const HomePage = () => {
                     setIsLoading(true);
                     refetch();
                     refetchCancelled();
-                    // refetchOnGoing();
+                    refetchOnGoing();
                     refetchTemp();
                     refetchDestination();
                     refetchComplete();
@@ -341,7 +368,9 @@ const HomePage = () => {
               </div>
               <div className="item-container temp">
                 <div className="item-top">
-                  <div className="item-title" style={{ fontSize: "17px" }}>Kế hoạch chưa chốt thành viên</div>
+                  <div className="item-title" style={{ fontSize: "17px" }}>
+                    Kế hoạch chưa chốt thành viên
+                  </div>
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/1`} className="navigateButton">
@@ -408,7 +437,9 @@ const HomePage = () => {
                     <div className="right">
                       <div className="btn success">
                         <Link to={`/plans/sbs/4`} className="navigateButton">
-                          <CheckCircleOutlineOutlinedIcon sx={{ color: "white" }} />
+                          <CheckCircleOutlineOutlinedIcon
+                            sx={{ color: "white" }}
+                          />
                         </Link>
                       </div>
                     </div>
@@ -459,10 +490,13 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/7`} className="navigateButton">
-                        {published == 0 ?
-                          <p>{published} </p> :
-                          <p>{published} / {completed}</p>
-                        }
+                        {published == 0 ? (
+                          <p>{published} </p>
+                        ) : (
+                          <p>
+                            {published} / {completed}
+                          </p>
+                        )}
                       </Link>
                     </div>
                     <div className="right">
@@ -581,17 +615,28 @@ const HomePage = () => {
             <hr style={{ borderTop: "1px solid #e4e4e4", marginTop: "1rem" }} />
             <div className="item-list-title">
               <h2 style={{ display: "inline-block" }}>Địa điểm nổi bật</h2>
-              {trendingDest &&
-                <span style={{ fontSize: "1.1rem", float: "right" }}><em>*Dữ liệu được thống kê từ {(new Date(trendingDest.from)).toLocaleDateString("vi-VN",)} tới {(new Date(trendingDest.to)).toLocaleDateString("vi-VN")} (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).</em></span>}
+              {trendingDest && (
+                <span style={{ fontSize: "1.1rem", float: "right" }}>
+                  <em>
+                    *Dữ liệu được thống kê từ{" "}
+                    {new Date(trendingDest.from).toLocaleDateString("vi-VN")}{" "}
+                    tới {new Date(trendingDest.to).toLocaleDateString("vi-VN")}{" "}
+                    (Số liệu được cập nhật mỗi Thứ 2 hàng tuần).
+                  </em>
+                </span>
+              )}
             </div>
             <div className="item-list-trending">
               <div className="item-container info">
-                {trendingDest ?
-                  <TrendingDestinationChart chartData={trendingDest} /> :
+                {trendingDest ? (
+                  <TrendingDestinationChart chartData={trendingDest} />
+                ) : (
                   <div>
-                    <span style={{fontSize: "1.3rem", fontStyle: "italic"}}>Không có dữ liệu.</span>
+                    <span style={{ fontSize: "1.3rem", fontStyle: "italic" }}>
+                      Không có dữ liệu.
+                    </span>
                   </div>
-                }
+                )}
               </div>
             </div>
           </div>

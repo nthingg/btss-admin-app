@@ -66,6 +66,14 @@ export const LOAD_PLANS_SIMULATOR = gql`
         joinMethod
         schedule
         utcStartAt
+        tempOrders {
+          uuid
+          cart
+          type
+          period
+          serveDateIndexes
+          note
+        }
       }
     }
   }

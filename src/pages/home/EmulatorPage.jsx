@@ -33,6 +33,7 @@ import {
 } from "../../services/graphql/destination";
 import { LOAD_PRODUCTS_BY_PROVIDER } from "../../services/graphql/products";
 import client from "../../services/apollo/config";
+import { v4 as uuidv4 } from "uuid";
 
 const EmulatorPage = () => {
   const initQuery = gql`
@@ -93,6 +94,10 @@ const EmulatorPage = () => {
   const [orderNumVisible, setOrderNumVisible] = useState(false);
   const [verifyNumVisible, setVerifyNumVisible] = useState(false);
   const [loginMsg, setLoginMsg] = useState("");
+  const [isEmulatorLoading, setIsEmulatorLoading] = useState(true);
+  const [isLoadingVisible, setIsLoadingVisible] = useState(false);
+  const [totalMsg, setTotalMsg] = useState(0);
+  const [successMsg, setSuccessMsg] = useState(0);
 
   const {
     error: errDestinations,
@@ -313,7 +318,7 @@ const EmulatorPage = () => {
     },
   });
 
-  const handleCreatePlan = async (plan, count, acc, dateTime) => {
+  const handleCreatePlan = async (plan, count, acc, dateTime, tempOrders) => {
     try {
       const { data } = await create({
         variables: {
@@ -332,6 +337,7 @@ const EmulatorPage = () => {
             schedule: plan.schedule,
             surcharges: plan.surcharges,
             travelDuration: plan.travelDuration,
+            tempOrders: tempOrders,
           },
         },
       });
@@ -434,6 +440,8 @@ const EmulatorPage = () => {
       }
       planTempData.savedProviderIds = contacts;
 
+      let tempOrders = [];
+
       for (let i = 0; i < planTempData.schedule.length; i++) {
         for (let k = 0; k < planTempData.schedule[i].length; k++) {
           if (planTempData.schedule[i][k].type === "EAT") {
@@ -469,16 +477,21 @@ const EmulatorPage = () => {
                   }
                 }
 
-                planTempData.schedule[i][k].tempOrder =
-                  tempCart.length === 0
-                    ? null
-                    : {
-                        cart: tempCart,
-                        note: "",
-                        period: "NOON",
-                        providerId: providers[j].id,
-                        total: tempTotal,
-                      };
+                if (tempCart.length !== 0) {
+                  const uuid = uuidv4();
+                  planTempData.schedule[i][k].orderUUID = uuid;
+                  tempOrders.push({
+                    uuid: uuid,
+                    cart: tempCart,
+                    note: null,
+                    period: "NOON",
+                    // providerId: providers[j].id,
+                    serveDateIndexes: [i],
+                    // total: tempTotal,
+                    type: "EAT",
+                  });
+                }
+
                 break;
               }
             }
@@ -492,7 +505,8 @@ const EmulatorPage = () => {
         planData[0],
         count,
         loggedAcc[i],
-        dateTime
+        dateTime,
+        tempOrders
       );
       response.push(res);
       setResponseMsg(response);
@@ -1134,20 +1148,19 @@ const EmulatorPage = () => {
             break;
           }
 
-          let temp = [];
-          for (
-            let index = 0;
-            index < currentPlans[j].schedule.length;
-            index++
-          ) {
-            for (let l = 0; l < currentPlans[j].schedule[index].length; l++) {
-              if (currentPlans[j].schedule[index][l].type === "EAT") {
-                if (currentPlans[j].schedule[index][l].tempOrder !== null) {
-                  temp.push(currentPlans[j].schedule[index][l].tempOrder);
-                }
-              }
-            }
-          }
+          // for (
+          //   let index = 0;
+          //   index < currentPlans[j].schedule.length;
+          //   index++
+          // ) {
+          //   for (let l = 0; l < currentPlans[j].schedule[index].length; l++) {
+          //     if (currentPlans[j].schedule[index][l].type === "EAT") {
+          //       if (currentPlans[j].schedule[index][l].tempOrder !== null) {
+          //         temp.push(currentPlans[j].schedule[index][l].tempOrder);
+          //       }
+          //     }
+          //   }
+          // }
 
           // if (i <= 15) {
           //   temp = [planData[0].tempOrders[0], planData[0].tempOrders[1]];
@@ -1164,36 +1177,39 @@ const EmulatorPage = () => {
           //   console.log("70%");
           // }
 
-          var a = moment
-            .utc(currentPlans[j].utcStartAt)
-            .utcOffset("+07:00")
-            .add(1, "days");
-          var b = moment
-            .utc(currentPlans[j].utcStartAt)
-            .utcOffset("+07:00")
-            .add(2, "days");
-          var formattedA = a.format();
-          var formattedB = b.format();
-
-          for (let k = 0; k < temp.length; k++) {
+          for (let k = 0; k < currentPlans[j].tempOrders.length; k++) {
             count++;
+
+            let listServeDates = [];
+            for (
+              let m = 0;
+              m < currentPlans[j].tempOrders[k].serveDateIndexes.length;
+              m++
+            ) {
+              var b = moment
+                .utc(currentPlans[j].utcStartAt)
+                .utcOffset("+07:00")
+                .add(currentPlans[j].tempOrders[k].serveDateIndexes[m], "days");
+              var formatted = b.format();
+              listServeDates.push(formatted);
+            }
 
             const convertedData = [];
 
-            for (const key in temp[k].cart) {
+            for (const key in currentPlans[j].tempOrders[k].cart) {
               convertedData.push({
                 key: parseInt(key, 10),
-                value: temp[k].cart[key],
+                value: currentPlans[j].tempOrders[k].cart[key],
               });
             }
 
             const orderData = {
               cart: convertedData,
-              note: temp[k].note,
+              note: currentPlans[j].tempOrders[k].note,
               planId: currentPlans[j].id,
-              serveDates: [formattedA, formattedB],
-              type: "EAT",
-              period: temp[k].period,
+              serveDates: listServeDates,
+              type: currentPlans[j].tempOrders[k].type,
+              period: currentPlans[j].tempOrders[k].period,
               planName: currentPlans[j].name,
             };
             console.log(orderData);
