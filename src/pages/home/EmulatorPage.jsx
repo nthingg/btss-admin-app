@@ -195,8 +195,12 @@ const EmulatorPage = () => {
     VERIFY_PLAN_SIMULATOR
   );
 
-  const [getLatest, { data: dataLatest, error: errLatest }] =
-    useLazyQuery(GET_NEWEST_NAME);
+  const {
+    data: dataLatest,
+    loading: loadingLatest,
+    error: errLatest,
+    refetch: refetchLatest,
+  } = useQuery(GET_NEWEST_NAME);
 
   const {
     error: errorPending,
@@ -328,7 +332,14 @@ const EmulatorPage = () => {
     },
   });
 
-  const handleCreatePlan = async (plan, count, acc, dateTime, tempOrders) => {
+  const handleCreatePlan = async (
+    plan,
+    count,
+    acc,
+    dateTime,
+    tempOrders,
+    currentPos
+  ) => {
     try {
       const { data } = await create({
         variables: {
@@ -340,7 +351,7 @@ const EmulatorPage = () => {
             maxMemberCount: plan.maxMemberCount,
             maxMemberWeight: plan.maxMemberWeight,
             departureAddress: plan.departureAddress,
-            name: plan.name + count,
+            name: plan.name + currentPos,
             note: plan.note,
             periodCount: plan.periodCount,
             savedProviderIds: plan.savedProviderIds,
@@ -354,7 +365,7 @@ const EmulatorPage = () => {
       const response = {
         userName: acc.name,
         action: "Tạo kế hoạch",
-        detail: `[${acc.name}] tạo kế hoạch [${plan.name + count}]`,
+        detail: `[${acc.name}] tạo kế hoạch [${plan.name + currentPos}]`,
         status: true,
         id: count,
       };
@@ -417,10 +428,17 @@ const EmulatorPage = () => {
   const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
+    const { data: latest } = await refetchLatest();
+    const latestPlan = latest.plans.nodes[0].name;
+    const parts = latestPlan.split("-");
+    const number = parseInt(parts[parts.length - 1], 10);
+    let countLatest = number;
+
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
     let count = 0;
     let successCount = 0;
+
     let log = "";
     for (let i = 0; i < planNum; i++) {
       localStorage.setItem("userToken", loggedAcc[i].token);
@@ -510,14 +528,14 @@ const EmulatorPage = () => {
         }
       }
 
-      console.log(planTempData);
-
+      countLatest++;
       const res = await handleCreatePlan(
         planData[0],
         count,
         loggedAcc[i],
         dateTime,
-        tempOrders
+        tempOrders,
+        countLatest
       );
       if (res.status) {
         successCount++;

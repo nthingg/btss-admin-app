@@ -9,9 +9,9 @@ import { useQuery, useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AddCardIcon from '@mui/icons-material/AddCard';
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import AddCardIcon from "@mui/icons-material/AddCard";
 import { CurrencyExchange, ReceiptLong, Sell } from "@mui/icons-material";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
@@ -62,27 +62,39 @@ const TransactionPage = () => {
         break;
       case 1:
         setSelectedStatus(topoType[0]);
-        searchTerm ? searchData(topoType[0], searchTerm) : fetchData([topoType[0]]);
+        searchTerm
+          ? searchData(topoType[0], searchTerm)
+          : fetchData([topoType[0]]);
         break;
       case 2:
         setSelectedStatus(topoType[1]);
-        searchTerm ? searchData(topoType[1], searchTerm) : fetchData([topoType[1]]);
+        searchTerm
+          ? searchData(topoType[1], searchTerm)
+          : fetchData([topoType[1]]);
         break;
       case 3:
         setSelectedStatus(topoType[2]);
-        searchTerm ? searchData(topoType[2], searchTerm) : fetchData([topoType[2]]);
+        searchTerm
+          ? searchData(topoType[2], searchTerm)
+          : fetchData([topoType[2]]);
         break;
       case 4:
         setSelectedStatus(topoType[3]);
-        searchTerm ? searchData(topoType[3], searchTerm) : fetchData([topoType[3]]);
+        searchTerm
+          ? searchData(topoType[3], searchTerm)
+          : fetchData([topoType[3]]);
         break;
       case 5:
         setSelectedStatus(topoType[4]);
-        searchTerm ? searchData(topoType[4], searchTerm) : fetchData([topoType[4]]);
+        searchTerm
+          ? searchData(topoType[4], searchTerm)
+          : fetchData([topoType[4]]);
         break;
       case 6:
         setSelectedStatus(topoType[5]);
-        searchTerm ? searchData(topoType[5], searchTerm) : fetchData([topoType[5]]);
+        searchTerm
+          ? searchData(topoType[5], searchTerm)
+          : fetchData([topoType[5]]);
         break;
       default:
         break;
@@ -116,7 +128,7 @@ const TransactionPage = () => {
     { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
   ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
 
-  const [searchTransactions, { }] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
+  const [searchTransactions, {}] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
 
   const fetchData = async (transactionType) => {
     // Code to be executed on page load
@@ -160,8 +172,8 @@ const TransactionPage = () => {
       const { data } = await searchTransactions({
         variables: {
           type: transactionType,
-          id: searchTerm
-        }
+          id: searchTerm,
+        },
       });
 
       const transactions = data.transactions.edges;
@@ -174,7 +186,7 @@ const TransactionPage = () => {
       setIsLoading(false);
       return res;
     }
-  }
+  };
 
   const setNumberTransaction = (type) => {
     setPlanFund(0);
@@ -212,7 +224,7 @@ const TransactionPage = () => {
         }
       }
     }
-  }
+  };
 
   useEffect(() => {
     fetchData(topoType);
@@ -331,11 +343,11 @@ const TransactionPage = () => {
 
   const handleSearchSubmit = async () => {
     setIsLoading(true);
-    const searchTerm = document.getElementById('floatingValue').value;
+    const searchTerm = document.getElementById("floatingValue").value;
     if (!searchTerm) {
       setIsLoading(false);
       return;
-    };
+    }
     if (!isNaN(searchTerm)) {
       const searchId = parseInt(searchTerm, 10);
       setSearchTerm(searchId);
@@ -350,7 +362,7 @@ const TransactionPage = () => {
         setNumberTransaction(null);
       }
     }
-  }
+  };
 
   var settings = {
     dots: false,
@@ -377,7 +389,7 @@ const TransactionPage = () => {
             name="value"
             placeholder="Nhập mã đơn hàng..."
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleSearchSubmit();
               }
             }}
@@ -413,8 +425,9 @@ const TransactionPage = () => {
             {filter.map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -424,11 +437,11 @@ const TransactionPage = () => {
                   <FormatListBulletedIcon sx={{ color: "#3498DB" }} />
                 )}
                 {index === 1 && <AddCardIcon sx={{ color: "#3498DB" }} />}
-                {index === 2 && <AccountBalanceWalletIcon sx={{ color: "#3498DB" }} />}
-                {index === 3 && <CurrencyExchange sx={{ color: "#3498DB" }} />}
-                {index === 4 && (
-                  <ReceiptIcon sx={{ color: "#3498DB" }} />
+                {index === 2 && (
+                  <AccountBalanceWalletIcon sx={{ color: "#3498DB" }} />
                 )}
+                {index === 3 && <CurrencyExchange sx={{ color: "#3498DB" }} />}
+                {index === 4 && <ReceiptIcon sx={{ color: "#3498DB" }} />}
                 {index === 5 && <ReceiptLong sx={{ color: "#3498DB" }} />}
                 {index === 6 && <Sell sx={{ color: "#3498DB" }} />}
                 <span>
@@ -446,7 +459,7 @@ const TransactionPage = () => {
         </div>
 
         {isLoading && (
-          <div className="loading">
+          <div className="tbl-loading">
             <RestartAltIcon
               sx={{
                 fontSize: 80,
@@ -458,7 +471,9 @@ const TransactionPage = () => {
         {!isLoading && selectedDiv === 0 && (
           <TransactionTable totalTransactions={transactions} />
         )}
-        {!isLoading && selectedDiv !== 0 && <TransactionTable transactions={transactions} />}
+        {!isLoading && selectedDiv !== 0 && (
+          <TransactionTable transactions={transactions} />
+        )}
       </div>
     </div>
   );

@@ -64,8 +64,8 @@ const AccountPage = () => {
     refetch: refetchTotal,
   } = useQuery(LOAD_ACCOUNTS, {
     variables: {
-      searchTerm: searchTerm
-    }
+      searchTerm: searchTerm,
+    },
   });
 
   const [accountTravelers, setTravelers] = useState(0);
@@ -108,13 +108,13 @@ const AccountPage = () => {
     setTravelers(countTraveler);
     setSuppliers(countSupplier);
     setStaffs(countStaff);
-  }
+  };
 
   const { error, loading, data, refetch } = useQuery(accountQuery, {
     variables: {
       role: selectedStatus,
       searchTerm: searchTerm,
-      phone: phoneSearchTerm
+      phone: phoneSearchTerm,
     },
   });
 
@@ -233,8 +233,9 @@ const AccountPage = () => {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -257,7 +258,7 @@ const AccountPage = () => {
           </Slider>
         </div>
         {isLoading && (
-          <div className="loading">
+          <div className="tbl-loading">
             <RestartAltIcon
               sx={{
                 fontSize: 80,
@@ -266,9 +267,15 @@ const AccountPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedStatus === "TRAVELER" && <AccountTable travelers={accounts} />}
-        {!isLoading && selectedStatus === "PROVIDER" && <AccountTable suppliers={accounts} />}
-        {!isLoading && selectedStatus === "STAFF" && <AccountTable staffs={accounts} />}
+        {!isLoading && selectedStatus === "TRAVELER" && (
+          <AccountTable travelers={accounts} />
+        )}
+        {!isLoading && selectedStatus === "PROVIDER" && (
+          <AccountTable suppliers={accounts} />
+        )}
+        {!isLoading && selectedStatus === "STAFF" && (
+          <AccountTable staffs={accounts} />
+        )}
       </div>
     </div>
   );
