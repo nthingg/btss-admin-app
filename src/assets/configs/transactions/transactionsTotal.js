@@ -14,7 +14,7 @@ export const transactionsTotalColumns = [
   {
     field: "id",
     headerClassName: "prodHeader",
-    width: 100,
+    width: 120,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
@@ -26,12 +26,12 @@ export const transactionsTotalColumns = [
 
       return <div>{idString}</div>;
     },
-    renderHeader: () => <span>MÃ ĐƠN</span>,
+    renderHeader: () => <span>MÃ GIAO DỊCH</span>,
   },
   {
     field: "accountName",
     headerName: "Trạng thái",
-    width: 300,
+    width: 250,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {

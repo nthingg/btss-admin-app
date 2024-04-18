@@ -12,12 +12,15 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AddCardIcon from "@mui/icons-material/AddCard";
-import { CurrencyExchange, ReceiptLong, Sell } from "@mui/icons-material";
+import { CurrencyExchange, DensityMedium, Person, ReceiptLong, Sell, StoreMallDirectory } from "@mui/icons-material";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
-import { Snackbar, Alert, Typography } from "@mui/material";
+import { Snackbar, Alert, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import * as XLSX from "xlsx";
 import {
+  LOAD_NUMBERS_PROVIDER_TRANSACTIONS,
+  LOAD_NUMBERS_TRAVELER_TRANSACTIONS,
+  LOAD_PROVIDER_TRANSACTION_FILTER,
   LOAD_TRANSACTIONS_FILTER,
   LOAD_TRANSACTIONS_GIFT,
   LOAD_TRANSACTIONS_ORDER,
@@ -29,6 +32,7 @@ import {
   LOAD_TRANSACTIONS_TOTAL_COUNT,
   LOAD_TRANSACTIONS_TOTAL_INIT,
   LOAD_TRANSACTION_SEARCH,
+  LOAD_TRAVELER_TRANSACTION_FILTER,
 } from "../../services/graphql/transaction";
 import TransactionTable from "../../components/tables/TransactionTable";
 
@@ -44,6 +48,7 @@ const TransactionPage = () => {
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [selectedDiv, setSelectedDiv] = useState(0);
+  const [roleSelectedDiv, setRoleSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(topoType);
   const [errorMsg, setErrMsg] = useState(false);
   const [successMsg, setSucessMsg] = useState(false);
@@ -51,6 +56,7 @@ const TransactionPage = () => {
   const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("all");
   const [filter, setFilter] = useState([0, 1, 2, 3, 4, 5, 6]);
 
   const handleClick = (index) => {
@@ -58,43 +64,59 @@ const TransactionPage = () => {
     switch (index) {
       case 0:
         setSelectedStatus(topoType);
-        searchTerm ? searchData(topoType, searchTerm) : fetchData(topoType);
+        searchTerm
+          ? searchData(topoType, searchTerm)
+          : selectedRole !== "all"
+            ? filterData(topoType, selectedRole)
+            : fetchData(topoType);
         break;
       case 1:
         setSelectedStatus(topoType[0]);
         searchTerm
           ? searchData(topoType[0], searchTerm)
-          : fetchData([topoType[0]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[0], selectedRole)
+            : fetchData(topoType[0]);
         break;
       case 2:
         setSelectedStatus(topoType[1]);
         searchTerm
           ? searchData(topoType[1], searchTerm)
-          : fetchData([topoType[1]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[1], selectedRole)
+            : fetchData(topoType[1]);
         break;
       case 3:
         setSelectedStatus(topoType[2]);
         searchTerm
           ? searchData(topoType[2], searchTerm)
-          : fetchData([topoType[2]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[2], selectedRole)
+            : fetchData(topoType[2]);
         break;
       case 4:
         setSelectedStatus(topoType[3]);
         searchTerm
           ? searchData(topoType[3], searchTerm)
-          : fetchData([topoType[3]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[3], selectedRole)
+            : fetchData(topoType[3]);
         break;
       case 5:
         setSelectedStatus(topoType[4]);
         searchTerm
           ? searchData(topoType[4], searchTerm)
-          : fetchData([topoType[4]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[4], selectedRole)
+            : fetchData(topoType[4]);
         break;
       case 6:
         setSelectedStatus(topoType[5]);
         searchTerm
           ? searchData(topoType[5], searchTerm)
-          : fetchData([topoType[5]]);
+          : selectedRole !== "all"
+            ? filterData(topoType[5], selectedRole)
+            : fetchData(topoType[5]);
         break;
       default:
         break;
@@ -128,13 +150,17 @@ const TransactionPage = () => {
     { error: errorTotalInit, loading: loadingTotalInit, data: dataTotalInit },
   ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
 
-  const [searchTransactions, {}] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
+  const [searchTransactions, { }] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
+  const [filterTravelerTransactions, { }] = useLazyQuery(LOAD_TRAVELER_TRANSACTION_FILTER);
+  const [countTravelerFilterData, { }] = useLazyQuery(LOAD_NUMBERS_TRAVELER_TRANSACTIONS);
+  const [countProviderFilterData, { }] = useLazyQuery(LOAD_NUMBERS_PROVIDER_TRANSACTIONS);
+  const [filterProviderTransactions, { }] = useLazyQuery(LOAD_PROVIDER_TRANSACTION_FILTER);
 
   const fetchData = async (transactionType) => {
     // Code to be executed on page load
 
     const { data } = await getInitTransactions({
-      variables: { type: transactionType },
+      variables: { type: transactionType }, fetchPolicy: "network-only"
     });
 
     let transactionsData = data.transactions.edges;
@@ -144,7 +170,7 @@ const TransactionPage = () => {
       let currentEndCursor = data.transactions.pageInfo.endCursor;
       while (check) {
         const { data: dataRefetch } = await getTransactions({
-          variables: { cursor: currentEndCursor, type: transactionType },
+          variables: { cursor: currentEndCursor, type: transactionType }, fetchPolicy: "network-only"
         });
 
         transactionsData = transactionsData.concat(
@@ -187,6 +213,127 @@ const TransactionPage = () => {
       return res;
     }
   };
+
+  const filterData = async (transactionType, selectedRole) => {
+    let transactionsData = null;
+    switch (selectedRole) {
+      case "traveler": {
+        const { data } = await filterTravelerTransactions({
+          variables: { type: transactionType }, fetchPolicy: "network-only"
+        });
+
+        transactionsData = data.transactions.edges;
+        break;
+      }
+      case "provider": {
+        const { data } = await filterProviderTransactions({
+          variables: { type: transactionType }, fetchPolicy: "network-only"
+        });
+
+        transactionsData = data.transactions.edges;
+        break;
+      }
+    }
+
+    // if (data.transactions.pageInfo.hasNextPage === true) {
+    //   let check = true;
+    //   let currentEndCursor = data.transactions.pageInfo.endCursor;
+    //   while (check) {
+    //     const { data: dataRefetch } = await getTransactions({
+    //       variables: { cursor: currentEndCursor, type: transactionType },
+    //     });
+
+    //     transactionsData = transactionsData.concat(
+    //       dataRefetch.transactions.edges
+    //     );
+
+    //     if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
+    //       currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
+    //     } else {
+    //       check = false;
+    //     }
+    //   }
+    // }
+
+    if (transactionsData) {
+      let res = transactionsData.map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 }; // Add the index to the object
+      });
+      setTransactions(res);
+    }
+    else {
+      setTransactions([]);
+    }
+    setIsLoading(false);
+  }
+
+  const countData = async (selectedRole) => {
+    let totalCount = 0;
+    if (selectedRole === "provider") {
+      const { data } = await countProviderFilterData({
+        variables: {
+          type: topoType
+        },
+        fetchPolicy: "network-only"
+      });
+      totalCount = data.transactions.totalCount;
+    } else if (selectedRole === "traveler") {
+      const { data } = await countTravelerFilterData({
+        variables: {
+          type: topoType
+        },
+        fetchPolicy: "network-only"
+      });
+      totalCount = data.transactions.totalCount;
+    }
+    setTotal(totalCount);
+    topoType.forEach(async type => {
+      if (selectedRole === "provider") {
+        const { data } = await countProviderFilterData({
+          variables: {
+            type: type
+          },
+          fetchPolicy: "network-only"
+        });
+        totalCount = data.transactions.totalCount;
+      } else if (selectedRole === "traveler") {
+        const { data } = await countTravelerFilterData({
+          variables: {
+            type: type
+          },
+          fetchPolicy: "network-only"
+        });
+        totalCount = data.transactions.totalCount;
+      }
+      switch (type) {
+        case topoType[0]: {
+          setTopup(totalCount);
+          break;
+        }
+        case topoType[1]: {
+          setPlanFund(totalCount);
+          break;
+        }
+        case topoType[2]: {
+          setPlanRefund(totalCount);
+          break;
+        }
+        case topoType[3]: {
+          setOrder(totalCount);
+          break;
+        }
+        case topoType[4]: {
+          setOrderRefund(totalCount);
+          break;
+        }
+        case topoType[5]: {
+          setGift(totalCount);
+          break;
+        }
+      }
+    });
+  }
 
   const setNumberTransaction = (type) => {
     setPlanFund(0);
@@ -241,20 +388,22 @@ const TransactionPage = () => {
     if (!loadGift && !errGift && dataGift && dataGift["transactions"]) {
       setGift(dataGift["transactions"].totalCount);
     }
-  }, [dataGift, loadGift, errGift, searchTerm]);
+  }, [dataGift, loadGift, errGift, searchTerm, selectedRole]);
 
   const {
     error: errOrder,
     loading: loadOrder,
     data: dataOrder,
     refetch: refetchOrder,
-  } = useQuery(LOAD_TRANSACTIONS_ORDER);
+  } = useQuery(LOAD_TRANSACTIONS_ORDER, {
+    fetchPolicy: "network-only"
+  });
   const [order, setOrder] = useState(0);
   useEffect(() => {
     if (!loadOrder && !errOrder && dataOrder && dataOrder["transactions"]) {
       setOrder(dataOrder["transactions"].totalCount);
     }
-  }, [dataOrder, loadOrder, errOrder, searchTerm]);
+  }, [dataOrder, loadOrder, errOrder, searchTerm, selectedRole]);
 
   const {
     error: errOrderRefund,
@@ -272,7 +421,7 @@ const TransactionPage = () => {
     ) {
       setOrderRefund(dataOrderRefund["transactions"].totalCount);
     }
-  }, [dataOrderRefund, loadGift, errOrderRefund, searchTerm]);
+  }, [dataOrderRefund, loadGift, errOrderRefund, searchTerm, selectedRole]);
 
   const {
     error: errTotal,
@@ -290,7 +439,7 @@ const TransactionPage = () => {
     ) {
       setTotal(dataTransacTotal["transactions"].totalCount);
     }
-  }, [dataTransacTotal, loadTotal, errTotal, searchTerm]);
+  }, [dataTransacTotal, loadTotal, errTotal, searchTerm, selectedRole]);
 
   const {
     error: errPlanFund,
@@ -308,7 +457,7 @@ const TransactionPage = () => {
     ) {
       setPlanFund(dataPlanFund["transactions"].totalCount);
     }
-  }, [dataPlanFund, loadPlanFund, errPlanFund, searchTerm]);
+  }, [dataPlanFund, loadPlanFund, errPlanFund, searchTerm, selectedRole]);
 
   const {
     error: errPlanRefund,
@@ -326,7 +475,7 @@ const TransactionPage = () => {
     ) {
       setPlanRefund(dataPlanRefund["transactions"].totalCount);
     }
-  }, [dataPlanRefund, loadPlanRefund, errPlanRefund, searchTerm]);
+  }, [dataPlanRefund, loadPlanRefund, errPlanRefund, searchTerm, selectedRole]);
 
   const {
     error: errTopup,
@@ -339,10 +488,16 @@ const TransactionPage = () => {
     if (!loadTopup && !errTopup && dataTopup && dataTopup["transactions"]) {
       setTopup(dataTopup["transactions"].totalCount);
     }
-  }, [dataTopup, loadTopup, errTopup, searchTerm]);
+  }, [dataTopup, loadTopup, errTopup, searchTerm, selectedRole]);
 
   const handleSearchSubmit = async () => {
     setIsLoading(true);
+    // config for role filter
+    setSelectedRole("all");
+    setRoleSelectedDiv(0);
+    document.getElementById('role-tab').style.display = 'none';
+
+    // handle search
     const searchTerm = document.getElementById("floatingValue").value;
     if (!searchTerm) {
       setIsLoading(false);
@@ -364,6 +519,49 @@ const TransactionPage = () => {
     }
   };
 
+  const toggleChangeRole = (index) => {
+    setRoleSelectedDiv(index);
+    let selectedRole = "all";
+    switch (index) {
+      case 0: {
+        selectedRole = "all";
+        break;
+      }
+      case 1: {
+        selectedRole = "traveler";
+        break;
+      }
+      case 2: {
+        selectedRole = "provider";
+        break;
+      }
+    }
+    setSelectedRole(selectedRole);
+
+    switch (selectedRole) {
+      case "all": {
+        fetchData(topoType);
+        setSelectedStatus(topoType);
+        setSelectedDiv(0);
+        break;
+      }
+      case "traveler": {
+        filterData(topoType, selectedRole);
+        setSelectedStatus(topoType);
+        setSelectedDiv(0);
+        countData(selectedRole);
+        break;
+      }
+      case "provider": {
+        filterData(topoType, selectedRole);
+        setSelectedStatus(topoType);
+        setSelectedDiv(0);
+        countData(selectedRole);
+        break;
+      }
+    }
+  }
+
   var settings = {
     dots: false,
     infinite: false,
@@ -371,6 +569,14 @@ const TransactionPage = () => {
     slidesToScroll: 2,
     centerPadding: "60px",
   };
+
+  var roleSliderSettings = {
+    dots: false,
+    infinite: false,
+    slidesToShow: 3,
+    centerPadding: "30px",
+    arrows: false
+  }
 
   return (
     <div className="destination-page">
@@ -387,7 +593,7 @@ const TransactionPage = () => {
             className={"form-control"}
             id="floatingValue"
             name="value"
-            placeholder="Nhập mã đơn hàng..."
+            placeholder="Nhập mã giao dịch..."
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSearchSubmit();
@@ -405,10 +611,18 @@ const TransactionPage = () => {
           <button
             className="link"
             onClick={() => {
+              document.getElementById('role-tab').style.display = 'block';
               setIsLoading(true);
               setSearchTerm(null);
               refetch();
-              fetchData(topoType);
+              refetchTotal();
+              refetchPlanFund();
+              refetchPlanRefund();
+              refetchOrder();
+              refetchOrderRefund();
+              refetchTopup();
+              refetchGift();
+              selectedRole === "all" ? fetchData(selectedStatus) : filterData(selectedStatus, selectedRole);
               // refetchTotal();
               setTimeout(() => {
                 setIsLoading(false);
@@ -420,42 +634,97 @@ const TransactionPage = () => {
         </div>
       </div>
       <div className="destinationContainer">
-        <div className="icon-row">
-          <Slider {...settings}>
-            {filter.map((index) => (
+        <div className="role-icon-row" id="role-tab">
+          <Slider {...roleSliderSettings}>
+            {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`role-icon-item ${roleSelectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
-                  handleClick(index);
+                  toggleChangeRole(index);
                 }}
               >
                 {/* Replace with appropriate icons */}
                 {index === 0 && (
-                  <FormatListBulletedIcon sx={{ color: "#3498DB" }} />
+                  <DensityMedium sx={{ color: "#3498DB" }} />
                 )}
-                {index === 1 && <AddCardIcon sx={{ color: "#3498DB" }} />}
+                {index === 1 && <Person sx={{ color: "#3498DB" }} />}
                 {index === 2 && (
-                  <AccountBalanceWalletIcon sx={{ color: "#3498DB" }} />
+                  <StoreMallDirectory sx={{ color: "#3498DB" }} />
                 )}
-                {index === 3 && <CurrencyExchange sx={{ color: "#3498DB" }} />}
-                {index === 4 && <ReceiptIcon sx={{ color: "#3498DB" }} />}
-                {index === 5 && <ReceiptLong sx={{ color: "#3498DB" }} />}
-                {index === 6 && <Sell sx={{ color: "#3498DB" }} />}
                 <span>
-                  {index === 0 && `Tất cả (${total})`}
-                  {index === 1 && `Nạp tiền (${topup})`}
-                  {index === 2 && `Đóng quỹ (${planFund})`}
-                  {index === 3 && `Hoàn quỹ (${planRefund})`}
-                  {index === 4 && `Đặt đơn (${order})`}
-                  {index === 5 && `Hoàn đơn (${orderRefund})`}
-                  {index === 6 && `Tặng quà (${gift})`}
+                  {index === 0 && `Tất cả`}
+                  {index === 1 && `Người dùng`}
+                  {index === 2 && `Nhà cung cấp`}
                 </span>
               </div>
             ))}
           </Slider>
+        </div>
+        <div className="icon-row">
+          {selectedRole !== "provider" &&
+            <Slider {...settings}>
+              {filter.map((index) => (
+                <div
+                  key={index}
+                  className={`icon-item ${selectedDiv === index ? "selected" : ""
+                    }`}
+                  onClick={() => {
+                    handleClick(index);
+                  }}
+                >
+                  {/* Replace with appropriate icons */}
+                  {index === 0 && (
+                    <FormatListBulletedIcon sx={{ color: "#3498DB" }} />
+                  )}
+                  {index === 1 && <AddCardIcon sx={{ color: "#3498DB" }} />}
+                  {index === 2 && (
+                    <AccountBalanceWalletIcon sx={{ color: "#3498DB" }} />
+                  )}
+                  {index === 3 && <CurrencyExchange sx={{ color: "#3498DB" }} />}
+                  {index === 4 && <ReceiptIcon sx={{ color: "#3498DB" }} />}
+                  {index === 5 && <ReceiptLong sx={{ color: "#3498DB" }} />}
+                  {index === 6 && <Sell sx={{ color: "#3498DB" }} />}
+                  <span>
+                    {index === 0 && `Tất cả (${total})`}
+                    {index === 1 && `Nạp tiền (${topup})`}
+                    {index === 2 && `Đóng quỹ (${planFund})`}
+                    {index === 3 && `Hoàn quỹ (${planRefund})`}
+                    {index === 4 && `Đặt đơn (${order})`}
+                    {index === 5 && `Hoàn đơn (${orderRefund})`}
+                    {index === 6 && `Tặng quà (${gift})`}
+                  </span>
+                </div>
+              ))}
+            </Slider>
+          }
+          {selectedRole === "provider" &&
+            <Slider {...settings}>
+              {[0, 4, 5].map((index) => (
+                <div
+                  key={index}
+                  className={`icon-item ${selectedDiv === index ? "selected" : ""
+                    }`}
+                  onClick={() => {
+                    handleClick(index);
+                  }}
+                >
+                  {/* Replace with appropriate icons */}
+                  {index === 0 && (
+                    <FormatListBulletedIcon sx={{ color: "#3498DB" }} />
+                  )}
+                  {index === 4 && <ReceiptIcon sx={{ color: "#3498DB" }} />}
+                  {index === 5 && <ReceiptLong sx={{ color: "#3498DB" }} />}
+                  <span>
+                    {index === 0 && `Tất cả (${total})`}
+                    {index === 4 && `Đặt đơn (${order})`}
+                    {index === 5 && `Hoàn đơn (${orderRefund})`}
+                  </span>
+                </div>
+              ))}
+            </Slider>
+          }
         </div>
 
         {isLoading && (
@@ -468,11 +737,17 @@ const TransactionPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedDiv === 0 && (
+        {!isLoading && selectedDiv === 0 && selectedRole === "all" && (
           <TransactionTable totalTransactions={transactions} />
         )}
-        {!isLoading && selectedDiv !== 0 && (
+        {!isLoading && selectedDiv === 0 && selectedRole !== "all" && (
+          <TransactionTable roleTransactionsTotal={transactions} />
+        )}
+        {!isLoading && selectedDiv !== 0 && selectedRole === "all" && (
           <TransactionTable transactions={transactions} />
+        )}
+        {!isLoading && selectedDiv !== 0 && selectedRole !== "all" && (
+          <TransactionTable roleTransactions={transactions} />
         )}
       </div>
     </div>

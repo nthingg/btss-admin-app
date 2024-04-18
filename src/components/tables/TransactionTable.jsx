@@ -8,11 +8,15 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import { transactionsColumns } from "../../assets/configs/transactions/transactions";
 import { accounttransactionsColumns } from "../../assets/configs/accounts/accountTransaction";
 import { transactionsTotalColumns } from "../../assets/configs/transactions/transactionsTotal";
+import { roleTransactionsColumns } from "../../assets/configs/transactions/transactionsRoleTotal";
+import { roleTransactionsTotalColumns } from "../../assets/configs/transactions/transactionsRoleFilter";
 
 const TransactionTable = ({
   totalTransactions,
   transactions,
   accountTransactions,
+  roleTransactions,
+  roleTransactionsTotal,
 }) => {
   const navigate = useNavigate();
   const [anchorId, setAnchorId] = useState(null);
@@ -160,6 +164,56 @@ const TransactionTable = ({
           <DataGrid
             rows={accountTransactions}
             columns={accounttransactionsColumns}
+            getRowId={(row) => row.node.id}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2c3d50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
+      {roleTransactions && (
+        <div
+          className="roleTransactionTable"
+          style={{ width: "fit-content", height: "23.28rem", margin: "auto" }}>
+          <DataGrid
+            rows={roleTransactions}
+            columns={roleTransactionsColumns}
+            getRowId={(row) => row.node.id}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2c3d50",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+            }}
+          />
+        </div>
+      )}
+      {roleTransactionsTotal && (
+        <div
+          className="roleTransactionTable"
+          style={{ width: "fit-content", height: "23.28rem", margin: "auto" }}>
+          <DataGrid
+            rows={roleTransactionsTotal}
+            columns={roleTransactionsTotalColumns}
             getRowId={(row) => row.node.id}
             rowSelection={false}
             pagination
