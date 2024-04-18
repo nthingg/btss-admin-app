@@ -66,6 +66,7 @@ const AccountPage = () => {
     variables: {
       searchTerm: searchTerm,
     },
+    fetchPolicy: "network-only"
   });
 
   const [accountTravelers, setTravelers] = useState(0);
@@ -116,6 +117,7 @@ const AccountPage = () => {
       searchTerm: searchTerm,
       phone: phoneSearchTerm,
     },
+    fetchPolicy: "network-only"
   });
 
   const [accounts, setAccounts] = useState([]);
@@ -126,6 +128,7 @@ const AccountPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setAccounts(res);
+      setIsLoading(false);
     }
   }, [data, loading, error]);
 
@@ -216,11 +219,14 @@ const AccountPage = () => {
             className="link"
             onClick={() => {
               setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+              setIsLoading(true);
               setSearchTerm("");
               setPhoneSearchTerm("");
-              setIsLoading(true);
               refetch();
               refetchTotal();
+              setTimeout(() => {
+                setIsLoading(false);
+              }, 300);
             }}
           >
             <RefreshIcon />

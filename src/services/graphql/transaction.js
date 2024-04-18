@@ -168,6 +168,128 @@ export const LOAD_TRANSACTION_SEARCH = gql`
   }
 `
 
+export const LOAD_TRAVELER_TRANSACTION_FILTER = gql`
+  query FilterTravelerTransaction($type: [TransactionType!]) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        accountId: {
+          neq: null
+        }
+      }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_NUMBERS_TRAVELER_TRANSACTIONS = gql`
+  query LoadTransactions($type: [TransactionType!]) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        accountId: {
+          neq: null
+        }
+      }
+    ) {
+      totalCount
+    }
+  }
+`
+
+export const LOAD_PROVIDER_TRANSACTION_FILTER = gql`
+  query FilterTravelerTransaction($type: [TransactionType!]) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        providerId: {
+          neq: null
+        }
+      }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_NUMBERS_PROVIDER_TRANSACTIONS = gql`
+  query LoadTransactions($type: [TransactionType!]) {
+    transactions(
+      first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        providerId: {
+          neq: null
+        }
+      }
+    ) {
+      totalCount
+    }
+  }
+`
+
 export const LOAD_TRANSACTIONS_GIFT = gql`
   query {
     transactions(where: { type: { eq: GIFT } }) {

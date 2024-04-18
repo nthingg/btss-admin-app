@@ -112,7 +112,6 @@ const PlanPage = () => {
         searchTerm: searchTerm,
       },
     });
-    console.log(data);
     let planData = data.plans.edges;
     if (data.plans.pageInfo.hasNextPage === true) {
       let check = true;
@@ -142,9 +141,6 @@ const PlanPage = () => {
       }
     });
     setTotalPlan(res);
-    console.log(res);
-    console.log(planData);
-    console.log("setting");
     setIsLoading(false);
   };
 
