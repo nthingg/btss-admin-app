@@ -21,6 +21,7 @@ import {
   LOAD_NUMBERS_PROVIDER_TRANSACTIONS,
   LOAD_NUMBERS_TRAVELER_TRANSACTIONS,
   LOAD_PROVIDER_TRANSACTION_FILTER,
+  LOAD_PROVIDER_TRANSACTION_FILTER_INIT,
   LOAD_TRANSACTIONS_FILTER,
   LOAD_TRANSACTIONS_GIFT,
   LOAD_TRANSACTIONS_ORDER,
@@ -33,6 +34,7 @@ import {
   LOAD_TRANSACTIONS_TOTAL_INIT,
   LOAD_TRANSACTION_SEARCH,
   LOAD_TRAVELER_TRANSACTION_FILTER,
+  LOAD_TRAVELER_TRANSACTION_FILTER_INIT,
 } from "../../services/graphql/transaction";
 import TransactionTable from "../../components/tables/TransactionTable";
 
@@ -151,10 +153,12 @@ const TransactionPage = () => {
   ] = useLazyQuery(LOAD_TRANSACTIONS_TOTAL_INIT);
 
   const [searchTransactions, { }] = useLazyQuery(LOAD_TRANSACTION_SEARCH);
+  const [filterTravelerTransactionsInit, { }] = useLazyQuery(LOAD_TRAVELER_TRANSACTION_FILTER_INIT);
   const [filterTravelerTransactions, { }] = useLazyQuery(LOAD_TRAVELER_TRANSACTION_FILTER);
   const [countTravelerFilterData, { }] = useLazyQuery(LOAD_NUMBERS_TRAVELER_TRANSACTIONS);
-  const [countProviderFilterData, { }] = useLazyQuery(LOAD_NUMBERS_PROVIDER_TRANSACTIONS);
+  const [filterProviderTransactionsInit, { }] = useLazyQuery(LOAD_PROVIDER_TRANSACTION_FILTER_INIT);
   const [filterProviderTransactions, { }] = useLazyQuery(LOAD_PROVIDER_TRANSACTION_FILTER);
+  const [countProviderFilterData, { }] = useLazyQuery(LOAD_NUMBERS_PROVIDER_TRANSACTIONS);
 
   const fetchData = async (transactionType) => {
     // Code to be executed on page load
@@ -218,42 +222,64 @@ const TransactionPage = () => {
     let transactionsData = null;
     switch (selectedRole) {
       case "traveler": {
-        const { data } = await filterTravelerTransactions({
+        const { data } = await filterTravelerTransactionsInit({
           variables: { type: transactionType }, fetchPolicy: "network-only"
         });
 
         transactionsData = data.transactions.edges;
+
+        if (data.transactions.pageInfo.hasNextPage === true) {
+          let check = true;
+          let currentEndCursor = data.transactions.pageInfo.endCursor;
+          while (check) {
+            const { data: dataRefetch } = await filterTravelerTransactions({
+              variables: { cursor: currentEndCursor, type: transactionType }, fetchPolicy: "network-only"
+            });
+    
+            transactionsData = transactionsData.concat(
+              dataRefetch.transactions.edges
+            );
+    
+            if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
+              currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
+            } else {
+              check = false;
+            }
+          }
+        }
+
         break;
       }
       case "provider": {
-        const { data } = await filterProviderTransactions({
+        const { data } = await filterProviderTransactionsInit({
           variables: { type: transactionType }, fetchPolicy: "network-only"
         });
 
         transactionsData = data.transactions.edges;
+
+        if (data.transactions.pageInfo.hasNextPage === true) {
+          let check = true;
+          let currentEndCursor = data.transactions.pageInfo.endCursor;
+          while (check) {
+            const { data: dataRefetch } = await filterProviderTransactions({
+              variables: { cursor: currentEndCursor, type: transactionType }, fetchPolicy: "network-only"
+            });
+    
+            transactionsData = transactionsData.concat(
+              dataRefetch.transactions.edges
+            );
+    
+            if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
+              currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
+            } else {
+              check = false;
+            }
+          }
+        }
+
         break;
       }
     }
-
-    // if (data.transactions.pageInfo.hasNextPage === true) {
-    //   let check = true;
-    //   let currentEndCursor = data.transactions.pageInfo.endCursor;
-    //   while (check) {
-    //     const { data: dataRefetch } = await getTransactions({
-    //       variables: { cursor: currentEndCursor, type: transactionType },
-    //     });
-
-    //     transactionsData = transactionsData.concat(
-    //       dataRefetch.transactions.edges
-    //     );
-
-    //     if (dataRefetch.transactions.pageInfo.hasNextPage === true) {
-    //       currentEndCursor = dataRefetch.transactions.pageInfo.endCursor;
-    //     } else {
-    //       check = false;
-    //     }
-    //   }
-    // }
 
     if (transactionsData) {
       let res = transactionsData.map((node, index) => {

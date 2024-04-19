@@ -185,7 +185,7 @@ const TransactionTable = ({
       {roleTransactions && (
         <div
           className="roleTransactionTable"
-          style={{ width: "fit-content", height: "23.28rem", margin: "auto" }}>
+          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}>
           <DataGrid
             rows={roleTransactions}
             columns={roleTransactionsColumns}
@@ -210,7 +210,7 @@ const TransactionTable = ({
       {roleTransactionsTotal && (
         <div
           className="roleTransactionTable"
-          style={{ width: "fit-content", height: "23.28rem", margin: "auto" }}>
+          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}>
           <DataGrid
             rows={roleTransactionsTotal}
             columns={roleTransactionsTotalColumns}

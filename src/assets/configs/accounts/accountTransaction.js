@@ -14,7 +14,7 @@ export const accounttransactionsColumns = [
   {
     field: "id",
     headerClassName: "prodHeader",
-    width: 100,
+    width: 120,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
@@ -24,9 +24,27 @@ export const accounttransactionsColumns = [
         idString = "0" + idString;
       }
 
-      return <div>{params.row.node.id}</div>;
+      return <div>{idString}</div>;
     },
-    renderHeader: () => <span>ID</span>,
+    renderHeader: () => <span>MÃ GIAO DỊCH</span>,
+  },
+  {
+    field: "type",
+    width: 150,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      const type = {
+        GIFT: "Tặng quà",
+        ORDER: "Đặt đơn",
+        ORDER_REFUND: "Hoàn đơn",
+        PLAN_FUND: "Đóng quỹ",
+        PLAN_REFUND: "Hoàn quỹ",
+        TOPUP: "Nạp tiền",
+      };
+      return <div>{type[params.row.node.type]}</div>;
+    },
+    renderHeader: () => <span>LOẠI</span>,
   },
   {
     field: "status",
@@ -51,7 +69,7 @@ export const accounttransactionsColumns = [
     renderCell: (params) => {
       return <div>{params.row.node.gcoinAmount}</div>;
     },
-    renderHeader: () => <span>SỐ TIỀN</span>,
+    renderHeader: () => <span>SỐ GCOIN</span>,
   },
   {
     field: "gateway",

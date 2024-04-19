@@ -168,10 +168,55 @@ export const LOAD_TRANSACTION_SEARCH = gql`
   }
 `
 
-export const LOAD_TRAVELER_TRANSACTION_FILTER = gql`
+export const LOAD_TRAVELER_TRANSACTION_FILTER_INIT = gql`
   query FilterTravelerTransaction($type: [TransactionType!]) {
     transactions(
       first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        accountId: {
+          neq: null
+        }
+      }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_TRAVELER_TRANSACTION_FILTER = gql`
+  query FilterTravelerTransaction($type: [TransactionType!], $cursor: String) {
+    transactions(
+      first: 100
+      after: $cursor
       order: { id: DESC }
       where: {
         type: { in: $type }
@@ -229,10 +274,55 @@ export const LOAD_NUMBERS_TRAVELER_TRANSACTIONS = gql`
   }
 `
 
-export const LOAD_PROVIDER_TRANSACTION_FILTER = gql`
+export const LOAD_PROVIDER_TRANSACTION_FILTER_INIT = gql`
   query FilterTravelerTransaction($type: [TransactionType!]) {
     transactions(
       first: 100
+      order: { id: DESC }
+      where: {
+        type: { in: $type }
+        providerId: {
+          neq: null
+        }
+      }
+    ) {
+      edges {
+        node {
+          id
+          orderId
+          type
+          status
+          gcoinAmount
+          gateway
+          bankTransCode
+          createdAt
+          provider {
+            name
+          }
+          account {
+            name
+          }
+          provider {
+            name
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_PROVIDER_TRANSACTION_FILTER = gql`
+  query FilterTravelerTransaction($type: [TransactionType!], $cursor: String) {
+    transactions(
+      first: 100
+      after: $cursor
       order: { id: DESC }
       where: {
         type: { in: $type }
