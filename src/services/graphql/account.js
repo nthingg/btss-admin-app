@@ -30,7 +30,12 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
 
 export const LOAD_ACCOUNTS_FILTER = gql`
   query LoadAccounts($role: [Role!], $searchTerm: String) {
-    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } } searchTerm: $searchTerm) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: { role: { in: $role } }
+      searchTerm: $searchTerm
+    ) {
       nodes {
         id
         name
@@ -53,13 +58,14 @@ export const LOAD_ACCOUNTS_FILTER = gql`
 
 export const LOAD_ACCOUNTS = gql`
   query LoadAccount($searchTerm: String) {
-    accounts(first: 100, order: { id: ASC } searchTerm: $searchTerm) {
+    accounts(first: 100, order: { id: ASC }, searchTerm: $searchTerm) {
       nodes {
         id
         role
         plans {
           id
         }
+        isPro
       }
     }
   }
@@ -100,13 +106,11 @@ export const LOAD_DETAIL_ACCOUNT = gql`
 
 export const LOAD_ACCOUNT_USERS = gql`
   {
-    accounts(
-      where: { role: { eq: TRAVELER } }
-    ) {
+    accounts(where: { role: { eq: TRAVELER } }) {
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_ACCOUNTS_TRAVELER = gql`
   query {
