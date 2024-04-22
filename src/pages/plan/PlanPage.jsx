@@ -43,10 +43,12 @@ import FilterModal from "../../components/others/PlanFilterOrderModal";
 import client from "../../services/apollo/config";
 
 const PlanPage = () => {
+  //#region Variables
+
   const { sbsNumber } = useParams();
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
-  const [filterOrder, setFilterOrders] = useState('all');
+  const [filterOrder, setFilterOrders] = useState("all");
   const [plans, setPlans] = useState([]);
   const [searchTerm, setSearchTerm] = useState(null);
   const [accountId, setAccountId] = useState(null);
@@ -58,6 +60,9 @@ const PlanPage = () => {
     "FLAWED",
     "CANCELED",
   ];
+
+  //#endregion
+
   const [selectedDiv, setSelectedDiv] = useState(
     sbsNumber ? parseInt(sbsNumber, 10) : 0
   );
@@ -100,7 +105,15 @@ const PlanPage = () => {
     setIsLoading(false);
   }, []);
 
-  async function planQueryInit(statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery) {
+  async function planQueryInit(
+    statusQuery,
+    searchTerm,
+    utcDepartAtQuery,
+    publishedQuery,
+    onGoingQuery,
+    ordersQuery,
+    accountQuery
+  ) {
     let query;
     if (onGoingQuery !== "") {
       query = gql`
@@ -143,7 +156,7 @@ const PlanPage = () => {
           }
         }
       }
-    `
+    `;
     } else if (publishedQuery !== "") {
       query = gql`
         query LoadPlansFilterInit {
@@ -185,16 +198,15 @@ const PlanPage = () => {
             }
           }
         }
-      `
-    }
-    else {
+      `;
+    } else {
       // console.log(`
       // query LoadPlansFilterInit {
       //   plans(
       //     first: 100
       //     order: { id: DESC }
-      //     where: { 
-      //       ${statusQuery} 
+      //     where: {
+      //       ${statusQuery}
       //       ${utcDepartAtQuery}
       //       ${ordersQuery}
       //     }
@@ -269,7 +281,7 @@ const PlanPage = () => {
             }
           }
         }
-    `
+    `;
     }
 
     try {
@@ -283,7 +295,16 @@ const PlanPage = () => {
     }
   }
 
-  async function planQuery(cursor, statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery) {
+  async function planQuery(
+    cursor,
+    statusQuery,
+    searchTerm,
+    utcDepartAtQuery,
+    publishedQuery,
+    onGoingQuery,
+    ordersQuery,
+    accountQuery
+  ) {
     let query;
     if (onGoingQuery !== "") {
       query = gql`
@@ -327,7 +348,7 @@ const PlanPage = () => {
             }
           }
         }
-      `
+      `;
     } else if (publishedQuery !== "") {
       query = gql`
         query LoadPlansFilter {
@@ -370,7 +391,7 @@ const PlanPage = () => {
             }
           }
         }
-      `
+      `;
     } else {
       query = gql`
         query LoadPlansFilter {
@@ -414,7 +435,7 @@ const PlanPage = () => {
             }
           }
         }
-      `
+      `;
     }
 
     try {
@@ -428,183 +449,12 @@ const PlanPage = () => {
     }
   }
 
-  // const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
-  // const [totalPlan, setTotalPlan] = useState([]);
-  // const [getTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN, {
-  //   fetchPolicy: "no-cache",
-  // });
-  // const [getInitTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT, {
-  //   fetchPolicy: "no-cache",
-  // });
-  // const [getPlanFilterInit, { }] = useLazyQuery(queryPlanInit, {
-  //   fetchPolicy: "network-only"
-  // });
-  // const [getPlanFilter, { }] = useLazyQuery(queryPlan, {
-  //   fetchPolicy: "network-only"
-  // });
-  // const [getPlanCommingSoonInit, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON_INIT);
-  // const [getPlanCommingSoon, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON);
-  // const [getPlanOnGoingInit, { }] = useLazyQuery(LOAD_PLAN_ONGOING_INIT);
-  // const [getPlanOnGoing, { }] = useLazyQuery(LOAD_PLAN_ONGOING);
-  // const [getPublishedPlanInit, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FILTER_INIT);
-  // const [getPublishedPlan, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FITLER)
-  // const fetchTotalPlan = async (searchTerm) => {
-  //   const { data } = await getInitTotalPlan({
-  //     variables: {
-  //       searchTerm: searchTerm,
-  //     },
-  //   });
-  //   let planData = data.plans.edges;
-  //   if (data.plans.pageInfo.hasNextPage === true) {
-  //     let check = true;
-  //     let endCursor = data.plans.pageInfo.endCursor;
-  //     while (check) {
-  //       const { data: dataRefetch } = await getTotalPlan({
-  //         variables: {
-  //           searchTerm: searchTerm,
-  //           endCursor: endCursor,
-  //         },
-  //       });
-
-  //       planData = planData.concat(dataRefetch.plans.edges);
-
-  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
-  //       } else {
-  //         check = false;
-  //       }
-  //     }
-  //   }
-
-  //   let res = planData.map((node, index) => {
-  //     if (node) {
-  //       const { __typename, ...rest } = node;
-  //       return { ...rest, index: index + 1 };
-  //     }
-  //   });
-  //   setTotalPlan(res);
-  //   setIsLoading(false);
-  // };
-
-  // const fetchPlanCommingSoon = async (searchTerm) => {
-  //   const { data } = await getPlanCommingSoonInit({
-  //     variables: {
-  //       searchTerm: searchTerm,
-  //       dateTime: now.toUTCString()
-  //     },
-  //   });
-  //   let planData = data.plans.edges;
-  //   if (data.plans.pageInfo.hasNextPage === true) {
-  //     let check = true;
-  //     let endCursor = data.plans.pageInfo.endCursor;
-  //     while (check) {
-  //       const { data: dataRefetch } = await getPlanCommingSoon({
-  //         variables: {
-  //           searchTerm: searchTerm,
-  //           dateTime: now.toUTCString(),
-  //           endCursor: endCursor,
-  //         },
-  //       });
-
-  //       planData = planData.concat(dataRefetch.plans.edges);
-
-  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
-  //       } else {
-  //         check = false;
-  //       }
-  //     }
-  //   }
-
-  //   let res = planData.map((node, index) => {
-  //     if (node) {
-  //       const { __typename, ...rest } = node;
-  //       return { ...rest, index: index + 1 };
-  //     }
-  //   });
-  //   setPlans(res);
-  //   setIsLoading(false);
-  // }
-
-  // const fetchPlanOngoing = async (searchTerm) => {
-  //   const { data } = await getPlanOnGoingInit({
-  //     variables: {
-  //       searchTerm: searchTerm,
-  //       dateTime: now.toUTCString()
-  //     },
-  //   });
-  //   let planData = data.plans.edges;
-  //   if (data.plans.pageInfo.hasNextPage === true) {
-  //     let check = true;
-  //     let endCursor = data.plans.pageInfo.endCursor;
-  //     while (check) {
-  //       const { data: dataRefetch } = await getPlanOnGoing({
-  //         variables: {
-  //           searchTerm: searchTerm,
-  //           dateTime: now.toUTCString(),
-  //           endCursor: endCursor,
-  //         },
-  //       });
-
-  //       planData = planData.concat(dataRefetch.plans.edges);
-
-  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
-  //       } else {
-  //         check = false;
-  //       }
-  //     }
-  //   }
-
-  //   let res = planData.map((node, index) => {
-  //     if (node) {
-  //       const { __typename, ...rest } = node;
-  //       return { ...rest, index: index + 1 };
-  //     }
-  //   });
-  //   setPlans(res);
-  //   setIsLoading(false);
-  // }
-
-  // const fetchPlanPublished = async (searchTerm) => {
-  //   const { data } = await getPublishedPlanInit({
-  //     variables: {
-  //       searchTerm: searchTerm
-  //     },
-  //   });
-  //   let planData = data.plans.edges;
-  //   if (data.plans.pageInfo.hasNextPage === true) {
-  //     let check = true;
-  //     let endCursor = data.plans.pageInfo.endCursor;
-  //     while (check) {
-  //       const { data: dataRefetch } = await getPublishedPlan({
-  //         variables: {
-  //           searchTerm: searchTerm,
-  //           endCursor: endCursor,
-  //         },
-  //       });
-
-  //       planData = planData.concat(dataRefetch.plans.edges);
-
-  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
-  //       } else {
-  //         check = false;
-  //       }
-  //     }
-  //   }
-
-  //   let res = planData.map((node, index) => {
-  //     if (node) {
-  //       const { __typename, ...rest } = node;
-  //       return { ...rest, index: index + 1 };
-  //     }
-  //   });
-  //   setPlans(res);
-  //   setIsLoading(false);
-  // }
-
-  const fetchPlanFilter = async (selectedStatus, searchTerm, filterOrder, accountId) => {
+  const fetchPlanFilter = async (
+    selectedStatus,
+    searchTerm,
+    filterOrder,
+    accountId
+  ) => {
     let statusQuery = `status: { in: ${selectedStatus} }`;
     let utcDepartAtQuery;
     let onGoingQuery = "";
@@ -612,15 +462,15 @@ const PlanPage = () => {
     let ordersQuery = "";
     let accountQuery = "";
     switch (selectedStatus) {
-      case 'READY':
+      case "READY":
         utcDepartAtQuery = `utcDepartAt: { gte: "${now.toUTCString()}" }`;
         break;
-      case 'VERIFIED':
+      case "VERIFIED":
         statusQuery = "";
         onGoingQuery = `or: [
           { status: { eq: READY }, utcDepartAt: { lte: "${now.toUTCString()}" } },
           { status: { eq: VERIFIED } }
-        ]`
+        ]`;
         break;
       case true: {
         statusQuery = "";
@@ -636,19 +486,36 @@ const PlanPage = () => {
         utcDepartAtQuery = "";
         break;
     }
-    if (filterOrder && filterOrder !== 'all') {
-      ordersQuery = ` orders: { any: ${filterOrder === 'haveOrders'} }`
+    if (filterOrder && filterOrder !== "all") {
+      ordersQuery = ` orders: { any: ${filterOrder === "haveOrders"} }`;
     }
     if (accountId) {
-      accountQuery = `accountId: { eq: ${accountId} }`
+      accountQuery = `accountId: { eq: ${accountId} }`;
     }
-    const data = await planQueryInit(statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery);
+    const data = await planQueryInit(
+      statusQuery,
+      searchTerm,
+      utcDepartAtQuery,
+      publishedQuery,
+      onGoingQuery,
+      ordersQuery,
+      accountQuery
+    );
     let planData = data.plans.edges;
     if (data.plans.pageInfo.hasNextPage === true) {
       let check = true;
       let endCursor = data.plans.pageInfo.endCursor;
       while (check) {
-        const dataRefetch = await planQuery(endCursor, statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery);
+        const dataRefetch = await planQuery(
+          endCursor,
+          statusQuery,
+          searchTerm,
+          utcDepartAtQuery,
+          publishedQuery,
+          onGoingQuery,
+          ordersQuery,
+          accountQuery
+        );
 
         planData = planData.concat(dataRefetch.plans.edges);
 
@@ -668,7 +535,7 @@ const PlanPage = () => {
     });
     setPlans(res);
     setIsLoading(false);
-  }
+  };
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -676,7 +543,12 @@ const PlanPage = () => {
       case 0:
         setSelectedStatus(planStat);
         // fetchTotalPlan(searchTerm);
-        fetchPlanFilter(`[${planStat.toString()}]`, searchTerm, filterOrder, accountId);
+        fetchPlanFilter(
+          `[${planStat.toString()}]`,
+          searchTerm,
+          filterOrder,
+          accountId
+        );
         break;
       case 1:
         setSelectedStatus(planStat[0]);
@@ -694,7 +566,12 @@ const PlanPage = () => {
         break;
       case 4:
         setSelectedStatus([planStat[3], planStat[4]]);
-        fetchPlanFilter(`[${planStat[3]}, ${planStat[4]}]`, searchTerm, filterOrder, accountId);
+        fetchPlanFilter(
+          `[${planStat[3]}, ${planStat[4]}]`,
+          searchTerm,
+          filterOrder,
+          accountId
+        );
         break;
       case 5:
         setSelectedStatus(true);
@@ -718,22 +595,7 @@ const PlanPage = () => {
     refetchPublished();
   };
 
-  // const { error, loading, data, refetch } = useQuery(planQuery, {
-  //   variables: {
-  //     status: selectedStatus,
-  //     searchTerm: searchTerm,
-  //     dateTime: now.toUTCString(),
-  //   },
-  // });
-  // useEffect(() => {
-  //   if (!loading && !error && data && data["plans"]["nodes"]) {
-  //     let res = data.plans.nodes.map((node, index) => {
-  //       const { __typename, ...rest } = node;
-  //       return { ...rest, index: index + 1 }; // Add the index to the object
-  //     });
-  //     setPlans(res);
-  //   }
-  // }, [data, loading, error]);
+  //#region UseState
 
   const {
     error: errTotal,
@@ -885,16 +747,17 @@ const PlanPage = () => {
     setSearchTerm(search);
     fetchPlanFilter(`[${selectedStatus}]`, search, filterOrder);
   };
+  //#endregion
 
   const handleChangeFilter = (e) => {
     var orderFilter = e.target.value;
     setFilterOrders(orderFilter);
-  }
+  };
 
   const handleModalSubmit = async (filterOrder, accountId) => {
     setIsLoading(true);
     fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
-  }
+  };
 
   return (
     <div className="plan">
@@ -918,10 +781,7 @@ const PlanPage = () => {
               }
             }}
           />
-          <button
-            className="link"
-            onClick={handleSearchSubmit}
-          >
+          <button className="link" onClick={handleSearchSubmit}>
             <SearchIcon />
           </button>
         </div>
@@ -929,13 +789,19 @@ const PlanPage = () => {
           {/* <button className="link">
             <CloudDownloadIcon />
           </button> */}
-          <FilterModal filterOrder={filterOrder} handleChangeFilter={handleChangeFilter} accountId={accountId} setAccountId={setAccountId} handleModalSubmit={handleModalSubmit} />
+          <FilterModal
+            filterOrder={filterOrder}
+            handleChangeFilter={handleChangeFilter}
+            accountId={accountId}
+            setAccountId={setAccountId}
+            handleModalSubmit={handleModalSubmit}
+          />
           <button
             className="link"
             onClick={() => {
               setIsLoading(true);
               setSearchTerm(null);
-              setFilterOrders('all');
+              setFilterOrders("all");
               setAccountId(null);
               refetchRegis();
               refetchCancelled();
@@ -944,29 +810,6 @@ const PlanPage = () => {
               refetchComplete();
               refetchOngoing();
               refetchPublished();
-              // switch (selectedStatus.toString()) {
-              //   case planStat.toString():
-              //     fetchPlanFilter(`[${planStat.toString()}]`, null);
-              //     break;
-              //   case planStat[0].toString():
-              //     fetchPlanFilter(planStat[0], null);
-              //     break;
-              //   case planStat[1].toString():
-              //     fetchPlanFilter(planStat[1], null);
-              //     break;
-              //   case planStat[2].toString():
-              //     fetchPlanFilter(planStat[2], null);
-              //     break;
-              //   case planStat[3].toString():
-              //     fetchPlanFilter([planStat[3], planStat[4]], null);
-              //     break;
-              //   case planStat[4].toString():
-              //     fetchPlanFilter(true, null);
-              //     break;
-              //   case planStat[5].toString():
-              //     fetchPlanFilter(planStat[5], null);
-              //     break;
-              // }
               fetchPlanFilter(`[${selectedStatus}]`, searchTerm);
             }}
           >
@@ -980,8 +823,9 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -1023,11 +867,13 @@ const PlanPage = () => {
             />
           </div>
         )}
-        {!isLoading && selectedStatus.toString() === planStat.toString() &&
-          <PlanTable planTotal={plans} />}
+        {!isLoading && selectedStatus.toString() === planStat.toString() && (
+          <PlanTable planTotal={plans} sbs={selectedDiv} />
+        )}
 
-        {!isLoading && selectedStatus.toString() !== planStat.toString() &&
-          <PlanTable plans={plans} />}
+        {!isLoading && selectedStatus.toString() !== planStat.toString() && (
+          <PlanTable plans={plans} sbs={selectedDiv} />
+        )}
       </div>
     </div>
   );

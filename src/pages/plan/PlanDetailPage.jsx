@@ -32,7 +32,7 @@ import { PickersDay } from "@mui/x-date-pickers";
 import PlanOrderTable from "../../components/tables/PlanOrderTable";
 
 const PlanDetailPage = () => {
-  const { planId } = useParams();
+  const { planId, sbsNumber } = useParams();
   const [plan, setPlan] = useState(null);
   const [orders, setOrders] = useState([]);
   const [emergencies, setEmergencies] = useState([]);
@@ -52,6 +52,9 @@ const PlanDetailPage = () => {
   const [activities, setActivities] = useState(null);
   const [members, setMembers] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
+  const [selectedDiv, setSelectedDiv] = useState(
+    sbsNumber ? parseInt(sbsNumber, 10) : 0
+  );
 
   const containerStyle = {
     width: "950px",
@@ -235,7 +238,10 @@ const PlanDetailPage = () => {
             <div className="navigation">
               <div className="left">
                 <div className="return-btn">
-                  <Link to="/plans" className="navigateButton">
+                  <Link
+                    to={`/plans/sbs/${selectedDiv}`}
+                    className="navigateButton"
+                  >
                     <ArrowCircleLeftIcon />
                     <p>Trở về</p>
                   </Link>
@@ -292,13 +298,6 @@ const PlanDetailPage = () => {
                         <a href={`/destinations/${plan?.destination.id}`}>
                           {plan?.destination.name}
                         </a>
-                        {/* <IconButton
-                      className="mapBtn"
-                      color="info"
-                      onClick={handleClickOpen}
-                    >
-                      <MapIcon />
-                    </IconButton> */}
                       </span>
                     </div>
                     <div className="detailItem">
@@ -309,190 +308,25 @@ const PlanDetailPage = () => {
                       <span className="itemKey">Ngày kết thúc:</span>
                       <span className="itemValue">{endDate}</span>
                     </div>
-                    {/* <div className="detailItem">
-                  <span className="itemKey">Thành viên hiện tại:</span>
-                  <span className="itemValue">
-                    {plan?.memberCount + " người"}
-                  </span>
-                </div> */}
-                    {/* <div className="detailItem">
-                  <span className="itemKey">Thành viên tối đa:</span>
-                  <span className="itemValue">
-                    {plan?.memberLimit + " người"}
-                  </span>
-                </div>
-                {plan?.status === "PUBLIC" && (
-                  <div className="detailItem">
-                    <span className="itemKey">Ngày chốt:</span>
-                    <span className="itemValue">{closeRegDate}</span>
-                  </div>
-                )}
-
-                <div className="detailItem">
-                  <span className="itemKey">Chi phí bình quân:</span>
-                  <span className="itemValue">
-                    {(plan?.gcoinBudgetPerCapita * 100).toLocaleString(
-                      "vi-VN"
-                    ) + "đ"}
-                  </span>
-                </div> */}
-                    {/* {(plan?.status == "PUBLISHED" || plan?.status == "READY") && (
-                  <div className="detailItem">
-                    <span className="itemKey">Quỹ nhóm hiện có:</span>
-                    <span className="itemValue">
-                      {(plan?.currentGcoinBudget * 100).toLocaleString(
-                        "vi-VN"
-                      ) + "đ"}
-                    </span>
-                  </div>
-                )} */}
                   </div>
                 </div>
               </div>
-              {/* <div className="bottom">
-            <Accordion>
-              <AccordionSummary
-                sx={{
-                  fontSize: 24,
-                }}
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                Lịch trình ({startDate} - {endDate})
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  minWidth: 1400,
-                }}
-              >
-                <div className="mix-table">
-                  <div className="left">
-                    <p className="activities-title">Ngày hoạt động</p>
-                    <div className="calendar">
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateCalendar
-                          value={dates[0] ? dayjs(dates[0]) : dayjs()}
-                          // readOnly
-                          slots={{
-                            day: ServerDay,
-                          }}
-                          slotProps={{
-                            day: {
-                              dates,
-                            },
-                          }}
-                          onChange={(value) => {
-                            // Create a date object
-                            const date = new Date(value.$y, value.$M, value.$D);
-                            date.setDate(date.getDate() + 1);
-                            const dateConverted = date
-                              .toISOString()
-                              .slice(0, 10);
-                            if (dates.indexOf(dateConverted) == -1) {
-                              setActivities(null);
-                            } else {
-                              let list =
-                                plan?.schedule[dates.indexOf(dateConverted)];
-
-                              let res = list.events.map((node, id) => {
-                                const { __typename, ...rest } = node;
-                                return { ...rest, id: id + 1 }; // Add the index to the object
-                              });
-                              setActivities(res);
-                            }
-
-                            // console.log(activities);
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <p className="activities-title">Chi tiết hoạt động</p>
-                    <div className="activities-container">
-                      <div className="tbl">
-                        {activities && (
-                          <ActivityTable activities={activities} />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </AccordionDetails>
-            </Accordion>
-          </div>
-          <div className="bottom">
-            <Accordion>
-              <AccordionSummary
-                sx={{
-                  fontSize: 24,
-                }}
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                Danh sách thành viên
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  minWidth: 1400,
-                }}
-              >
-                <MemberTable members={members} />
-              </AccordionDetails>
-            </Accordion>
-          </div> */}
               <div className="bottom">
-                {/* <Accordion>
-              <AccordionSummary
-                sx={{
-                  fontSize: 24,
-                }}
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                Danh sách đơn hàng
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  minWidth: 1400,
-                }}
-              >
-                <PlanOrderTable orders={orders} />
-              </AccordionDetails>
-            </Accordion> */}
                 <div className="bottom">
                   <div className="item">
                     <h1 className="item-title">Danh sách đơn hàng</h1>
-                    {orders.length > 0 && <PlanOrderTable orders={orders} />}
-                    {(!orders || orders.length === 0) && 
-                    <p style={{fontSize: "1.2rem", fontWeight: 500}}><em>Không có đơn hàng nào được đặt trong kế hoạch này.</em></p>}
+                    {/* {orders.length > 0 && <PlanOrderTable orders={orders} />}
+                    {(!orders || orders.length === 0) && (
+                      <p style={{ fontSize: "1.2rem", fontWeight: 500 }}>
+                        <em>
+                          Không có đơn hàng nào được đặt trong kế hoạch này.
+                        </em>
+                      </p>
+                    )} */}
+                    <PlanOrderTable orders={orders} />
                   </div>
                 </div>
               </div>
-              {/* <div className="bottom">
-            <Accordion>
-              <AccordionSummary
-                sx={{
-                  fontSize: 24,
-                }}
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                Danh sách số khẩn cấp
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  minWidth: 1400,
-                }}
-              >
-                <EmergencyTable list={emergencies} />
-              </AccordionDetails>
-            </Accordion>
-          </div> */}
             </div>
           </div>
           <Dialog
@@ -509,44 +343,11 @@ const PlanDetailPage = () => {
               <DialogContentText style={{ padding: "20px 0 10px 0" }}>
                 Chi tiết địa điểm đến:
               </DialogContentText>
-              {/* <GoogleMap
-                mapContainerStyle={containerStyle}
-                center={position}
-                zoom={15}
-              >
-                <MarkerF position={position} />
-              </GoogleMap> */}
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Đóng</Button>
             </DialogActions>
           </Dialog>
-          {/* <Dialog
-        open={openDepart}
-        onClose={() => {
-          setOpenDepart(false);
-        }}
-        maxWidth={false}
-      >
-        <DialogTitle backgroundColor={"#239b56"} color={"white"}>
-          Bản đồ
-        </DialogTitle>
-        <DialogContent style={{ width: 1000 }}>
-          <DialogContentText style={{ padding: "20px 0 10px 0" }}>
-            Chi tiết địa điểm khởi hành:
-          </DialogContentText>
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={positionDepart}
-            zoom={15}
-          >
-            <MarkerF position={positionDepart} />
-          </GoogleMap>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDepart}>Đóng</Button>
-        </DialogActions>
-      </Dialog> */}
         </div>
       )}
     </div>

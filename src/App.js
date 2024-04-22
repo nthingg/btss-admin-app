@@ -57,6 +57,10 @@ const App = () => {
               <Route path="sbs/:sbsNumber" element={<PlanPage />} />
               <Route path=":planId" element={<PlanDetailPage />} />
               <Route
+                path=":planId/sbs/:sbsNumber"
+                element={<PlanDetailPage />}
+              />
+              <Route
                 path=":planId/account/:accountId"
                 element={<AccountProfilePage />}
               />

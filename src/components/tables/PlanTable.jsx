@@ -10,7 +10,13 @@ import { accountPlansColumns } from "../../assets/configs/accounts/accountPlans"
 import { destinationPlansColumns } from "../../assets/configs/destinations/destinationPlans";
 import { planTotalColumns } from "../../assets/configs/plans/planTotal";
 
-const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
+const PlanTable = ({
+  plans,
+  planTotal,
+  accountPlans,
+  destinationPlans,
+  sbs,
+}) => {
   const navigate = useNavigate();
 
   const actionColumn = [
@@ -26,7 +32,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
             <IconButton
               color="info"
               onClick={() => {
-                navigate(`/plans/${params.row.node.id}`);
+                navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
               }}
             >
               <VisibilityIcon />
@@ -39,7 +45,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -50,7 +56,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -61,7 +67,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -72,7 +78,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -102,7 +108,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
             <IconButton
               color="info"
               onClick={() => {
-                navigate(`/plans/${params.row.node.id}`);
+                navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
               }}
             >
               <VisibilityIcon />
@@ -115,7 +121,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -126,7 +132,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -137,7 +143,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
@@ -148,7 +154,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.node.id}`);
+                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
                 }}
               >
                 <VisibilityIcon />
