@@ -145,7 +145,7 @@ const PlanDetailPage = () => {
           timeZone: "UTC",
         })
       );
-      const endDate = new Date(data["plans"]["nodes"][0]["endDate"]);
+      const endDate = new Date(data["plans"]["nodes"][0]["utcEndAt"]);
       setEndDate(
         endDate.toLocaleDateString("vi-VN", {
           timeZone: "UTC",
@@ -466,7 +466,9 @@ const PlanDetailPage = () => {
                 <div className="bottom">
                   <div className="item">
                     <h1 className="item-title">Danh sách đơn hàng</h1>
-                    <PlanOrderTable orders={orders} />
+                    {orders.length > 0 && <PlanOrderTable orders={orders} />}
+                    {(!orders || orders.length === 0) && 
+                    <p style={{fontSize: "1.2rem", fontWeight: 500}}><em>Không có đơn hàng nào được đặt trong kế hoạch này.</em></p>}
                   </div>
                 </div>
               </div>

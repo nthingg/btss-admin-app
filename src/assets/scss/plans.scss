@@ -39,16 +39,52 @@
     p {
         margin: 0;
     }
+
+    .cellWithStatus {
+        padding: 8px;
+
+        &.NONE {
+            color: crimson;
+        }
+
+        &.AVAILABLE {
+            color: green;
+        }
+    }
 }
 
 //plan account table
 .planAccountTable {
     width: fit-content;
+
+    .cellWithStatus {
+        padding: 8px;
+
+        &.NONE {
+            color: crimson;
+        }
+
+        &.AVAILABLE {
+            color: green;
+        }
+    }
 }
 
 .planDestinationTable {
     width: fit-content;
     margin: auto;
+
+    .cellWithStatus {
+        padding: 8px;
+
+        &.NONE {
+            color: crimson;
+        }
+
+        &.AVAILABLE {
+            color: green;
+        }
+    }
 }
 
 //plan detail

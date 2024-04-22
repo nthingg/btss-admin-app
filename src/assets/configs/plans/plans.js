@@ -1,4 +1,6 @@
 import { Switch } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const plansColumns = [
   {
@@ -17,15 +19,15 @@ export const plansColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.id}</div>;
+      return <div>{params.row.node.id}</div>;
     },
     renderHeader: () => <span>ID</span>,
   },
   {
     field: "name",
-    width: 240,
+    width: 200,
     renderCell: (params) => {
-      return <div>{params.row.name}</div>;
+      return <div>{params.row.node.name}</div>;
     },
     renderHeader: () => <span>KẾ HOẠCH</span>,
   },
@@ -36,18 +38,18 @@ export const plansColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.account.name}</div>;
+      return <div>{params.row.node.account.name}</div>;
     },
     renderHeader: () => <span>TRƯỞNG NHÓM</span>,
   },
 
   {
     field: "destination",
-    width: 260,
+    width: 220,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.destination.name}</div>;
+      return <div>{params.row.node.destination.name}</div>;
     },
     renderHeader: () => <span>ĐỊA ĐIỂM</span>,
   },
@@ -60,7 +62,7 @@ export const plansColumns = [
     renderCell: (params) => {
       return (
         <div>
-          {params.row.memberCount} / {params.row.maxMemberCount}
+          {params.row.node.memberCount} / {params.row.node.maxMemberCount}
         </div>
       );
     },
@@ -72,7 +74,7 @@ export const plansColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.utcDepartAt);
+      const date = new Date(params.row.node.utcDepartAt);
 
       const formattedDateTime = date.toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -94,7 +96,7 @@ export const plansColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      const date = new Date(params.row.utcEndAt);
+      const date = new Date(params.row.node.utcEndAt);
 
       const dateOnly = date.toLocaleDateString("vi-VN", {
         timeZone: "UTC",
@@ -110,5 +112,21 @@ export const plansColumns = [
       );
     },
     renderHeader: () => <span>KẾT THÚC</span>,
+  },
+  {
+    field: "haveOrder",
+    width: 120,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      if (params.row.node.orders.length > 0) {
+        return (
+          <div className="cellWithStatus AVAILABLE">{<CheckCircleIcon />}</div>
+        );
+      } else {
+        return <div className="cellWithStatus NONE">{<CancelIcon />}</div>;
+      }
+    },
+    renderHeader: () => <span>CÓ ĐƠN HÀNG</span>,
   },
 ];

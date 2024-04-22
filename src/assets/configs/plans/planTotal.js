@@ -1,4 +1,6 @@
 import { Switch } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const planTotalColumns = [
   {
@@ -60,7 +62,7 @@ export const planTotalColumns = [
 
   {
     field: "destination",
-    width: 260,
+    width: 220,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
@@ -127,5 +129,21 @@ export const planTotalColumns = [
       );
     },
     renderHeader: () => <span>KẾT THÚC</span>,
+  },
+  {
+    field: "haveOrder",
+    width: 120,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      if (params.row.node.orders.length > 0) {
+        return (
+          <div className="cellWithStatus AVAILABLE">{<CheckCircleIcon />}</div>
+        );
+      } else {
+        return <div className="cellWithStatus NONE">{<CancelIcon />}</div>;
+      }
+    },
+    renderHeader: () => <span>CÓ ĐƠN HÀNG</span>,
   },
 ];

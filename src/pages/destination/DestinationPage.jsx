@@ -470,9 +470,9 @@ const DestinationPage = () => {
             <AddCircleIcon />
             <span>Thêm địa điểm</span>
           </Link>
-          <button className="link">
+          {/* <button className="link">
             <FilterAltIcon />
-          </button>
+          </button> */}
           <input
             type="file"
             id="upload-excel"

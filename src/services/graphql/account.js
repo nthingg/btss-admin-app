@@ -22,7 +22,7 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
         plans {
           id
         }
-        isPro
+        publishedPlanCount
       }
     }
   }
@@ -50,11 +50,27 @@ export const LOAD_ACCOUNTS_FILTER = gql`
         plans {
           id
         }
-        isPro
+        publishedPlanCount
       }
     }
   }
 `;
+
+export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
+  query LoadTravelerOptions($searchTerm: String) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: { role: { eq: TRAVELER } }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+      }
+    }
+  }
+`
 
 export const LOAD_ACCOUNTS = gql`
   query LoadAccount($searchTerm: String) {
@@ -65,7 +81,7 @@ export const LOAD_ACCOUNTS = gql`
         plans {
           id
         }
-        isPro
+        publishedPlanCount
       }
     }
   }

@@ -631,9 +631,9 @@ const TransactionPage = () => {
           </button>
         </div>
         <div className="right">
-          <button className="link">
+          {/* <button className="link">
             <FilterAltIcon />
-          </button>
+          </button> */}
           <button
             className="link"
             onClick={() => {

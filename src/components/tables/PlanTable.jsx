@@ -20,13 +20,13 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        let check = params.row.status;
-        if (params.row.isPublished === true) {
+        let check = params.row.node.status;
+        if (params.row.node.isPublished === true) {
           return (
             <IconButton
               color="info"
               onClick={() => {
-                navigate(`/plans/${params.row.id}`);
+                navigate(`/plans/${params.row.node.id}`);
               }}
             >
               <VisibilityIcon />
@@ -39,7 +39,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
+                  navigate(`/plans/${params.row.node.id}`);
                 }}
               >
                 <VisibilityIcon />
@@ -50,7 +50,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
+                  navigate(`/plans/${params.row.node.id}`);
                 }}
               >
                 <VisibilityIcon />
@@ -61,7 +61,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
+                  navigate(`/plans/${params.row.node.id}`);
                 }}
               >
                 <VisibilityIcon />
@@ -72,7 +72,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               <IconButton
                 color="info"
                 onClick={() => {
-                  navigate(`/plans/${params.row.id}`);
+                  navigate(`/plans/${params.row.node.id}`);
                 }}
               >
                 <VisibilityIcon />
@@ -177,6 +177,7 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
             autoPageSize
             // pageSizeOptions={8}
             // autoHeight={true}
+            getRowId={(row) => row.node.id}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
