@@ -24,10 +24,9 @@ const style = {
     p: 4,
 };
 
-export default function FilterModal({ filterOrder, handleChangeFilter }) {
+export default function FilterModal({ filterOrder, handleChangeFilter, accountId, setAccountId, handleModalSubmit }) {
     const [open, setOpen] = React.useState(false);
     const [travelersOptions, setOptions] = React.useState([]);
-    const [accountId, setAccountId] = React.useState(null);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -70,7 +69,6 @@ export default function FilterModal({ filterOrder, handleChangeFilter }) {
                                 value={filterOrder}
                                 onChange={(e) => {
                                     handleChangeFilter(e);
-                                    handleClose();
                                 }}
                             >
                                 <FormControlLabel value="all" control={<Radio />} label="Tất cả" />
@@ -79,11 +77,12 @@ export default function FilterModal({ filterOrder, handleChangeFilter }) {
                             </RadioGroup>
                         </FormControl>
                     </div>
-                    <div>
-                        <span>Trưởng nhóm</span>
+                    <div style={{ marginTop: "1rem" }}>
+                        <FormLabel>Trưởng nhóm</FormLabel>
                         <Select
                             placeholder={"Không có dữ liệu"}
                             className="basic-single"
+                            id='traveler-id-select'
                             classNamePrefix="select"
                             isDisabled={false}
                             isClearable={true}
@@ -105,6 +104,13 @@ export default function FilterModal({ filterOrder, handleChangeFilter }) {
                             })}
                         />
                     </div>
+                    <button onClick={() => {
+                        console.log(accountId);
+                        handleModalSubmit(filterOrder, accountId);
+                        handleClose();
+                    }}>
+                        Tìm kiếm
+                    </button>
                 </Box>
             </Modal>
         </div>

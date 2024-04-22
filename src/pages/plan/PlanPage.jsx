@@ -4,7 +4,7 @@ import "../../assets/scss/filter.scss";
 import "../../assets/scss/shared.scss";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -40,33 +40,16 @@ import {
 import Slider from "react-slick";
 import { useParams } from "react-router-dom";
 import FilterModal from "../../components/others/PlanFilterOrderModal";
-
-function usePlanFilters() {
-  const [filters, _updateFilter] = useState({
-    status: undefined,
-    orders: undefined,
-    isPublished: undefined,
-    utcDepartAt: undefined
-  });
-
-  const updateFilter = (filterType, value) => {
-    _updateFilter({
-      [filterType]: value,
-    });
-  };
-
-  return {
-    models: { filters },
-    operations: { updateFilter },
-  };
-}
+import client from "../../services/apollo/config";
 
 const PlanPage = () => {
   const { sbsNumber } = useParams();
-  const { operations, models } = usePlanFilters();
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
   const [filterOrder, setFilterOrders] = useState('all');
+  const [plans, setPlans] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [accountId, setAccountId] = useState(null);
   const planStat = [
     "REGISTERING",
     "READY",
@@ -91,19 +74,19 @@ const PlanPage = () => {
           break;
         case "2":
           setSelectedStatus(planStat[1]);
-          fetchPlanCommingSoon(searchTerm);
+          fetchPlanFilter(planStat[1]);
           break;
         case "3":
           setSelectedStatus(planStat[2]);
-          fetchPlanOngoing(planStat[2], searchTerm);
+          fetchPlanFilter(planStat[2], searchTerm);
           break;
         case "4":
           setSelectedStatus([planStat[3], planStat[4]]);
-          fetchPlanFilter([planStat[3], planStat[4]], searchTerm);
+          fetchPlanFilter(`[${planStat[3]}, ${planStat[4]}]`, searchTerm);
           break;
         case "5":
           setSelectedStatus(true);
-          fetchPlanPublished(searchTerm);
+          fetchPlanFilter(true, searchTerm);
           break;
         case "6":
           setSelectedStatus(planStat[5]);
@@ -112,257 +95,560 @@ const PlanPage = () => {
       }
     } else {
       setSelectedStatus(planStat);
-      fetchTotalPlan(null);
+      fetchPlanFilter(`[${planStat.toString()}]`, null);
     }
     setIsLoading(false);
   }, []);
 
+  async function planQueryInit(statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery) {
+    let query;
+    if (onGoingQuery !== "") {
+      query = gql`
+      query LoadPlansFilterInit {
+        plans(
+          first: 100
+          order: { id: DESC }
+          where: { 
+            ${onGoingQuery}
+            ${ordersQuery}
+            ${accountQuery}
+          }
+          ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+        ) {
+          edges {
+            node {
+              id
+              name
+              account {
+                name
+              }
+              destination {
+                name
+              }
+              utcDepartAt
+              utcStartAt
+              memberCount
+              maxMemberCount
+              utcEndAt
+              status
+              isPublished
+              orders {
+                id
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `
+    } else if (publishedQuery !== "") {
+      query = gql`
+        query LoadPlansFilterInit {
+          plans(
+            first: 100
+            order: { id: DESC }
+            where: { 
+              ${publishedQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            edges {
+              node {
+                id
+                name
+                account {
+                  name
+                }
+                destination {
+                  name
+                }
+                utcDepartAt
+                utcStartAt
+                memberCount
+                maxMemberCount
+                utcEndAt
+                status
+                isPublished
+                orders {
+                  id
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      `
+    }
+    else {
+      // console.log(`
+      // query LoadPlansFilterInit {
+      //   plans(
+      //     first: 100
+      //     order: { id: DESC }
+      //     where: { 
+      //       ${statusQuery} 
+      //       ${utcDepartAtQuery}
+      //       ${ordersQuery}
+      //     }
+      //     ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+      //   ) {
+      //     edges {
+      //       node {
+      //         id
+      //         name
+      //         account {
+      //           name
+      //         }
+      //         destination {
+      //           name
+      //         }
+      //         utcDepartAt
+      //         utcStartAt
+      //         memberCount
+      //         maxMemberCount
+      //         utcEndAt
+      //         status
+      //         isPublished
+      //         orders {
+      //           id
+      //         }
+      //       }
+      //     }
+      //     pageInfo {
+      //       hasNextPage
+      //       endCursor
+      //     }
+      //   }
+      // }`)
+      query = gql`
+        query LoadPlansFilterInit {
+          plans(
+            first: 100
+            order: { id: DESC }
+            where: { 
+              ${statusQuery} 
+              ${utcDepartAtQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            edges {
+              node {
+                id
+                name
+                account {
+                  name
+                }
+                destination {
+                  name
+                }
+                utcDepartAt
+                utcStartAt
+                memberCount
+                maxMemberCount
+                utcEndAt
+                status
+                isPublished
+                orders {
+                  id
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+    `
+    }
+
+    try {
+      const result = await client.query({ query });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      console.log(msg);
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
+  async function planQuery(cursor, statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery) {
+    let query;
+    if (onGoingQuery !== "") {
+      query = gql`
+        query LoadPlansFilter {
+          plans(
+            first: 100
+            after: "${cursor}"
+            order: { id: DESC }
+            where: { 
+              ${onGoingQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            edges {
+              node {
+                id
+                name
+                account {
+                  name
+                }
+                destination {
+                  name
+                }
+                utcDepartAt
+                utcStartAt
+                memberCount
+                maxMemberCount
+                utcEndAt
+                status
+                isPublished
+                orders {
+                  id
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      `
+    } else if (publishedQuery !== "") {
+      query = gql`
+        query LoadPlansFilter {
+          plans(
+            first: 100
+            after: "${cursor}"
+            order: { id: DESC }
+            where: { 
+              ${publishedQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            edges {
+              node {
+                id
+                name
+                account {
+                  name
+                }
+                destination {
+                  name
+                }
+                utcDepartAt
+                utcStartAt
+                memberCount
+                maxMemberCount
+                utcEndAt
+                status
+                isPublished
+                orders {
+                  id
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      `
+    } else {
+      query = gql`
+        query LoadPlansFilter {
+          plans(
+            first: 100
+            after: "${cursor}"
+            order: { id: DESC }
+            where: { 
+              ${statusQuery} 
+              ${utcDepartAtQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            edges {
+              node {
+                id
+                name
+                account {
+                  name
+                }
+                destination {
+                  name
+                }
+                utcDepartAt
+                utcStartAt
+                memberCount
+                maxMemberCount
+                utcEndAt
+                status
+                isPublished
+                orders {
+                  id
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      `
+    }
+
+    try {
+      const result = await client.query({ query });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      console.log(msg);
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
   // const [planQuery, setPlanQuery] = useState(LOAD_PLANS_FILTER);
-  const [searchTerm, setSearchTerm] = useState(null);
-  const [totalPlan, setTotalPlan] = useState([]);
-  const [getTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN, {
-    fetchPolicy: "no-cache",
-  });
-  const [getInitTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT, {
-    fetchPolicy: "no-cache",
-  });
-  const [getPlanFilterInit, { }] = useLazyQuery(LOAD_PLANS_FILTER_INIT, {
-    fetchPolicy: "network-only"
-  });
-  const [getPlanFilter, { }] = useLazyQuery(LOAD_PLANS_FILTER, {
-    fetchPolicy: "network-only"
-  });
-  const [getPlanCommingSoonInit, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON_INIT);
-  const [getPlanCommingSoon, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON);
-  const [getPlanOnGoingInit, { }] = useLazyQuery(LOAD_PLAN_ONGOING_INIT);
-  const [getPlanOnGoing, { }] = useLazyQuery(LOAD_PLAN_ONGOING);
-  const [getPublishedPlanInit, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FILTER_INIT);
-  const [getPublishedPlan, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FITLER)
-  const [filterPlanOrdersInit, { }] = useLazyQuery(LOAD_PLAN_FILTER_ORDERS_INIT, {
-    fetchPolicy: "network-only"
-  });;
-  const [filterPlanOrders, { }] = useLazyQuery(LOAD_PLAN_FILTER_ORDERS, {
-    fetchPolicy: "network-only"
-  });;
+  // const [totalPlan, setTotalPlan] = useState([]);
+  // const [getTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN, {
+  //   fetchPolicy: "no-cache",
+  // });
+  // const [getInitTotalPlan, { }] = useLazyQuery(LOAD_TOTAL_PLAN_INIT, {
+  //   fetchPolicy: "no-cache",
+  // });
+  // const [getPlanFilterInit, { }] = useLazyQuery(queryPlanInit, {
+  //   fetchPolicy: "network-only"
+  // });
+  // const [getPlanFilter, { }] = useLazyQuery(queryPlan, {
+  //   fetchPolicy: "network-only"
+  // });
+  // const [getPlanCommingSoonInit, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON_INIT);
+  // const [getPlanCommingSoon, { }] = useLazyQuery(LOAD_PLAN_COMMING_SOON);
+  // const [getPlanOnGoingInit, { }] = useLazyQuery(LOAD_PLAN_ONGOING_INIT);
+  // const [getPlanOnGoing, { }] = useLazyQuery(LOAD_PLAN_ONGOING);
+  // const [getPublishedPlanInit, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FILTER_INIT);
+  // const [getPublishedPlan, { }] = useLazyQuery(LOAD_PLANS_PUBLISHED_FITLER)
+  // const fetchTotalPlan = async (searchTerm) => {
+  //   const { data } = await getInitTotalPlan({
+  //     variables: {
+  //       searchTerm: searchTerm,
+  //     },
+  //   });
+  //   let planData = data.plans.edges;
+  //   if (data.plans.pageInfo.hasNextPage === true) {
+  //     let check = true;
+  //     let endCursor = data.plans.pageInfo.endCursor;
+  //     while (check) {
+  //       const { data: dataRefetch } = await getTotalPlan({
+  //         variables: {
+  //           searchTerm: searchTerm,
+  //           endCursor: endCursor,
+  //         },
+  //       });
 
-  const fetchTotalPlan = async (searchTerm) => {
-    const { data } = await getInitTotalPlan({
-      variables: {
-        searchTerm: searchTerm,
-      },
-    });
-    let planData = data.plans.edges;
-    if (data.plans.pageInfo.hasNextPage === true) {
-      let check = true;
-      let endCursor = data.plans.pageInfo.endCursor;
-      while (check) {
-        const { data: dataRefetch } = await getTotalPlan({
-          variables: {
-            searchTerm: searchTerm,
-            endCursor: endCursor,
-          },
-        });
+  //       planData = planData.concat(dataRefetch.plans.edges);
 
-        planData = planData.concat(dataRefetch.plans.edges);
+  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
+  //       } else {
+  //         check = false;
+  //       }
+  //     }
+  //   }
 
-        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-          endCursor = dataRefetch.plans.pageInfo.endCursor;
-        } else {
-          check = false;
-        }
+  //   let res = planData.map((node, index) => {
+  //     if (node) {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 };
+  //     }
+  //   });
+  //   setTotalPlan(res);
+  //   setIsLoading(false);
+  // };
+
+  // const fetchPlanCommingSoon = async (searchTerm) => {
+  //   const { data } = await getPlanCommingSoonInit({
+  //     variables: {
+  //       searchTerm: searchTerm,
+  //       dateTime: now.toUTCString()
+  //     },
+  //   });
+  //   let planData = data.plans.edges;
+  //   if (data.plans.pageInfo.hasNextPage === true) {
+  //     let check = true;
+  //     let endCursor = data.plans.pageInfo.endCursor;
+  //     while (check) {
+  //       const { data: dataRefetch } = await getPlanCommingSoon({
+  //         variables: {
+  //           searchTerm: searchTerm,
+  //           dateTime: now.toUTCString(),
+  //           endCursor: endCursor,
+  //         },
+  //       });
+
+  //       planData = planData.concat(dataRefetch.plans.edges);
+
+  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
+  //       } else {
+  //         check = false;
+  //       }
+  //     }
+  //   }
+
+  //   let res = planData.map((node, index) => {
+  //     if (node) {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 };
+  //     }
+  //   });
+  //   setPlans(res);
+  //   setIsLoading(false);
+  // }
+
+  // const fetchPlanOngoing = async (searchTerm) => {
+  //   const { data } = await getPlanOnGoingInit({
+  //     variables: {
+  //       searchTerm: searchTerm,
+  //       dateTime: now.toUTCString()
+  //     },
+  //   });
+  //   let planData = data.plans.edges;
+  //   if (data.plans.pageInfo.hasNextPage === true) {
+  //     let check = true;
+  //     let endCursor = data.plans.pageInfo.endCursor;
+  //     while (check) {
+  //       const { data: dataRefetch } = await getPlanOnGoing({
+  //         variables: {
+  //           searchTerm: searchTerm,
+  //           dateTime: now.toUTCString(),
+  //           endCursor: endCursor,
+  //         },
+  //       });
+
+  //       planData = planData.concat(dataRefetch.plans.edges);
+
+  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
+  //       } else {
+  //         check = false;
+  //       }
+  //     }
+  //   }
+
+  //   let res = planData.map((node, index) => {
+  //     if (node) {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 };
+  //     }
+  //   });
+  //   setPlans(res);
+  //   setIsLoading(false);
+  // }
+
+  // const fetchPlanPublished = async (searchTerm) => {
+  //   const { data } = await getPublishedPlanInit({
+  //     variables: {
+  //       searchTerm: searchTerm
+  //     },
+  //   });
+  //   let planData = data.plans.edges;
+  //   if (data.plans.pageInfo.hasNextPage === true) {
+  //     let check = true;
+  //     let endCursor = data.plans.pageInfo.endCursor;
+  //     while (check) {
+  //       const { data: dataRefetch } = await getPublishedPlan({
+  //         variables: {
+  //           searchTerm: searchTerm,
+  //           endCursor: endCursor,
+  //         },
+  //       });
+
+  //       planData = planData.concat(dataRefetch.plans.edges);
+
+  //       if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+  //         endCursor = dataRefetch.plans.pageInfo.endCursor;
+  //       } else {
+  //         check = false;
+  //       }
+  //     }
+  //   }
+
+  //   let res = planData.map((node, index) => {
+  //     if (node) {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 };
+  //     }
+  //   });
+  //   setPlans(res);
+  //   setIsLoading(false);
+  // }
+
+  const fetchPlanFilter = async (selectedStatus, searchTerm, filterOrder, accountId) => {
+    let statusQuery = `status: { in: ${selectedStatus} }`;
+    let utcDepartAtQuery;
+    let onGoingQuery = "";
+    let publishedQuery = "";
+    let ordersQuery = "";
+    let accountQuery = "";
+    switch (selectedStatus) {
+      case 'READY':
+        utcDepartAtQuery = `utcDepartAt: { gte: "${now.toUTCString()}" }`;
+        break;
+      case 'VERIFIED':
+        statusQuery = "";
+        onGoingQuery = `or: [
+          { status: { eq: READY }, utcDepartAt: { lte: "${now.toUTCString()}" } },
+          { status: { eq: VERIFIED } }
+        ]`
+        break;
+      case true: {
+        statusQuery = "";
+        publishedQuery = `isPublished: { eq: true }`;
+        break;
       }
+      case "[true]": {
+        statusQuery = "";
+        publishedQuery = `isPublished: { eq: true }`;
+        break;
+      }
+      default:
+        utcDepartAtQuery = "";
+        break;
     }
-
-    let res = planData.map((node, index) => {
-      if (node) {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      }
-    });
-    setTotalPlan(res);
-    setIsLoading(false);
-  };
-
-  const fetchPlanOrdersFilter = async (selectedStatus, haveOrders) => {
-    const { data } = await filterPlanOrdersInit({
-      variables: {
-        searchTerm: searchTerm,
-        status: selectedStatus,
-        haveOrder: haveOrders
-      },
-    });
-    let planData = data.plans.edges;
-    if (data.plans.pageInfo.hasNextPage === true) {
-      let check = true;
-      let endCursor = data.plans.pageInfo.endCursor;
-      while (check) {
-        const { data: dataRefetch } = await filterPlanOrders({
-          variables: {
-            searchTerm: searchTerm,
-            status: selectedStatus,
-            haveOrder: haveOrders,
-            endCursor: endCursor,
-          },
-        });
-
-        planData = planData.concat(dataRefetch.plans.edges);
-
-        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-          endCursor = dataRefetch.plans.pageInfo.endCursor;
-        } else {
-          check = false;
-        }
-      }
+    if (filterOrder && filterOrder !== 'all') {
+      ordersQuery = ` orders: { any: ${filterOrder === 'haveOrders'} }`
     }
-
-    let res = planData.map((node, index) => {
-      if (node) {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      }
-    });
-    setPlans(res);
-    setTotalPlan(res);
-    setIsLoading(false);
-  }
-
-  const fetchPlanFilter = async (selectedStatus, searchTerm) => {
-    const { data } = await getPlanFilterInit({
-      variables: {
-        status: selectedStatus,
-        searchTerm: searchTerm,
-      },
-    });
-    let planData = data.plans.edges;
-    if (data.plans.pageInfo.hasNextPage === true) {
-      let check = true;
-      let endCursor = data.plans.pageInfo.endCursor;
-      while (check) {
-        const { data: dataRefetch } = await getPlanFilter({
-          variables: {
-            status: selectedStatus,
-            searchTerm: searchTerm,
-            endCursor: endCursor,
-          },
-        });
-
-        planData = planData.concat(dataRefetch.plans.edges);
-
-        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-          endCursor = dataRefetch.plans.pageInfo.endCursor;
-        } else {
-          check = false;
-        }
-      }
+    if (accountId) {
+      accountQuery = `accountId: { eq: ${accountId} }`
     }
-
-    let res = planData.map((node, index) => {
-      if (node) {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      }
-    });
-    setPlans(res);
-    setIsLoading(false);
-  }
-
-  const fetchPlanCommingSoon = async (searchTerm) => {
-    const { data } = await getPlanCommingSoonInit({
-      variables: {
-        searchTerm: searchTerm,
-        dateTime: now.toUTCString()
-      },
-    });
+    const data = await planQueryInit(statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery);
     let planData = data.plans.edges;
     if (data.plans.pageInfo.hasNextPage === true) {
       let check = true;
       let endCursor = data.plans.pageInfo.endCursor;
       while (check) {
-        const { data: dataRefetch } = await getPlanCommingSoon({
-          variables: {
-            searchTerm: searchTerm,
-            dateTime: now.toUTCString(),
-            endCursor: endCursor,
-          },
-        });
-
-        planData = planData.concat(dataRefetch.plans.edges);
-
-        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-          endCursor = dataRefetch.plans.pageInfo.endCursor;
-        } else {
-          check = false;
-        }
-      }
-    }
-
-    let res = planData.map((node, index) => {
-      if (node) {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      }
-    });
-    setPlans(res);
-    setIsLoading(false);
-  }
-
-  const fetchPlanOngoing = async (searchTerm) => {
-    const { data } = await getPlanOnGoingInit({
-      variables: {
-        searchTerm: searchTerm,
-        dateTime: now.toUTCString()
-      },
-    });
-    let planData = data.plans.edges;
-    if (data.plans.pageInfo.hasNextPage === true) {
-      let check = true;
-      let endCursor = data.plans.pageInfo.endCursor;
-      while (check) {
-        const { data: dataRefetch } = await getPlanOnGoing({
-          variables: {
-            searchTerm: searchTerm,
-            dateTime: now.toUTCString(),
-            endCursor: endCursor,
-          },
-        });
-
-        planData = planData.concat(dataRefetch.plans.edges);
-
-        if (dataRefetch.plans.pageInfo.hasNextPage === true) {
-          endCursor = dataRefetch.plans.pageInfo.endCursor;
-        } else {
-          check = false;
-        }
-      }
-    }
-
-    let res = planData.map((node, index) => {
-      if (node) {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 };
-      }
-    });
-    setPlans(res);
-    setIsLoading(false);
-  }
-
-  const fetchPlanPublished = async (searchTerm) => {
-    const { data } = await getPublishedPlanInit({
-      variables: {
-        searchTerm: searchTerm
-      },
-    });
-    let planData = data.plans.edges;
-    if (data.plans.pageInfo.hasNextPage === true) {
-      let check = true;
-      let endCursor = data.plans.pageInfo.endCursor;
-      while (check) {
-        const { data: dataRefetch } = await getPublishedPlan({
-          variables: {
-            searchTerm: searchTerm,
-            endCursor: endCursor,
-          },
-        });
+        const dataRefetch = await planQuery(endCursor, statusQuery, searchTerm, utcDepartAtQuery, publishedQuery, onGoingQuery, ordersQuery, accountQuery);
 
         planData = planData.concat(dataRefetch.plans.edges);
 
@@ -386,54 +672,41 @@ const PlanPage = () => {
 
   const handleClick = (index) => {
     setSelectedDiv(index);
-    let selectStatus;
     switch (index) {
       case 0:
         setSelectedStatus(planStat);
-        fetchTotalPlan(searchTerm);
-        selectStatus = planStat;
+        // fetchTotalPlan(searchTerm);
+        fetchPlanFilter(`[${planStat.toString()}]`, searchTerm, filterOrder, accountId);
         break;
       case 1:
         setSelectedStatus(planStat[0]);
-        fetchPlanFilter(planStat[0], searchTerm);
-        selectStatus = planStat[0];
+        fetchPlanFilter(planStat[0], searchTerm, filterOrder, accountId);
         break;
       case 2:
         setSelectedStatus(planStat[1]);
-        fetchPlanCommingSoon(searchTerm);
-        selectStatus = planStat[1];
+        // fetchPlanCommingSoon(searchTerm);
+        fetchPlanFilter(planStat[1], searchTerm, filterOrder, accountId);
         break;
       case 3:
         setSelectedStatus(planStat[2]);
-        fetchPlanOngoing(planStat[2], searchTerm);
-        selectStatus = planStat[2];
+        // fetchPlanOngoing(planStat[2], searchTerm);
+        fetchPlanFilter(planStat[2], searchTerm, filterOrder, accountId);
         break;
       case 4:
         setSelectedStatus([planStat[3], planStat[4]]);
-        fetchPlanFilter([planStat[3], planStat[4]], searchTerm);
-        selectStatus = [planStat[3], planStat[4]];
+        fetchPlanFilter(`[${planStat[3]}, ${planStat[4]}]`, searchTerm, filterOrder, accountId);
         break;
       case 5:
         setSelectedStatus(true);
-        fetchPlanPublished(searchTerm);
-        selectStatus = planStat[3];
+        // fetchPlanPublished(searchTerm);
+        fetchPlanFilter(true, searchTerm, filterOrder, accountId);
         break;
       case 6:
         setSelectedStatus(planStat[5]);
-        fetchPlanFilter(planStat[5], searchTerm);
-        selectStatus = planStat[5];
+        fetchPlanFilter(planStat[5], searchTerm, filterOrder, accountId);
         break;
-      // case 7:
-      //   setPlanQuery(LOAD_PLANS_PUBLISHED_FILTER);
-      //   setSelectedStatus(true);
-      //   refetch();
-      //   break;
       default:
         break;
-    }
-    if (filterOrder !== 'all') {
-      setIsLoading(true);
-      fetchPlanOrdersFilter(selectStatus, filterOrder === 'haveOrders');
     }
     refetchRegis();
     // refetchPending();
@@ -452,8 +725,6 @@ const PlanPage = () => {
   //     dateTime: now.toUTCString(),
   //   },
   // });
-
-  const [plans, setPlans] = useState([]);
   // useEffect(() => {
   //   if (!loading && !error && data && data["plans"]["nodes"]) {
   //     let res = data.plans.nodes.map((node, index) => {
@@ -609,30 +880,20 @@ const PlanPage = () => {
   };
 
   const handleSearchSubmit = async () => {
+    setIsLoading(true);
     const search = document.getElementById("floatingValue").value;
     setSearchTerm(search);
+    fetchPlanFilter(`[${selectedStatus}]`, search, filterOrder);
   };
 
   const handleChangeFilter = (e) => {
     var orderFilter = e.target.value;
-    let haveOrder = true;
     setFilterOrders(orderFilter);
+  }
+
+  const handleModalSubmit = async (filterOrder, accountId) => {
     setIsLoading(true);
-    switch (orderFilter) {
-      case "all": {
-        fetchTotalPlan(null);
-        return;
-      }
-      case "haveOrders": {
-        haveOrder = true;
-        break;
-      }
-      case "noOrders": {
-        haveOrder = false;
-        break;
-      }
-    }
-    fetchPlanOrdersFilter(selectedStatus, haveOrder);
+    fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
   }
 
   return (
@@ -654,20 +915,12 @@ const PlanPage = () => {
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSearchSubmit();
-                const search = document.getElementById("floatingValue").value;
-                setIsLoading(true);
-                fetchTotalPlan(search);
               }
             }}
           />
           <button
             className="link"
-            onClick={() => {
-              handleSearchSubmit();
-              const search = document.getElementById("floatingValue").value;
-              setIsLoading(true);
-              fetchTotalPlan(search);
-            }}
+            onClick={handleSearchSubmit}
           >
             <SearchIcon />
           </button>
@@ -676,12 +929,14 @@ const PlanPage = () => {
           {/* <button className="link">
             <CloudDownloadIcon />
           </button> */}
-          <FilterModal filterOrder={filterOrder} handleChangeFilter={handleChangeFilter} />
+          <FilterModal filterOrder={filterOrder} handleChangeFilter={handleChangeFilter} accountId={accountId} setAccountId={setAccountId} handleModalSubmit={handleModalSubmit} />
           <button
             className="link"
             onClick={() => {
               setIsLoading(true);
               setSearchTerm(null);
+              setFilterOrders('all');
+              setAccountId(null);
               refetchRegis();
               refetchCancelled();
               refetchTotal();
@@ -689,30 +944,30 @@ const PlanPage = () => {
               refetchComplete();
               refetchOngoing();
               refetchPublished();
-              setFilterOrders('all');
-              switch (selectedStatus.toString()) {
-                case planStat.toString():
-                  fetchTotalPlan(null);
-                  break;
-                case planStat[0].toString():
-                  fetchPlanFilter(planStat[0], null);
-                  break;
-                case planStat[1].toString():
-                  fetchPlanCommingSoon(null);
-                  break;
-                case planStat[2].toString():
-                  fetchPlanOngoing(planStat[2], null);
-                  break;
-                case planStat[3].toString():
-                  fetchPlanFilter([planStat[3], planStat[4]], null);
-                  break;
-                case planStat[4].toString():
-                  fetchPlanPublished(null);
-                  break;
-                case planStat[5].toString():
-                  fetchPlanFilter(planStat[5], null);
-                  break;
-              }
+              // switch (selectedStatus.toString()) {
+              //   case planStat.toString():
+              //     fetchPlanFilter(`[${planStat.toString()}]`, null);
+              //     break;
+              //   case planStat[0].toString():
+              //     fetchPlanFilter(planStat[0], null);
+              //     break;
+              //   case planStat[1].toString():
+              //     fetchPlanFilter(planStat[1], null);
+              //     break;
+              //   case planStat[2].toString():
+              //     fetchPlanFilter(planStat[2], null);
+              //     break;
+              //   case planStat[3].toString():
+              //     fetchPlanFilter([planStat[3], planStat[4]], null);
+              //     break;
+              //   case planStat[4].toString():
+              //     fetchPlanFilter(true, null);
+              //     break;
+              //   case planStat[5].toString():
+              //     fetchPlanFilter(planStat[5], null);
+              //     break;
+              // }
+              fetchPlanFilter(`[${selectedStatus}]`, searchTerm);
             }}
           >
             <RefreshIcon />
@@ -745,14 +1000,14 @@ const PlanPage = () => {
                 {index === 5 && <PublicIcon sx={{ color: "#3498DB" }} />}
                 {index === 6 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 <span>
-                  {index === 0 && (filterOrder === 'all' ? `Tất cả (${total})` : `Tất cả`)}
-                  {index === 1 && (filterOrder === 'all' ? `Chưa chốt (${registering})` : `Chưa chốt`)}
-                  {index === 2 && (filterOrder === 'all' ? `Sắp diễn ra (${temp})` : `Sắp diễn ra`)}
-                  {index === 3 && (filterOrder === 'all' ? `Đang diễn ra (${onGoing})` : `Đang diễn ra`)}
-                  {index === 4 && (filterOrder === 'all' ? `Đã hoàn thành (${completed})` : `Đã hoàn thành`)}
+                  {index === 0 && `Tất cả (${total})`}
+                  {index === 1 && `Chưa chốt (${registering})`}
+                  {index === 2 && `Sắp diễn ra (${temp})`}
+                  {index === 3 && `Đang diễn ra (${onGoing})`}
+                  {index === 4 && `Đã hoàn thành (${completed})`}
                   {/* {index === 6 && `Có vấn đề (${flawed})`} */}
-                  {index === 5 && (filterOrder === 'all' ? `Đã chia sẻ (${published})` : `Đã chia sẻ`)}
-                  {index === 6 && (filterOrder === 'all' ? `Đã hủy (${cancelled})` : `Đã hủy`)}
+                  {index === 5 && `Đã chia sẻ (${published})`}
+                  {index === 6 && `Đã hủy (${cancelled})`}
                 </span>
               </div>
             ))}
@@ -769,7 +1024,7 @@ const PlanPage = () => {
           </div>
         )}
         {!isLoading && selectedStatus.toString() === planStat.toString() &&
-          <PlanTable planTotal={totalPlan} />}
+          <PlanTable planTotal={plans} />}
 
         {!isLoading && selectedStatus.toString() !== planStat.toString() &&
           <PlanTable plans={plans} />}

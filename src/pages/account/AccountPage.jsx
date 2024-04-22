@@ -209,12 +209,12 @@ const AccountPage = () => {
             <AddCircleIcon />
             <span>Thêm quản lý</span>
           </Link>
-          <button className="link">
+          {/* <button className="link">
             <CloudDownloadIcon />
           </button>
           <button className="link">
             <FilterAltIcon />
-          </button>
+          </button> */}
           <button
             className="link"
             onClick={() => {
