@@ -167,11 +167,6 @@ const AccountCreatePage = () => {
                     : "https://vinhphucwater.com.vn/wp-content/uploads/2023/05/no-image.jpg"
                 }
               />
-              <div className="formInput imageAdd">
-                <label htmlFor="file">
-                  <span>Hình ảnh</span>
-                </label>
-              </div>
             </div>
           </div>
           <div className="right">

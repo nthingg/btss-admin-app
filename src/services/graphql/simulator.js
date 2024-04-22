@@ -85,6 +85,48 @@ export const LOAD_PLANS_SIMULATOR = gql`
   }
 `;
 
+export const LOAD_PLANS_PUBLISHED_SIMULATOR = gql`
+  query LoadPlans($id: Int!, $status: PlanStatus) {
+    plans(
+      first: 100
+      order: { id: DESC }
+      where: {
+        account: { id: { eq: $id } }
+        status: { eq: $status }
+        isPublished: { eq: false }
+      }
+    ) {
+      nodes {
+        id
+        name
+        account {
+          name
+        }
+        status
+        memberCount
+        maxMemberCount
+        joinMethod
+        schedule
+        utcStartAt
+        members {
+          account {
+            id
+          }
+          status
+        }
+        tempOrders {
+          uuid
+          cart
+          type
+          period
+          serveDateIndexes
+          note
+        }
+      }
+    }
+  }
+`;
+
 export const LOAD_PLANS_BY_ID_SIMULATOR = gql`
   query LoadPlans($id: Int!) {
     plans(first: 20, order: { id: DESC }, where: { id: { eq: $id } }) {
@@ -278,6 +320,7 @@ export const CHECK_NUMBERS_COMPLETED_PLANS = gql`
       where: {
         account: { name: { startsWith: "test-account" } }
         status: { eq: COMPLETED }
+        isPublished: { eq: false }
       }
     ) {
       edges {

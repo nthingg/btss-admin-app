@@ -130,6 +130,15 @@ const TransactionTable = ({
                 borderRightWidth: "2px",
               },
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
@@ -152,6 +161,15 @@ const TransactionTable = ({
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </div>
@@ -179,13 +197,23 @@ const TransactionTable = ({
                 borderRightWidth: "2px",
               },
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
       {roleTransactions && (
         <div
           className="roleTransactionTable"
-          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}>
+          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}
+        >
           <DataGrid
             rows={roleTransactions}
             columns={roleTransactionsColumns}
@@ -204,13 +232,23 @@ const TransactionTable = ({
                 borderRightWidth: "2px",
               },
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
       {roleTransactionsTotal && (
         <div
           className="roleTransactionTable"
-          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}>
+          style={{ width: "fit-content", height: "36.08rem", margin: "auto" }}
+        >
           <DataGrid
             rows={roleTransactionsTotal}
             columns={roleTransactionsTotalColumns}
@@ -228,6 +266,15 @@ const TransactionTable = ({
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </div>

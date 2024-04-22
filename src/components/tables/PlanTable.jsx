@@ -194,6 +194,15 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               // },
               boxShadow: 0.4,
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
@@ -224,6 +233,15 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               // },
               boxShadow: 0.4,
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
@@ -246,6 +264,15 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </div>
@@ -270,6 +297,15 @@ const PlanTable = ({ plans, planTotal, accountPlans, destinationPlans }) => {
               "& .MuiDataGrid-columnHeader--withRightBorder": {
                 borderRightWidth: "2px",
               },
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </div>

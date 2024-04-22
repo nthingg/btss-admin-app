@@ -20,6 +20,7 @@ import {
   INVITE_PLANS_SIMULATOR,
   JOIN_PLAN_SIMULATOR,
   LOAD_PLANS_BY_ID_SIMULATOR,
+  LOAD_PLANS_PUBLISHED_SIMULATOR,
   LOAD_PLANS_SIMULATOR,
   ORDER_CREATE_SIMULATOR,
   PUBLISH_PLAN_SIMULATOR,
@@ -224,6 +225,18 @@ const EmulatorPage = () => {
     variables: {
       id: 0,
       status: "PENDING",
+    },
+  });
+
+  const {
+    error: errorLoadPublishedPlans,
+    loading: loadingLoadPublishedPlans,
+    data: dataLoadPublishedPlans,
+    refetch: refetchLoadPublishedPlans,
+  } = useQuery(LOAD_PLANS_PUBLISHED_SIMULATOR, {
+    variables: {
+      id: 0,
+      status: "COMPLETED",
     },
   });
 
@@ -1567,7 +1580,7 @@ const EmulatorPage = () => {
 
       let currentPlans = [];
       try {
-        const { data } = await refetchLoadPlans({
+        const { data } = await refetchLoadPublishedPlans({
           id: loggedAcc[i].id, // Always refetches a new list,
           status: "COMPLETED",
         });
@@ -2751,7 +2764,7 @@ const EmulatorPage = () => {
                         const { data } = await refetchVeri();
                         const limitVerify = data.plans.totalCount;
                         if (planPublishNum > limitVerify) {
-                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch đã hoàn thành)`;
+                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch chưa được chia sẻ)`;
                           setErrMsg(msg);
                           handleClick();
                           setIsLoadingVisible(false);

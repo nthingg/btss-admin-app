@@ -25,6 +25,15 @@ const EmergencyTable = ({ list }) => {
           },
           backgroundColor: "white",
         }}
+        localeText={{
+          MuiTablePagination: {
+            labelDisplayedRows: ({ from, to, count }) =>
+              `${from} - ${to} trong ${
+                count === -1 ? `nhiều hơn ${to}` : count
+              }`,
+          },
+          noRowsLabel: "Không có dữ liệu",
+        }}
       />
     </div>
   );

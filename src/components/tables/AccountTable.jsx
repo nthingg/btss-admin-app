@@ -130,6 +130,15 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
                 borderRightWidth: "2px",
               },
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
@@ -153,6 +162,15 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
               },
               boxShadow: 2,
             }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
           />
         </div>
       )}
@@ -175,6 +193,15 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
                 borderRightWidth: "2px",
               },
               boxShadow: 2,
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${
+                    count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </div>
