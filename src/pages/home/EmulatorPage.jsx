@@ -468,7 +468,7 @@ const EmulatorPage = () => {
 
       let tempOrders = [];
 
-      for (let i = 0; i < planTempData.schedule.length; i++) {
+      for (let i = 0; i < 1; i++) {
         for (let k = 0; k < planTempData.schedule[i].length; k++) {
           if (planTempData.schedule[i][k].type === "EAT") {
             for (let j = 0; j < providers.length; j++) {
@@ -1178,10 +1178,11 @@ const EmulatorPage = () => {
           dto: {
             cart: dto.cart,
             note: dto.note,
-            period: dto.period,
+            // period: dto.period,
             planId: dto.planId,
-            serveDates: dto.serveDates,
-            type: dto.type,
+            uuid: dto.uuid,
+            // serveDates: dto.serveDates,
+            // type: dto.type,
           },
         },
       });
@@ -1247,7 +1248,7 @@ const EmulatorPage = () => {
             break;
           }
 
-          for (let k = 0; k < currentPlans[j].tempOrders.length; k++) {
+          for (let k = 0; k < 1; k++) {
             count++;
 
             let listServeDates = [];
@@ -1272,6 +1273,7 @@ const EmulatorPage = () => {
                 value: currentPlans[j].tempOrders[k].cart[key],
               });
             }
+            console.log(currentPlans[j].tempOrders[k]);
 
             const orderData = {
               cart: convertedData,
@@ -1281,6 +1283,7 @@ const EmulatorPage = () => {
               type: currentPlans[j].tempOrders[k].type,
               period: currentPlans[j].tempOrders[k].period,
               planName: currentPlans[j].name,
+              uuid: currentPlans[j].tempOrders[k].uuid,
             };
             console.log(orderData);
             log += `[Đặt hàng cho kế hoạch] ${loggedAcc[i].name} \n`;
@@ -1482,13 +1485,12 @@ const EmulatorPage = () => {
       localStorage.setItem("checkIsUserCall", "yes");
       localStorage.setItem("userToken", loggedAcc[i].token);
 
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           if (limitVerify > verifyNum) {
             break;
           }
+          log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
 
           count++;
           log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
@@ -1581,13 +1583,12 @@ const EmulatorPage = () => {
       localStorage.setItem("checkIsUserCall", "yes");
       localStorage.setItem("userToken", loggedAcc[i].token);
 
-      log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
           if (limitPublish > publishNum) {
             break;
           }
+          log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
 
           count++;
           log += `[Chia sẻ kế hoạch] ${loggedAcc[i].name} \n`;
@@ -2540,23 +2541,9 @@ const EmulatorPage = () => {
                       }
 
                       let selectedDate = new Date(dateCreatePlanSimulator);
-                      let today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      const sevenDaysLater = new Date(
-                        today.getTime() + 8 * 24 * 60 * 60 * 1000
-                      );
-
-                      if (selectedDate < sevenDaysLater) {
-                        const msg = `Thời gian tạo kế hoạch phải cách 7 ngày kể từ hôm nay`;
-                        setErrMsg(msg);
-                        handleClick();
-                        setIsLoadingVisible(false);
-                        return;
-                      }
 
                       var a = moment.utc(selectedDate).utcOffset("+07:00");
                       var formatted = a.format();
-                      // console.log(formatted);
 
                       simulateCreatePlans(planNum, formatted);
                     } else if (selectedSimulator === 2) {
@@ -2764,7 +2751,7 @@ const EmulatorPage = () => {
                         const { data } = await refetchVeri();
                         const limitVerify = data.plans.totalCount;
                         if (planPublishNum > limitVerify) {
-                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch đã check-in)`;
+                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch đã hoàn thành)`;
                           setErrMsg(msg);
                           handleClick();
                           setIsLoadingVisible(false);

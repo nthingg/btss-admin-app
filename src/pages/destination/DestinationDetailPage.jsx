@@ -7,11 +7,11 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import {
-  LOAD_DETAIL_DESTINATION,
-} from "../../services/graphql/destination";
+import { LOAD_DETAIL_DESTINATION } from "../../services/graphql/destination";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -240,20 +240,30 @@ const DestinationDetailPage = () => {
     }
   }, [data, loading, error]);
 
-  const { error: errorPlans, loading: loadingPlans, data: dataPlans, refetch: refetchPlans } = useQuery(LOAD_DESTINATION_PLANS, {
+  const {
+    error: errorPlans,
+    loading: loadingPlans,
+    data: dataPlans,
+    refetch: refetchPlans,
+  } = useQuery(LOAD_DESTINATION_PLANS, {
     variables: {
-      id: parseInt(destinationId, 10)
-    }
+      id: parseInt(destinationId, 10),
+    },
   });
   useEffect(() => {
-    if (!loadingPlans && !errorPlans && dataPlans && dataPlans["plans"]["nodes"]) {
+    if (
+      !loadingPlans &&
+      !errorPlans &&
+      dataPlans &&
+      dataPlans["plans"]["nodes"]
+    ) {
       let res = dataPlans.plans.nodes.map((node, index) => {
         const { __typename, ...rest } = node;
         return { ...rest, index: index + 1 };
       });
       setPlans(res);
     }
-  }, [dataPlans, errorPlans, loadingPlans])
+  }, [dataPlans, errorPlans, loadingPlans]);
 
   const providerQuery = gql`
     query {
@@ -262,7 +272,9 @@ const DestinationDetailPage = () => {
           coordinate: {
               distance: {
               lte: 10000
-              geometry: { type: Point, coordinates: [${destination && destination.coordinate.coordinates[0]}, ${destination && destination.coordinate.coordinates[1]}] }
+              geometry: { type: Point, coordinates: [${
+                destination && destination.coordinate.coordinates[0]
+              }, ${destination && destination.coordinate.coordinates[1]}] }
               }
           }
           type: { in: [HOTEL, MOTEL, RESTAURANT, REPAIR, VEHICLE_RENTAL] }
@@ -282,7 +294,7 @@ const DestinationDetailPage = () => {
           }
       }
     }
-  `
+  `;
   // const { error: errorProvi, loading: loadingProvi, data: dataProvi } = useQuery(providerQuery);
   // useEffect(() => {
   //   if (!loadingProvi && !errorProvi && dataProvi && dataProvi["providers"]["nodes"]) {
@@ -350,13 +362,22 @@ const DestinationDetailPage = () => {
           </div>
           <div className="detailContainer">
             <div className="destination-header">
-              <div className="prodTitle">
-                <p>{destination?.name}</p>
-              </div>
-
-              <div className="destination-status">
-                {!destination?.isVisible && <p className="status cancelled">Tạm ẩn</p>}
-                {destination?.isVisible && <p className="status confirmed">Đang hiển thị</p>}
+              <div className="destination-header">
+                <div className="destination-name">
+                  <p>{destination?.name}</p>
+                </div>
+                <div className="destination-status">
+                  {!destination?.isVisible && (
+                    <a className="status cancelled" title="Tạm ẩn">
+                      <CancelIcon />
+                    </a>
+                  )}
+                  {destination?.isVisible && (
+                    <a className="status served" title="Đang hoạt động">
+                      <CheckCircleIcon />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -474,7 +495,10 @@ const DestinationDetailPage = () => {
                   </div>
                   <div className="detailItem">
                     <span className="itemKey">Mô tả:</span>
-                    <span className="itemValue" style={{wordWrap: "break-word", whiteSpace: "normal"}}>
+                    <span
+                      className="itemValue"
+                      style={{ wordWrap: "break-word", whiteSpace: "normal" }}
+                    >
                       <ReadMore children={destination?.description} />
                     </span>
                   </div>
