@@ -188,46 +188,6 @@ const PlanPage = () => {
         }
       `;
     } else {
-      // console.log(`
-      // query LoadPlansFilterInit {
-      //   plans(
-      //     first: 100
-      //     order: { id: DESC }
-      //     where: {
-      //       ${statusQuery}
-      //       ${utcDepartAtQuery}
-      //       ${ordersQuery}
-      //     }
-      //     ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
-      //   ) {
-      //     edges {
-      //       node {
-      //         id
-      //         name
-      //         account {
-      //           name
-      //         }
-      //         destination {
-      //           name
-      //         }
-      //         utcDepartAt
-      //         utcStartAt
-      //         memberCount
-      //         maxMemberCount
-      //         utcEndAt
-      //         status
-      //         isPublished
-      //         orders {
-      //           id
-      //         }
-      //       }
-      //     }
-      //     pageInfo {
-      //       hasNextPage
-      //       endCursor
-      //     }
-      //   }
-      // }`)
       query = gql`
         query LoadPlansFilterInit {
           plans(
@@ -437,6 +397,74 @@ const PlanPage = () => {
     }
   }
 
+  async function countPlan(
+    statusQuery,
+    searchTerm,
+    utcDepartAtQuery,
+    publishedQuery,
+    onGoingQuery,
+    ordersQuery,
+    accountQuery) {
+    let query;
+    if (onGoingQuery !== "") {
+      query = gql`
+      query CountOnGoingPlans {
+        plans(
+          where: { 
+            ${onGoingQuery}
+            ${ordersQuery}
+            ${accountQuery}
+          }
+          ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+        ) {
+          totalCount
+        }
+      }
+    `;
+    } else if (publishedQuery !== "") {
+      query = gql`
+        query CountPublishedPlans {
+          plans(
+            where: { 
+              ${publishedQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            totalCount
+          }
+        }
+      `;
+    } else {
+      query = gql`
+        query CountPlanFilter {
+          plans(
+            where: { 
+              ${statusQuery} 
+              ${utcDepartAtQuery}
+              ${ordersQuery}
+              ${accountQuery}
+            }
+            ${searchTerm ? `searchTerm: "${searchTerm.toString()}"` : ""}
+          ) {
+            totalCount
+          }
+        }
+    `;
+    }
+
+    try {
+      const result = await client.query({ query });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      console.log(msg);
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
   const fetchPlanFilter = async (
     selectedStatus,
     searchTerm,
@@ -524,6 +552,136 @@ const PlanPage = () => {
     setPlans(res);
     setIsLoading(false);
   };
+
+  const fetchPlanCount = async (
+    searchTerm,
+    filterOrder,
+    accountId
+  ) => {
+    let statusQuery = `status: { in: [${planStat}] }`;
+    let utcDepartAtQuery = "";
+    let onGoingQuery = "";
+    let publishedQuery = "";
+    let ordersQuery = "";
+    let accountQuery = "";
+    if (filterOrder && filterOrder !== "all") {
+      ordersQuery = ` orders: { any: ${filterOrder === "haveOrders"} }`;
+    }
+    if (accountId) {
+      accountQuery = `accountId: { eq: ${accountId} }`;
+    }
+    const planTotalCount = await countPlan(
+      statusQuery,
+      searchTerm,
+      utcDepartAtQuery,
+      publishedQuery,
+      onGoingQuery,
+      ordersQuery,
+      accountQuery);
+    setTotal(planTotalCount.plans.totalCount);
+    for (let i = 1; i < 7; i++) {
+      utcDepartAtQuery = "";
+      onGoingQuery = "";
+      publishedQuery = "";
+      let selectedStatus = planStat[i - 1];
+      if (i === 4) {
+        selectedStatus = [planStat[3], planStat[4]];
+      } else if (i === 5) {
+        selectedStatus = true;
+      }
+      statusQuery = `status: { in: [${selectedStatus}] }`;
+      switch (selectedStatus) {
+        case "READY":
+          utcDepartAtQuery = `utcDepartAt: { gte: "${now.toUTCString()}" }`;
+          break;
+        case "VERIFIED":
+          statusQuery = "";
+          onGoingQuery = `or: [
+            { status: { eq: READY }, utcDepartAt: { lte: "${now.toUTCString()}" } },
+            { status: { eq: VERIFIED } }
+          ]`;
+          break;
+        case true: {
+          statusQuery = "";
+          publishedQuery = `isPublished: { eq: true }`;
+          break;
+        }
+        default:
+          utcDepartAtQuery = "";
+          break;
+      }
+      switch (i) {
+        case 1:
+          const registeringCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setRegistering(registeringCount.plans.totalCount);
+          break;
+        case 2:
+          const commingSoonCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setTemp(commingSoonCount.plans.totalCount);
+          break;
+        case 3:
+          const onGoingCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setOngoing(onGoingCount.plans.totalCount);
+          break;
+        case 4:
+          const completedCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setCompleted(completedCount.plans.totalCount);
+          break;
+        case 5:
+          const publishedCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setPublished(publishedCount.plans.totalCount);
+          break;
+        case 6:
+          const cancelledCount = await countPlan(
+            statusQuery,
+            searchTerm,
+            utcDepartAtQuery,
+            publishedQuery,
+            onGoingQuery,
+            ordersQuery,
+            accountQuery);
+          setCancelled(cancelledCount.plans.totalCount);
+          break;
+        default:
+          break;
+      }
+    }
+  }
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -744,6 +902,7 @@ const PlanPage = () => {
 
   const handleModalSubmit = async (filterOrder, accountId) => {
     setIsLoading(true);
+    fetchPlanCount(searchTerm, filterOrder, accountId);
     fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
   };
 
@@ -798,6 +957,7 @@ const PlanPage = () => {
               refetchComplete();
               refetchOngoing();
               refetchPublished();
+              fetchPlanCount();
               fetchPlanFilter(`[${selectedStatus}]`, searchTerm);
             }}
           >
@@ -811,9 +971,8 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}

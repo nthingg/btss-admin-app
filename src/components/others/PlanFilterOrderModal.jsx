@@ -137,7 +137,6 @@ export default function FilterModal({
           <button
             className="btn-modal-filter"
             onClick={() => {
-              console.log(accountId);
               handleModalSubmit(filterOrder, accountId);
               handleClose();
             }}
