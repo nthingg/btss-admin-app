@@ -958,7 +958,7 @@ const PlanPage = () => {
               refetchOngoing();
               refetchPublished();
               fetchPlanCount();
-              fetchPlanFilter(`[${selectedStatus}]`, searchTerm);
+              fetchPlanFilter(`[${selectedStatus}]`, null);
             }}
           >
             <RefreshIcon />
