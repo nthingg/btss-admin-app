@@ -238,13 +238,21 @@ const PlanDetailPage = () => {
             <div className="navigation">
               <div className="left">
                 <div className="return-btn">
-                  <Link
-                    to={`/plans/sbs/${selectedDiv}`}
-                    className="navigateButton"
-                  >
-                    <ArrowCircleLeftIcon />
-                    <p>Trở về</p>
-                  </Link>
+                  {parseInt(sbsNumber, 10) === 0 && (
+                    <Link to={`/plans`} className="navigateButton">
+                      <ArrowCircleLeftIcon />
+                      <p>Trở về</p>
+                    </Link>
+                  )}
+                  {parseInt(sbsNumber, 10) > 0 && (
+                    <Link
+                      to={`/plans/sbs/${selectedDiv}`}
+                      className="navigateButton"
+                    >
+                      <ArrowCircleLeftIcon />
+                      <p>Trở về</p>
+                    </Link>
+                  )}
                 </div>
                 <div className="return-title">
                   <div className="return-header">

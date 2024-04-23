@@ -78,10 +78,12 @@ export const transactionsColumns = [
   {
     field: "gcoinAmount",
     width: 180,
-    align: "center",
+    align: "right",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.node.gcoinAmount}</div>;
+      let amount = parseInt(params.row.node.gcoinAmount);
+      // let fixAmount = amount.toFixed(4);
+      return <div style={{ marginRight: 40 }}>{amount}</div>;
     },
     renderHeader: () => <span>SỐ GCOIN</span>,
   },
