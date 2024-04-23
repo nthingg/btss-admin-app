@@ -1,6 +1,6 @@
 import "../../assets/scss/productTable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -29,60 +29,60 @@ const PlanTable = ({
         let check = params.row.node.status;
         if (params.row.node.isPublished === true) {
           return (
-            <IconButton
-              color="info"
-              onClick={() => {
-                navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-              }}
+            <NavLink
+              to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+              style={{ textDecoration: "none" }}
             >
-              <VisibilityIcon />
-            </IconButton>
+              <IconButton color="info">
+                <VisibilityIcon />
+              </IconButton>
+            </NavLink>
           );
         }
         switch (check) {
           case "READY":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "VERIFIED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "FLAWED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "COMPLETED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           default:
             return (
@@ -105,60 +105,60 @@ const PlanTable = ({
         let check = params.row.node.status;
         if (params.row.node.isPublished === true) {
           return (
-            <IconButton
-              color="info"
-              onClick={() => {
-                navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-              }}
+            <NavLink
+              to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+              style={{ textDecoration: "none" }}
             >
-              <VisibilityIcon />
-            </IconButton>
+              <IconButton color="info">
+                <VisibilityIcon />
+              </IconButton>
+            </NavLink>
           );
         }
         switch (check) {
           case "READY":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "VERIFIED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "FLAWED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           case "COMPLETED":
             return (
-              <IconButton
-                color="info"
-                onClick={() => {
-                  navigate(`/plans/${params.row.node.id}/sbs/${sbs}`);
-                }}
+              <NavLink
+                to={`/plans/${params.row.node.id}/sbs/${sbs}`}
+                style={{ textDecoration: "none" }}
               >
-                <VisibilityIcon />
-              </IconButton>
+                <IconButton color="info">
+                  <VisibilityIcon />
+                </IconButton>
+              </NavLink>
             );
           default:
             return (

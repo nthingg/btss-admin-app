@@ -22,9 +22,6 @@ const PlanOrderTable = ({ orders }) => {
           "& .MuiDataGrid-columnHeader--withRightBorder": {
             borderRightWidth: "2px",
           },
-          ".MuiTablePagination-displayedRows": {
-            display: "none",
-          },
         }}
         localeText={{
           MuiTablePagination: {
