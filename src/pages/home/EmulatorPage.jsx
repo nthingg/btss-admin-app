@@ -481,7 +481,7 @@ const EmulatorPage = () => {
 
       let tempOrders = [];
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < planTempData.schedule.length; i++) {
         for (let k = 0; k < planTempData.schedule[i].length; k++) {
           if (planTempData.schedule[i][k].type === "EAT") {
             for (let j = 0; j < providers.length; j++) {
@@ -499,7 +499,7 @@ const EmulatorPage = () => {
                 let tempCart = [];
                 let tempTotal = 0;
                 if (products.length > 0) {
-                  for (let l = 0; l < 2; l++) {
+                  for (let l = 0; l < 3; l++) {
                     let random = Math.floor(Math.random() * products.length);
 
                     let isExisted = false;
@@ -538,6 +538,9 @@ const EmulatorPage = () => {
         }
       }
 
+      console.log(planTempData);
+      console.log(tempOrders);
+
       countLatest++;
       const res = await handleCreatePlan(
         planData[0],
@@ -547,6 +550,7 @@ const EmulatorPage = () => {
         tempOrders,
         countLatest
       );
+
       if (res.status) {
         successCount++;
       }
@@ -1261,7 +1265,9 @@ const EmulatorPage = () => {
             break;
           }
 
-          for (let k = 0; k < 1; k++) {
+          console.log(currentPlans[j].tempOrders);
+
+          for (let k = 0; k < currentPlans[j].tempOrders.length; k++) {
             count++;
 
             let listServeDates = [];
