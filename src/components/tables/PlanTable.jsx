@@ -9,9 +9,11 @@ import { plansColumns } from "../../assets/configs/plans/plans";
 import { accountPlansColumns } from "../../assets/configs/accounts/accountPlans";
 import { destinationPlansColumns } from "../../assets/configs/destinations/destinationPlans";
 import { planTotalColumns } from "../../assets/configs/plans/planTotal";
+import { plansCompletedColumns } from "../../assets/configs/plans/planCompleted";
 
 const PlanTable = ({
   plans,
+  plansCompleted,
   planTotal,
   accountPlans,
   destinationPlans,
@@ -203,8 +205,7 @@ const PlanTable = ({
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
@@ -212,6 +213,44 @@ const PlanTable = ({
           />
         </div>
       )}
+      {plansCompleted &&
+        <div className="planTable">
+          <DataGrid
+            rows={plansCompleted}
+            columns={plansCompletedColumns.concat(actionColumn)}
+            rowSelection={false}
+            pagination
+            autoPageSize
+            getRowId={(row) => row.node.id}
+            // pageSizeOptions={8}
+            // autoHeight={true}
+            showColumnVerticalBorder={true}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#2C3E50",
+                color: "white",
+                fontWeight: 600,
+                fontSize: 14,
+              },
+              "& .MuiDataGrid-columnHeader--withRightBorder": {
+                borderRightWidth: "2px",
+              },
+              // ".MuiTablePagination-displayedRows": {
+              //   display: "none",
+              // },
+              boxShadow: 0.4,
+            }}
+            localeText={{
+              MuiTablePagination: {
+                labelDisplayedRows: ({ from, to, count }) =>
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
+                  }`,
+              },
+              noRowsLabel: "Không có dữ liệu",
+            }}
+          />
+        </div>
+      }
       {planTotal && (
         <div className="planTable">
           <DataGrid
@@ -242,8 +281,7 @@ const PlanTable = ({
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
@@ -274,8 +312,7 @@ const PlanTable = ({
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
@@ -307,8 +344,7 @@ const PlanTable = ({
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",

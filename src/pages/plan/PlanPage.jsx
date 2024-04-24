@@ -16,6 +16,7 @@ import PlanTable from "../../components/tables/PlanTable";
 import FlagCircleIcon from "@mui/icons-material/FlagCircle";
 import PublicIcon from "@mui/icons-material/Public";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { Alert, Snackbar } from "@mui/material";
 import {
   LOAD_NUMBERS_CANCELED,
   LOAD_NUMBERS_COMPLETED,
@@ -32,8 +33,11 @@ import client from "../../services/apollo/config";
 
 const PlanPage = () => {
   //#region Variables
-
   const { sbsNumber } = useParams();
+  const [vertical, setVertical] = useState("top");
+  const [horizontal, setHorizontal] = useState("right");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMsg, setErrMsg] = useState(false);
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
   const [filterOrder, setFilterOrders] = useState("all");
@@ -92,6 +96,14 @@ const PlanPage = () => {
     }
     setIsLoading(false);
   }, []);
+  
+  const handleClickSnackBar = () => {
+    setSnackbarOpen(true);
+  };
+
+  const handleClose = () => {
+    setSnackbarOpen(false);
+  };
 
   async function planQueryInit(
     statusQuery,
@@ -233,12 +245,13 @@ const PlanPage = () => {
     }
 
     try {
-      const result = await client.query({ query });
+      const result = await client.query({ query, fetchPolicy: "network-only" });
       return result.data;
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
-      console.log(msg);
+      setErrMsg(msg);
+      handleClickSnackBar();
       localStorage.removeItem("errorMsg");
     }
   }
@@ -387,12 +400,13 @@ const PlanPage = () => {
     }
 
     try {
-      const result = await client.query({ query });
+      const result = await client.query({ query, fetchPolicy: "network-only" });
       return result.data;
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
-      console.log(msg);
+      setErrMsg(msg);
+      handleClickSnackBar();
       localStorage.removeItem("errorMsg");
     }
   }
@@ -455,12 +469,13 @@ const PlanPage = () => {
     }
 
     try {
-      const result = await client.query({ query });
+      const result = await client.query({ query, fetchPolicy: "network-only" });
       return result.data;
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
-      console.log(msg);
+      setErrMsg(msg);
+      handleClickSnackBar();
       localStorage.removeItem("errorMsg");
     }
   }
@@ -685,6 +700,7 @@ const PlanPage = () => {
 
   const handleClick = (index) => {
     setSelectedDiv(index);
+    setIsLoading(true);
     switch (index) {
       case 0:
         setSelectedStatus(planStat);
@@ -949,6 +965,7 @@ const PlanPage = () => {
               setIsLoading(true);
               setSearchTerm(null);
               setFilterOrders("all");
+              document.getElementById("floatingValue").value = "";
               setAccountId(null);
               refetchRegis();
               refetchCancelled();
@@ -1018,10 +1035,30 @@ const PlanPage = () => {
           <PlanTable planTotal={plans} sbs={selectedDiv} />
         )}
 
-        {!isLoading && selectedStatus.toString() !== planStat.toString() && (
+        {!isLoading && selectedStatus.toString() === [planStat[3], planStat[4]].toString() && (
+          <PlanTable plansCompleted={plans} sbs={selectedDiv} />
+        )}
+
+        {!isLoading && (selectedStatus.toString() !== planStat.toString() && selectedStatus.toString() !== [planStat[3], planStat[4]].toString()) && (
           <PlanTable plans={plans} sbs={selectedDiv} />
         )}
       </div>
+      <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={snackbarOpen}
+          onClose={handleClose}
+          autoHideDuration={2000}
+          key={vertical + horizontal}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {errorMsg}
+          </Alert>
+        </Snackbar>
     </div>
   );
 };

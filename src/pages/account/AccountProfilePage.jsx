@@ -8,7 +8,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { IconButton, styled } from "@mui/material";
+import { IconButton, Switch, styled } from "@mui/material";
 import MapIcon from "@mui/icons-material/Map";
 import {
   LOAD_DETAIL_ACCOUNT,
@@ -248,12 +248,15 @@ const AccountProfilePage = () => {
                   <p>{name}</p>
                 </div>
                 <div className="profile-status">
-                  {isActive === false && (
+                  {/* {isActive === false && (
                     <p className="status cancelled">Ngưng hoạt động</p>
                   )}
                   {isActive === true && (
                     <p className="status confirmed">Đang hoạt động</p>
-                  )}
+                  )} */}
+                  <a className="status active" title="Đang hoạt động">
+                    <Switch checked={isActive} color="success"/>
+                  </a>
                 </div>
               </div>
             </div>

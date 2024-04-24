@@ -542,7 +542,7 @@ const DestinationDetailPage = () => {
               </Accordion>
             </div> */}
             <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
                 <AccordionSummary
                   sx={{
                     fontSize: 24,
@@ -567,7 +567,7 @@ const DestinationDetailPage = () => {
               </Accordion>
             </div>
             <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
                 <AccordionSummary
                   sx={{
                     fontSize: 24,
