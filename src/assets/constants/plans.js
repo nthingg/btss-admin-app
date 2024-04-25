@@ -14,7 +14,7 @@ export const planData = [
     maxMemberCount: 10, //done
     maxMemberWeight: 3, //done
     departureAddress: "Đ. D1, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh", //done
-    name: "kế hoạch giả lập - ", //done
+    name: "kế hoạch - ", //done
     note: "", //done
     periodCount: 11, //done
     savedProviderIds: [6, 7],

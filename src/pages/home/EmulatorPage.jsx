@@ -360,7 +360,7 @@ const EmulatorPage = () => {
         maxMemberCount: plan.maxMemberCount,
         maxMemberWeight: plan.maxMemberWeight,
         departureAddress: plan.departureAddress,
-        name: plan.name + currentPos,
+        name: plan.name + moment().valueOf(),
         note: plan.note,
         periodCount: period,
         savedProviderIds: plan.savedProviderIds,
@@ -369,6 +369,8 @@ const EmulatorPage = () => {
         travelDuration: plan.travelDuration,
         tempOrders: tempOrders,
       });
+
+      let appendName = moment().valueOf();
 
       const { data } = await create({
         variables: {
@@ -379,7 +381,7 @@ const EmulatorPage = () => {
             maxMemberCount: plan.maxMemberCount,
             maxMemberWeight: plan.maxMemberWeight,
             departureAddress: plan.departureAddress,
-            name: plan.name + currentPos,
+            name: plan.name + appendName,
             note: plan.note,
             periodCount: period,
             savedProviderIds: plan.savedProviderIds,
@@ -393,7 +395,7 @@ const EmulatorPage = () => {
       const response = {
         userName: acc.name,
         action: "Tạo kế hoạch",
-        detail: `[${acc.name}] tạo kế hoạch [${plan.name + currentPos}]`,
+        detail: `[${acc.name}] tạo kế hoạch [${plan.name + appendName}]`,
         status: true,
         id: count,
       };
