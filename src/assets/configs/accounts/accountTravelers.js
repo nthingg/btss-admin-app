@@ -17,7 +17,7 @@ export const accountTravelersColumn = [
   },
   {
     field: "name",
-    width: 300,
+    width: 230,
     align: "left",
     headerAlign: "left",
     renderCell: (params) => {
@@ -115,7 +115,7 @@ export const accountTravelersColumn = [
   },
   {
     field: "IsTraveler",
-    width: 200,
+    width: 170,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
@@ -128,5 +128,15 @@ export const accountTravelersColumn = [
       }
     },
     renderHeader: () => <span>PHƯỢT THỦ</span>,
+  },
+  {
+    field: "publishedPlanCount",
+    width: 200,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => {
+      return <div>{params.row.publishedPlanCount}</div>
+    },
+    renderHeader: () => <span>KẾ HOẠCH ĐÃ CHIA SẺ</span>,
   },
 ];

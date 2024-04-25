@@ -56,6 +56,64 @@ export const LOAD_ACCOUNTS_FILTER = gql`
   }
 `;
 
+export const LOAD_TRAVELER_FILTER = gql`
+  query LoadAccounts($role: [Role!], $searchTerm: String, $phone: String) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: { role: { in: $role }, phone: { contains: $phone }, publishedPlanCount: { gt: 0 } }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+        phone
+        email
+        isMale
+        isActive
+        prestigePoint
+        provider {
+          name
+        }
+        plans {
+          id
+        }
+        publishedPlanCount
+      }
+      totalCount
+    }
+  }
+`
+
+export const LOAD_NON_TRAVELER_FILTER = gql`
+  query LoadAccounts($role: [Role!], $searchTerm: String, $phone: String) {
+    accounts(
+      first: 100
+      order: { id: DESC }
+      where: { role: { in: $role }, phone: { contains: $phone }, publishedPlanCount: { lte: 0 } }
+      searchTerm: $searchTerm
+    ) {
+      nodes {
+        id
+        name
+        phone
+        email
+        isMale
+        isActive
+        prestigePoint
+        provider {
+          name
+        }
+        plans {
+          id
+        }
+        publishedPlanCount
+      }
+      totalCount
+    }
+  }
+`
+
 export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
   query LoadTravelerOptions($searchTerm: String) {
     accounts(

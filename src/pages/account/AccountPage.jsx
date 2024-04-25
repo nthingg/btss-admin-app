@@ -4,7 +4,7 @@ import "../../assets/scss/filter.scss";
 import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -17,26 +17,42 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   LOAD_ACCOUNTS,
   LOAD_ACCOUNTS_FILTER,
+  LOAD_NON_TRAVELER_FILTER,
   LOAD_TRAVELER_ACCOUNT_FILTER,
+  LOAD_TRAVELER_FILTER,
 } from "../../services/graphql/account";
 import AccountTable from "../../components/tables/AccountTable";
 import Slider from "react-slick";
+import { Box, FormControl, FormControlLabel, FormLabel, Modal, Radio, RadioGroup, Typography } from "@mui/material";
 
 const AccountPage = () => {
+  const { sbsNumber } = useParams();
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(accountRole[0]);
   const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
+  const [totalQuery, setTotalQuery] = useState(LOAD_ACCOUNTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [phoneSearchTerm, setPhoneSearchTerm] = useState("");
   const [searchedTraveler, setSearchedTraveler] = useState(null);
+  const [filterTraveler, setFilterTraveler] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const handleClick = (index) => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
-        if (searchTerm !== "") {
+        if (filterTraveler !== 'all') {
+          if (filterTraveler === 'travelers') {
+            setAccoutQuery(LOAD_TRAVELER_FILTER);
+          } else {
+            setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
+          }
+        } else if (searchTerm !== "" || phoneSearchTerm !== "") {
           setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
         }
         setSelectedStatus(accountRole[0]);
@@ -62,7 +78,7 @@ const AccountPage = () => {
     loading: loadingTotal,
     data: dataTotal,
     refetch: refetchTotal,
-  } = useQuery(LOAD_ACCOUNTS, {
+  } = useQuery(filterTraveler === 'all' ? LOAD_ACCOUNTS : (filterTraveler === 'travelers' ? LOAD_ACCOUNTS_FILTER : LOAD_NON_TRAVELER_FILTER), {
     variables: {
       searchTerm: searchTerm,
     },
@@ -79,12 +95,12 @@ const AccountPage = () => {
       dataTotal &&
       dataTotal["accounts"]["nodes"]
     ) {
-      fetchNumberAccount(dataTotal["accounts"]["nodes"]);
+      fetchNumberAccount(dataTotal["accounts"]["nodes"], false);
       setIsLoading(false);
     }
   }, [dataTotal, loadingTotal, errorTotal]);
 
-  const fetchNumberAccount = (data) => {
+  const fetchNumberAccount = (data, isCountTravelerOnly) => {
     let countTraveler = 0;
     for (const item of data) {
       if (item["role"] === "TRAVELER" && item["plans"]) {
@@ -92,23 +108,25 @@ const AccountPage = () => {
       }
     }
 
-    let countSupplier = 0;
-    for (const item of data) {
-      if (item["role"] === "PROVIDER") {
-        countSupplier++;
-      }
-    }
-
-    let countStaff = 0;
-    for (const item of data) {
-      if (item["role"] === "STAFF") {
-        countStaff++;
-      }
-    }
-
     setTravelers(countTraveler);
-    setSuppliers(countSupplier);
-    setStaffs(countStaff);
+
+    if (!isCountTravelerOnly) {
+      let countSupplier = 0;
+      for (const item of data) {
+        if (item["role"] === "PROVIDER") {
+          countSupplier++;
+        }
+      }
+
+      let countStaff = 0;
+      for (const item of data) {
+        if (item["role"] === "STAFF") {
+          countStaff++;
+        }
+      }
+      setSuppliers(countSupplier);
+      setStaffs(countStaff);
+    }
   };
 
   const { error, loading, data, refetch } = useQuery(accountQuery, {
@@ -128,6 +146,9 @@ const AccountPage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setAccounts(res);
+      if (accountQuery === LOAD_TRAVELER_ACCOUNT_FILTER || accountQuery === LOAD_TRAVELER_FILTER || accountQuery === LOAD_NON_TRAVELER_FILTER) {
+        setSearchedTraveler(res);
+      }
       setIsLoading(false);
     }
   }, [data, loading, error]);
@@ -138,15 +159,25 @@ const AccountPage = () => {
     //isNaN(num): returns true if the variable does NOT contain a valid number
     if (isNaN(search)) {
       setSearchTerm(search);
+      setPhoneSearchTerm("");
     } else {
       if (search.startsWith("0")) {
         search = "84" + search.substring(1);
       }
-      setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+      if (filterTraveler !== 'all') {
+        if (filterTraveler === 'travelers') {
+          setAccoutQuery(LOAD_TRAVELER_FILTER);
+        } else {
+          setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
+        }
+      } else {
+        setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
+      }
       setSearchTerm("");
       setPhoneSearchTerm(search);
     }
     refetch();
+    refetchTotal();
   };
 
   useEffect(() => {
@@ -168,7 +199,51 @@ const AccountPage = () => {
 
   useEffect(() => {
     fetchData();
+    if (sbsNumber === "1") {
+      setFilterTraveler('travelers');
+      setAccoutQuery(LOAD_TRAVELER_FILTER);
+      refetch();
+    }
   }, []);
+
+  const [countTraveler, { }] = useLazyQuery(LOAD_TRAVELER_FILTER);
+  const [countNonTraveler, { }] = useLazyQuery(LOAD_NON_TRAVELER_FILTER);
+
+  const handleChangeFilter = async (e) => {
+    const filterValue = e.target.value;
+    setFilterTraveler(filterValue);
+    switch (filterValue) {
+      case 'all':
+        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+        refetch();
+        break;
+      case 'travelers':
+        setAccoutQuery(LOAD_TRAVELER_FILTER);
+        const { data: dataTravelers } = await countTraveler({
+          variables: {
+            role: selectedStatus,
+            searchTerm: searchTerm,
+            phone: phoneSearchTerm,
+          }
+        });
+        setTravelers(dataTravelers.accounts.totalCount);
+        refetch();
+        break;
+      case 'others':
+        setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
+        const { data: dataNonTravelers } = await countNonTraveler({
+          variables: {
+            role: selectedStatus,
+            searchTerm: searchTerm,
+            phone: phoneSearchTerm,
+          }
+        });
+        setTravelers(dataNonTravelers.accounts.totalCount);
+        refetch();
+        break;
+    }
+    handleClose();
+  }
 
   var settings = {
     dots: false,
@@ -176,6 +251,18 @@ const AccountPage = () => {
     slidesToShow: 3,
     slidesToScroll: 2,
     centerPadding: "60px",
+  };
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 430,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
   };
 
   return (
@@ -211,17 +298,75 @@ const AccountPage = () => {
           </Link>
           {/* <button className="link">
             <CloudDownloadIcon />
-          </button>
-          <button className="link">
-            <FilterAltIcon />
           </button> */}
+          <div>
+            <button className="link" id="filterTraveler" onClick={handleOpen}>
+              <FilterAltIcon />
+            </button>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={modalStyle}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Bộ Lọc
+                </Typography>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "2rem",
+                  }}
+                >
+                  <FormControl>
+                    <FormLabel
+                      id="demo-row-radio-buttons-group-label"
+                      className="label-filter"
+                    >
+                      Phượt thủ
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-controlled-radio-buttons-group"
+                      name="controlled-radio-buttons-group"
+                      value={filterTraveler}
+                      onChange={(e) => {
+                        handleChangeFilter(e);
+                      }}
+                    >
+                      <FormControlLabel
+                        value="all"
+                        control={<Radio />}
+                        label="Tất cả"
+                      />
+                      <FormControlLabel
+                        value="travelers"
+                        control={<Radio />}
+                        label="Phượt thủ"
+                      />
+                      <FormControlLabel
+                        value="others"
+                        control={<Radio />}
+                        label="Khác"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </div>
+              </Box>
+            </Modal>
+          </div>
           <button
             className="link"
             onClick={() => {
               setAccoutQuery(LOAD_ACCOUNTS_FILTER);
               setIsLoading(true);
+              document.getElementById('floatingValue').value = "";
               setSearchTerm("");
               setPhoneSearchTerm("");
+              setFilterTraveler('all');
+              setSearchedTraveler(null);
               refetch();
               refetchTotal();
               setTimeout(() => {
@@ -239,9 +384,8 @@ const AccountPage = () => {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${
-                  selectedDiv === index ? "selected" : ""
-                }`}
+                className={`icon-item ${selectedDiv === index ? "selected" : ""
+                  }`}
                 onClick={() => {
                   handleClick(index);
                 }}

@@ -70,6 +70,7 @@ const App = () => {
                 index
                 element={token ? <AccountPage /> : <Navigate to="/login" />}
               />
+              <Route path="sbs/:sbsNumber" element={<AccountPage />} />
               <Route path=":accountId" element={<AccountProfilePage />} />
               <Route path="add" element={<AccountCreatePage />} />
             </Route>
