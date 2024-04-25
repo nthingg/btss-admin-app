@@ -22,7 +22,7 @@ export const planData = [
       [
         {
           type: "CHECKIN",
-          duration: "01:30:00",
+          duration: "01:00:00",
           isStarred: false,
           description: "Nhận phòng tại khách sạn lưu trú.",
           shortDescription: "Nhận phòng.",

@@ -15,6 +15,7 @@ import {
   CHECK_NUMBERS_VERIFIED_PLANS,
   CONFIRM_PLAN_SIMULATOR,
   CREATE_PLAN_SIMULATOR,
+  FORCE_UPDATE_PRODUCTS_PRICE,
   GEN_MEM_SIMULATOR,
   GET_NEWEST_NAME,
   INVITE_PLANS_SIMULATOR,
@@ -140,6 +141,10 @@ const EmulatorPage = () => {
       value: 9,
       label: "Giả lập chia sẻ kế hoạch.",
     },
+    {
+      value: 10,
+      label: "Giả lập cập nhật giá sản phẩm trong hệ thống.",
+    },
   ];
 
   const handleClick = () => {
@@ -259,6 +264,10 @@ const EmulatorPage = () => {
 
   const [resetTime, { data: dataResetTime, error: errorResetTime }] =
     useMutation(RESET_TIME_SIMULATOR);
+
+  const [forceUpdate, { data: dateForce, error: errorForce }] = useMutation(
+    FORCE_UPDATE_PRODUCTS_PRICE
+  );
 
   const [changeJoinMethod, { data: dataJoinMethod, error: errorJoinMethod }] =
     useMutation(CHANGE_JOIN_METHOD_SIMULATOR);
@@ -448,7 +457,8 @@ const EmulatorPage = () => {
     planNum,
     dateTime,
     period,
-    maxDateLength
+    maxDateLength,
+    arrivalTime
   ) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
@@ -521,7 +531,16 @@ const EmulatorPage = () => {
 
       let tempOrders = [];
       let schedule = [];
-      for (let l = 0; l < maxDateLength - 1; l++) {
+
+      if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+        schedule.push([planData[0].schedule[0][0]]);
+      } else if (arrivalTime >= "10:00:00" && arrivalTime < "16:00:00") {
+        schedule.push([planData[0].schedule[0][0]]);
+      } else {
+        schedule.push(planData[0].schedule[0]);
+      }
+
+      for (let l = 1; l < maxDateLength - 1; l++) {
         schedule.push(planData[0].schedule[l]);
       }
       schedule.push(planData[0].schedule[14]);
@@ -620,6 +639,17 @@ const EmulatorPage = () => {
 
           if (tempCart.length > 0) {
             let fixedPeriod = "NOON";
+
+            if (schedule[m][k].type === "CHECKIN") {
+              if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+                fixedPeriod = "EVENING";
+              } else if (
+                arrivalTime >= "10:00:00" &&
+                arrivalTime < "16:00:00"
+              ) {
+                fixedPeriod = "AFTERNOON";
+              }
+            }
 
             const uuid = uuidv4();
             schedule[m][k].orderUUID = uuid;
@@ -1159,6 +1189,10 @@ const EmulatorPage = () => {
           console.log(currentPlans[j].tempOrders);
 
           for (let k = 0; k < currentPlans[j].tempOrders.length; k++) {
+            if (currentPlans[j].tempOrders[k].type === "CHECKOUT") {
+              continue;
+            }
+
             count++;
 
             let listServeDates = [];
@@ -1323,6 +1357,42 @@ const EmulatorPage = () => {
       const response = {
         userName: "Quản trị hệ thống",
         action: "Đặt lại thời gian hệ thống",
+        detail: `${msg}`,
+        status: false,
+        id: 1,
+      };
+      return response;
+    }
+  };
+
+  const handleForceUpdateProductsPrice = async () => {
+    try {
+      const { data } = await forceUpdate();
+      let dt = "";
+      let st = false;
+      if (data) {
+        st = true;
+        dt = `Quản trị hệ thống buộc cập nhật giá sản phẩm thành công.`;
+      } else {
+        dt = `Quản trị hệ thống buộc cập nhật giá sản phẩm thất bại`;
+      }
+      const response = {
+        userName: "Quản trị hệ thống",
+        action: "Cập nhật giá sản phẩm trong hệ thống",
+        detail: dt,
+        status: st,
+        id: 1,
+      };
+      return response;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClick();
+      localStorage.removeItem("errorMsg");
+      const response = {
+        userName: "Quản trị hệ thống",
+        action: "Cập nhật giá sản phẩm trong hệ thống",
         detail: `${msg}`,
         status: false,
         id: 1,
@@ -2511,7 +2581,7 @@ const EmulatorPage = () => {
                         arrivalTime >= "16:00:00" &&
                         arrivalTime <= "20:00:00"
                       ) {
-                        period = period + 1;
+                        period++;
                       }
 
                       console.log("period: " + period);
@@ -2521,6 +2591,13 @@ const EmulatorPage = () => {
                       console.log("dayEqualNight: " + dayEqualNight);
 
                       var maxDateLength = Math.ceil((period * 1.0) / 2);
+
+                      if (
+                        arrivalTime >= "16:00:00" &&
+                        arrivalTime <= "20:00:00"
+                      ) {
+                        maxDateLength++;
+                      }
 
                       console.log("maxDateLength: " + maxDateLength);
 
@@ -2550,7 +2627,8 @@ const EmulatorPage = () => {
                         planNum,
                         formatted,
                         period,
-                        maxDateLength
+                        maxDateLength,
+                        arrivalTime
                       );
                     } else if (selectedSimulator === 2) {
                       if (companionsHostJoinNum > 5) {
@@ -2772,6 +2850,20 @@ const EmulatorPage = () => {
                         handleClick();
                         localStorage.removeItem("errorMsg");
                       }
+                    } else if (selectedSimulator === 10) {
+                      let log = "";
+                      log += "[Đăng nhập] Quản trị hệ thống \n";
+                      log +=
+                        "[Cập nhật giá sản phẩm trong hệ thống] Quản trị hệ thống \n";
+                      let response = [];
+                      const res = await handleForceUpdateProductsPrice();
+
+                      response.push(res);
+                      setResponseMsg(response);
+                      setLoginMsg(log);
+                      setTotalMsg(1);
+                      setSuccessMsg(1);
+                      setIsEmulatorLoading(false);
                     }
                   }}
                 >

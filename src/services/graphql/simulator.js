@@ -228,6 +228,12 @@ export const RESET_TIME_SIMULATOR = gql`
   }
 `;
 
+export const FORCE_UPDATE_PRODUCTS_PRICE = gql`
+  mutation updateProducts {
+    forceUpdateProducts
+  }
+`;
+
 export const VERIFY_PLAN_SIMULATOR = gql`
   mutation checkinPlanSimulator($dto: PlanVerifyInput!) {
     verifyPlan(dto: $dto) {
