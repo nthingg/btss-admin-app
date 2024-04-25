@@ -3,14 +3,25 @@ import "../../assets/scss/loading.scss";
 import "../../assets/scss/shared.scss";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { IconButton, Switch, styled } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Switch,
+  styled,
+  Alert, Snackbar
+} from "@mui/material";
 import MapIcon from "@mui/icons-material/Map";
 import {
+  CHANGE_STATUS_ACCOUNT,
   LOAD_DETAIL_ACCOUNT,
   LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT,
   LOAD_TRANSACTIONS_TOTAL_INIT_BY_ACCOUNT,
@@ -26,6 +37,12 @@ import TransactionTable from "../../components/tables/TransactionTable";
 
 const AccountProfilePage = () => {
   const { planId, accountId } = useParams();
+  const [vertical, setVertical] = useState("top");
+  const [horizontal, setHorizontal] = useState("right");
+  const [errorMsg, setErrMsg] = useState(false);
+  const [successMsg, setSucessMsg] = useState(false);
+  const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
+  const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
   const [traveler, setTraveler] = useState(null);
   const [plans, setPlans] = useState([]);
   const [phone, setPhone] = useState("");
@@ -39,13 +56,35 @@ const AccountProfilePage = () => {
   ];
   // const [phoneHide, setPhoneHide] = useState("");
   // const [phoneVisibility, setPhoneVisibility] = useState(false);
-  const [isActive, setIsActive] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [isMale, setIsMale] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [prestigeScore, setPrestigeScore] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [transactions, setTransactions] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const openErrorSnackBar = () => {
+    setsnackBarErrorOpen(true);
+  };
+
+  const openSuccessSnackBar = () => {
+    setsnackBarSucessOpen(true);
+  };
+
+  const handleCloseSnack = () => {
+    setsnackBarErrorOpen(false);
+    setsnackBarSucessOpen(false);
+  };
 
   const containerStyle = {
     width: "950px",
@@ -57,6 +96,8 @@ const AccountProfilePage = () => {
       id: parseInt(accountId, 10),
     },
   });
+
+  const [changeStatus, { }] = useMutation(CHANGE_STATUS_ACCOUNT);
 
   const [
     getTransactions,
@@ -106,7 +147,6 @@ const AccountProfilePage = () => {
       return { ...rest, index: index + 1 }; // Add the index to the object
     });
     setTransactions(res);
-    console.log("Component mounted!");
   };
 
   useEffect(() => {
@@ -162,7 +202,7 @@ const AccountProfilePage = () => {
       setPhone(formatPhoneNumberCen(data["accounts"]["nodes"][0]["phone"]));
       let avt = data["accounts"]["nodes"][0]["avatarPath"];
       setAvatarUrl(avt);
-      setIsActive(data["accounts"]["nodes"][0]["isActive"]);
+      setIsActive(Boolean(data["accounts"]["nodes"][0]["isActive"]));
       let gender = data["accounts"]["nodes"][0]["isMale"];
       setIsMale(gender === true ? "Nam" : "Nữ");
       let gmail = data["accounts"]["nodes"][0]["email"];
@@ -174,9 +214,28 @@ const AccountProfilePage = () => {
         return { ...rest, index: index + 1 }; // Add the index to the object
       });
       setPlans(res);
-      console.log();
     }
   }, [data, loading, error]);
+
+  const handleConfirmChangeStatus = () => {
+    try {
+      changeStatus({
+        variables: {
+          id: parseInt(accountId)
+        }
+      });
+      setIsActive(!isActive);
+      setSucessMsg("Cập nhật thành công!");
+      openSuccessSnackBar();
+      handleClose();
+    } catch {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      setErrMsg(msg);
+      openErrorSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
 
   return (
     <div>
@@ -254,9 +313,55 @@ const AccountProfilePage = () => {
                   {isActive === true && (
                     <p className="status confirmed">Đang hoạt động</p>
                   )} */}
-                  <a className="status active" title="Đang hoạt động">
-                    <Switch checked={isActive} color="success"/>
+                  <a className="status active" title={isActive ? "Đang hoạt động" : "Ngưng hoạt động"}>
+                    <Switch checked={isActive} color={isActive ? "success" : "error"} onClick={handleClickOpen} />
                   </a>
+                  <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                    className="confirmDialog"
+                  >
+                    <DialogTitle id="alert-dialog-title">
+                      {"Xác nhận"}
+                    </DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        Bạn có xác nhận muốn đổi trạng thái của tài khoản này không?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <button className="btn-change-status-cancel" onClick={handleClose}
+                        style={{
+                          textDecoration: "none",
+                          color: "rgb(44, 61, 80)",
+                          backgroundColor: "white",
+                          fontSize: "16px",
+                          padding: "10px",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          border: "1px solid",
+                          transition: "0.4s"
+                        }}>
+                        Hủy bỏ
+                      </button>
+                      <button className="btn-change-status-confirm" onClick={handleConfirmChangeStatus} autoFocus
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          backgroundColor: "#2c3d50",
+                          fontSize: "16px",
+                          padding: "10px",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          border: "none",
+                          transition: "0.4s"
+                        }}>
+                        Đồng ý
+                      </button>
+                    </DialogActions>
+                  </Dialog>
                 </div>
               </div>
             </div>
@@ -300,6 +405,40 @@ const AccountProfilePage = () => {
           </div>
         </div>
       )}
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarErrorOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "error"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {/* <Typography whiteSpace="pre-line">{errorMsg}</Typography> */}
+          {errorMsg}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarSuccessOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "success"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {successMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
