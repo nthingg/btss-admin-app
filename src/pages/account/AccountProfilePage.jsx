@@ -328,7 +328,7 @@ const AccountProfilePage = () => {
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        Bạn có xác nhận muốn đổi trạng thái của tài khoản này không?
+                        Bạn có xác nhận muốn thay đổi trạng thái của tài khoản này không?
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>

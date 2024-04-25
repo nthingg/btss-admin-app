@@ -578,13 +578,13 @@ const HomePage = () => {
                   <div className="item-title">Số phượt thủ hiện tại</div>
                   <div className="item-body">
                     <div className="left">
-                      <Link to={`/accounts`} className="navigateButton">
+                      <Link to={`/accounts/sbs/1`} className="navigateButton">
                         <p>{travelers}</p>
                       </Link>
                     </div>
                     <div className="right">
                       <div className="btn info">
-                        <Link to={`/accounts`} className="navigateButton">
+                        <Link to={`/accounts/sbs/1`} className="navigateButton">
                           <InfoIcon sx={{ color: "white" }} />
                         </Link>
                       </div>
