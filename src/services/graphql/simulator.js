@@ -346,7 +346,7 @@ export const GET_NEWEST_NAME = gql`
     plans(
       first: 1
       order: { id: DESC }
-      where: { name: { startsWith: "test-plan-" } }
+      where: { name: { startsWith: "kế hoạch giả lập -" } }
     ) {
       nodes {
         id

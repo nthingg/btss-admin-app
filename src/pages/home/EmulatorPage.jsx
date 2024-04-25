@@ -254,10 +254,6 @@ const EmulatorPage = () => {
   const [join, { data: dataJoin, error: errorJoin }] =
     useMutation(JOIN_PLAN_SIMULATOR);
 
-  const [invite, { data: dataInvite, error: errorInvite }] = useMutation(
-    INVITE_PLANS_SIMULATOR
-  );
-
   const [setTime, { data: dataSetTime, error: errorSetTime }] =
     useMutation(SET_TIME_SIMULATOR);
 
@@ -343,24 +339,42 @@ const EmulatorPage = () => {
     acc,
     dateTime,
     tempOrders,
-    currentPos
+    currentPos,
+    period,
+    schedule
   ) => {
     try {
+      console.log({
+        departAt: dateTime,
+        departure: plan.departure,
+        destinationId: plan.destinationId,
+        maxMemberCount: plan.maxMemberCount,
+        maxMemberWeight: plan.maxMemberWeight,
+        departureAddress: plan.departureAddress,
+        name: plan.name + currentPos,
+        note: plan.note,
+        periodCount: period,
+        savedProviderIds: plan.savedProviderIds,
+        schedule: schedule,
+        surcharges: plan.surcharges,
+        travelDuration: plan.travelDuration,
+        tempOrders: tempOrders,
+      });
+
       const { data } = await create({
         variables: {
           dto: {
             departAt: dateTime,
             departure: plan.departure,
             destinationId: plan.destinationId,
-            gcoinBudgetPerCapita: plan.gcoinBudgetPerCapita,
             maxMemberCount: plan.maxMemberCount,
             maxMemberWeight: plan.maxMemberWeight,
             departureAddress: plan.departureAddress,
             name: plan.name + currentPos,
             note: plan.note,
-            periodCount: plan.periodCount,
+            periodCount: period,
             savedProviderIds: plan.savedProviderIds,
-            schedule: plan.schedule,
+            schedule: schedule,
             surcharges: plan.surcharges,
             travelDuration: plan.travelDuration,
             tempOrders: tempOrders,
@@ -406,7 +420,7 @@ const EmulatorPage = () => {
                   }
                 }
               }
-              type: {nin: [VEHICLE_RENTAL, MOTEL, HOTEL, GROCERY, REPAIR, TAXI]}
+              type: {nin: [GROCERY, REPAIR, TAXI]}
             }
             order: {id: DESC}
             first: 100
@@ -430,7 +444,12 @@ const EmulatorPage = () => {
     return result.data;
   }
 
-  const simulateCreatePlans = async (planNum, dateTime) => {
+  const simulateCreatePlans = async (
+    planNum,
+    dateTime,
+    period,
+    maxDateLength
+  ) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     let countLatest = 0;
@@ -459,10 +478,31 @@ const EmulatorPage = () => {
       let destination = destinations[random];
 
       const dataProvider = await fetchData(destination);
-      console.log(destination);
-      console.log(dataProvider);
 
       let providers = dataProvider.providers.nodes;
+
+      let fbProviders = [];
+      let acmdationProviders = [];
+      let vehicleProviders = [];
+      for (let u = 0; u < providers.length; u++) {
+        switch (providers[u].type) {
+          case "FOOD_STALL":
+            fbProviders.push(providers[u]);
+            break;
+          case "RESTAURANT":
+            fbProviders.push(providers[u]);
+            break;
+          case "HOTEL":
+            acmdationProviders.push(providers[u]);
+            break;
+          case "MOTEL":
+            acmdationProviders.push(providers[u]);
+            break;
+          case "VEHICLE_RENTAL":
+            vehicleProviders.push(providers[u]);
+            break;
+        }
+      }
 
       let planTempData = planData[0];
 
@@ -480,66 +520,134 @@ const EmulatorPage = () => {
       planTempData.savedProviderIds = contacts;
 
       let tempOrders = [];
+      let schedule = [];
+      for (let l = 0; l < maxDateLength - 1; l++) {
+        schedule.push(planData[0].schedule[l]);
+      }
+      schedule.push(planData[0].schedule[14]);
 
-      for (let i = 0; i < planTempData.schedule.length; i++) {
-        for (let k = 0; k < planTempData.schedule[i].length; k++) {
-          if (planTempData.schedule[i][k].type === "EAT") {
-            for (let j = 0; j < providers.length; j++) {
-              if (
-                providers[j].type === "FOOD_STALL" ||
-                providers[j].type === "RESTAURANT"
-              ) {
-                const { data: dataProduct } = await refetchProduct({
-                  id: providers[j].id,
-                  type: ["BEVERAGE", "FOOD"],
-                });
+      for (let z = 0; z < schedule.length; z++) {
+        for (let y = 0; y < schedule[z].length; y++) {
+          schedule[z][y].orderUUID = null;
+        }
+      }
+      console.log(schedule);
 
-                const products = dataProduct.products.nodes;
+      for (let m = 0; m < schedule.length; m++) {
+        for (let k = 0; k < schedule[m].length; k++) {
+          let isOrder = Math.floor(Math.random() * 2);
+          if (
+            isOrder === 1 &&
+            schedule[m][k].type !== "CHECKIN" &&
+            schedule[m][k].type !== "CHECKOUT"
+          ) {
+            continue;
+          }
 
-                let tempCart = [];
-                let tempTotal = 0;
-                if (products.length > 0) {
-                  for (let l = 0; l < 3; l++) {
-                    let random = Math.floor(Math.random() * products.length);
+          let products = [];
 
-                    let isExisted = false;
-                    for (let m = 0; m < tempCart.length; m++) {
-                      if (tempCart[m].key === products[random].id) {
-                        tempCart[m].value += 1;
-                        isExisted = true;
-                      }
-                    }
-                    if (!isExisted) {
-                      tempCart.push({ key: products[random].id, value: 1 });
-                    }
-                    tempTotal += products[random].price * 1;
+          if (schedule[m][k].type === "EAT") {
+            if (fbProviders.length > 0) {
+              let findProvider = Math.floor(Math.random() * fbProviders.length);
+
+              const { data: dataProduct } = await refetchProduct({
+                id: fbProviders[findProvider].id,
+                type: ["BEVERAGE", "FOOD"],
+              });
+
+              products = dataProduct.products.nodes;
+            }
+          } else if (schedule[m][k].type === "VISIT") {
+            if (vehicleProviders.length > 0) {
+              let findProvider = Math.floor(
+                Math.random() * vehicleProviders.length
+              );
+
+              const { data: dataProduct } = await refetchProduct({
+                id: vehicleProviders[findProvider].id,
+                type: ["VEHICLE"],
+              });
+
+              products = dataProduct.products.nodes;
+            }
+          } else if (schedule[m][k].type === "CHECKIN") {
+            if (acmdationProviders.length > 0) {
+              let findProvider = Math.floor(
+                Math.random() * acmdationProviders.length
+              );
+
+              const { data: dataProduct } = await refetchProduct({
+                id: acmdationProviders[findProvider].id,
+                type: ["ROOM", "CAMP"],
+              });
+
+              products = dataProduct.products.nodes;
+            }
+          }
+
+          let tempCart = [];
+          if (products.length > 0) {
+            let numOfProducts = 0;
+
+            if (schedule[m][k].type === "EAT") {
+              numOfProducts = 4;
+            } else if (schedule[m][k].type === "VISIT") {
+              numOfProducts = 1;
+            } else if (schedule[m][k].type === "CHECKIN") {
+              numOfProducts = 1;
+            }
+
+            for (let h = 0; h < numOfProducts; h++) {
+              let random = Math.floor(Math.random() * products.length);
+
+              const found = tempCart.find(
+                (item) => item.key === products[random].id
+              );
+
+              if (!found) {
+                let check = true;
+                let num = 0;
+                while (check) {
+                  num++;
+                  if (num * products[random].partySize >= 10) {
+                    check = false;
                   }
                 }
-
-                if (tempCart.length !== 0) {
-                  const uuid = uuidv4();
-                  planTempData.schedule[i][k].orderUUID = uuid;
-                  tempOrders.push({
-                    uuid: uuid,
-                    cart: tempCart,
-                    note: null,
-                    period: "NOON",
-                    // providerId: providers[j].id,
-                    serveDateIndexes: [i],
-                    // total: tempTotal,
-                    type: "EAT",
-                  });
-                }
-
-                break;
+                tempCart.push({ key: products[random].id, value: num });
               }
             }
           }
+
+          if (tempCart.length > 0) {
+            let fixedPeriod = "NOON";
+
+            const uuid = uuidv4();
+            schedule[m][k].orderUUID = uuid;
+            tempOrders.push({
+              uuid: schedule[m][k].orderUUID,
+              cart: tempCart,
+              note: null,
+              period: fixedPeriod,
+              // providerId: providers[j].id,
+              serveDateIndexes: [m],
+              // total: tempTotal,
+              type: schedule[m][k].type,
+            });
+          }
+
+          if (schedule[m][k].type === "CHECKOUT") {
+            schedule[m][k].orderUUID = schedule[0][0].orderUUID;
+            tempOrders.push({
+              uuid: schedule[0][0].orderUUID,
+              cart: tempOrders[0].cart,
+              note: null,
+              period: "NOON",
+              serveDateIndexes: [m],
+              type: "CHECKOUT",
+            });
+          }
         }
       }
-
-      console.log(planTempData);
-      console.log(tempOrders);
 
       countLatest++;
       const res = await handleCreatePlan(
@@ -548,7 +656,9 @@ const EmulatorPage = () => {
         loggedAcc[i],
         dateTime,
         tempOrders,
-        countLatest
+        countLatest,
+        period,
+        schedule
       );
 
       if (res.status) {
@@ -635,41 +745,6 @@ const EmulatorPage = () => {
     }
   };
 
-  const handleInvitePlan = async (dto, count, acc, guest) => {
-    try {
-      const { data } = await invite({
-        variables: {
-          dto: {
-            accountId: dto.accountId,
-            planId: dto.planId,
-          },
-        },
-      });
-      const response = {
-        userName: acc.name,
-        action: "Mời phượt thủ khác",
-        detail: `[${acc.name}] mời [${guest.name}] tham gia kế hoạch [${dto.planName}]`,
-        status: true,
-        id: count,
-      };
-      return response;
-    } catch (error) {
-      console.log(error);
-      const msg = localStorage.getItem("errorMsg");
-      // setErrMsg(msg);
-      // handleClick();
-      localStorage.removeItem("errorMsg");
-      const response = {
-        userName: acc.name,
-        action: "Mời phượt thủ khác",
-        detail: `[${acc.name}] mời [${guest.name}] tham gia kế hoạch [${dto.planName}]`,
-        status: false,
-        id: count,
-      };
-      return response;
-    }
-  };
-
   const handleCancelPlan = async (dto, count, acc) => {
     try {
       const { data } = await cancel({
@@ -748,18 +823,12 @@ const EmulatorPage = () => {
               planId: currentPlans[j].id,
               planName: currentPlans[j].name,
             };
-            let currentJoinMethod = "NONE";
+            let currentJoinMethod = "SCAN";
             if (currentPlans[j].joinMethod === "NONE") {
               // let random = Math.floor(Math.random() * 2);
-              if (i <= 25) {
-                currentJoinMethod = "SCAN";
-              } else {
-                currentJoinMethod = "INVITE";
-              }
+              currentJoinMethod = "SCAN";
             } else if (currentPlans[j].joinMethod === "INVITE") {
               currentJoinMethod = "SCAN";
-            } else {
-              currentJoinMethod = "INVITE";
             }
 
             const changeData = {
@@ -786,34 +855,6 @@ const EmulatorPage = () => {
             response.push(resJoin);
             response.push(resChange);
 
-            if (currentJoinMethod === "INVITE") {
-              let countMax = 1;
-              for (let index = 0; index < loggedAcc?.length; index++) {
-                if (countMax > 10) {
-                  break;
-                }
-                if (loggedAcc[index].id !== loggedAcc[i].id) {
-                  const inviteData = {
-                    accountId: loggedAcc[index].id,
-                    planId: currentPlans[j].id,
-                    planName: currentPlans[j].name,
-                  };
-                  count++;
-                  log += `[Mời phượt thủ khác tham gia] ${loggedAcc[i].name} \n`;
-                  const resInvite = await handleInvitePlan(
-                    inviteData,
-                    count,
-                    loggedAcc[i],
-                    loggedAcc[index]
-                  );
-                  if (resInvite.status) {
-                    successCount++;
-                  }
-                  response.push(resInvite);
-                  countMax++;
-                }
-              }
-            }
             limitRegister++;
           } else {
             const cancelData = {
@@ -884,184 +925,34 @@ const EmulatorPage = () => {
 
         for (let j = 0; j < currentPlans?.length; j++) {
           if (limitMassJoin <= massPlan) {
-            if (currentPlans[j].joinMethod === "INVITE") {
-              const members = currentPlans[j].members.filter(
-                (mem) => mem.status === "INVITED"
-              );
-
-              if (members.length > massTraveler) {
-                let limitMember = 1;
-                for (let k = 0; k < loggedAcc.length; k++) {
-                  if (limitMember > massTraveler) {
-                    break;
-                  }
-
-                  if (loggedAcc[k].id !== loggedAcc[i].id) {
-                    const acc = members.find(
-                      (member) => member.account.id === loggedAcc[k].id
-                    );
-
-                    if (acc) {
-                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                      localStorage.setItem("userToken", loggedAcc[k].token);
-
-                      const joinData = {
-                        companions:
-                          companionsArr.length !== 0 ? companionsArr : null,
-                        planId: currentPlans[j].id,
-                        weight: 1,
-                        planName: currentPlans[j].name,
-                      };
-                      count++;
-                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                      const resJoin = await handleJoinPlan(
-                        joinData,
-                        count,
-                        loggedAcc[k]
-                      );
-                      if (resJoin.status) {
-                        successCount++;
-                      }
-                      response.push(resJoin);
-                      limitMember++;
-                    }
-                  }
-                }
-              } else {
-                if (members.length === 0) {
-                  let limitMember = 1;
-                  for (let k = 0; k < loggedAcc.length; k++) {
-                    if (limitMember > massTraveler) {
-                      break;
-                    }
-
-                    if (loggedAcc[k].id !== loggedAcc[i].id) {
-                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                      localStorage.setItem("userToken", loggedAcc[k].token);
-
-                      const joinData = {
-                        companions:
-                          companionsArr.length !== 0 ? companionsArr : null,
-                        planId: currentPlans[j].id,
-                        weight: 1,
-                        planName: currentPlans[j].name,
-                      };
-                      count++;
-                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                      const resJoin = await handleJoinPlan(
-                        joinData,
-                        count,
-                        loggedAcc[k]
-                      );
-                      if (resJoin.status) {
-                        successCount++;
-                      }
-                      response.push(resJoin);
-                      limitMember++;
-                    }
-                  }
-                } else {
-                  let limitMember = 1;
-                  let limitMemberRemain = 1;
-                  for (let k = 0; k < loggedAcc.length; k++) {
-                    if (limitMember > members.length) {
-                      break;
-                    }
-
-                    if (loggedAcc[k].id !== loggedAcc[i].id) {
-                      const acc = members.find(
-                        (member) => member.account.id === loggedAcc[k].id
-                      );
-
-                      if (acc) {
-                        log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                        localStorage.setItem("userToken", loggedAcc[k].token);
-
-                        const joinData = {
-                          companions:
-                            companionsArr.length !== 0 ? companionsArr : null,
-                          planId: currentPlans[j].id,
-                          weight: 1,
-                          planName: currentPlans[j].name,
-                        };
-                        count++;
-                        log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                        const resJoin = await handleJoinPlan(
-                          joinData,
-                          count,
-                          loggedAcc[k]
-                        );
-                        if (resJoin.status) {
-                          successCount++;
-                        }
-                        response.push(resJoin);
-                        limitMember++;
-                      }
-                    }
-                  }
-                  for (let k = 0; k < loggedAcc.length; k++) {
-                    if (limitMemberRemain > massTraveler - members.length) {
-                      break;
-                    }
-
-                    if (loggedAcc[k].id !== loggedAcc[i].id) {
-                      log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                      localStorage.setItem("userToken", loggedAcc[k].token);
-
-                      const joinData = {
-                        companions:
-                          companionsArr.length !== 0 ? companionsArr : null,
-                        planId: currentPlans[j].id,
-                        weight: 1,
-                        planName: currentPlans[j].name,
-                      };
-                      count++;
-                      log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                      const resJoin = await handleJoinPlan(
-                        joinData,
-                        count,
-                        loggedAcc[k]
-                      );
-                      if (resJoin.status) {
-                        successCount++;
-                      }
-                      response.push(resJoin);
-                      limitMemberRemain++;
-                    }
-                  }
-                }
+            let limitMember = 1;
+            for (let k = 0; k < loggedAcc.length; k++) {
+              if (limitMember > massTraveler) {
+                break;
               }
-            } else {
-              let limitMember = 1;
-              for (let k = 0; k < loggedAcc.length; k++) {
-                if (limitMember > massTraveler) {
-                  break;
-                }
 
-                if (loggedAcc[k].id !== loggedAcc[i].id) {
-                  log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
-                  localStorage.setItem("userToken", loggedAcc[k].token);
+              if (loggedAcc[k].id !== loggedAcc[i].id) {
+                log += `[Đăng nhập] ${loggedAcc[k].name} \n`;
+                localStorage.setItem("userToken", loggedAcc[k].token);
 
-                  const joinData = {
-                    companions:
-                      companionsArr.length !== 0 ? companionsArr : null,
-                    planId: currentPlans[j].id,
-                    weight: 1,
-                    planName: currentPlans[j].name,
-                  };
-                  count++;
-                  log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
-                  const resJoin = await handleJoinPlan(
-                    joinData,
-                    count,
-                    loggedAcc[k]
-                  );
-                  if (resJoin.status) {
-                    successCount++;
-                  }
-                  response.push(resJoin);
-                  limitMember++;
+                const joinData = {
+                  companions: companionsArr.length !== 0 ? companionsArr : null,
+                  planId: currentPlans[j].id,
+                  weight: 1,
+                  planName: currentPlans[j].name,
+                };
+                count++;
+                log += `[Tham gia kế hoạch] ${loggedAcc[k].name} \n`;
+                const resJoin = await handleJoinPlan(
+                  joinData,
+                  count,
+                  loggedAcc[k]
+                );
+                if (resJoin.status) {
+                  successCount++;
                 }
+                response.push(resJoin);
+                limitMember++;
               }
             }
             limitMassJoin++;
@@ -2533,7 +2424,6 @@ const EmulatorPage = () => {
                     try {
                       if (loadingState) {
                         const { data } = await refetchAccounts();
-
                         let res = data["accounts"]["nodes"].map((account) => {
                           const { __typename, ...rest } = account;
                           return { ...rest, token: "" };
@@ -2564,7 +2454,104 @@ const EmulatorPage = () => {
                       var a = moment.utc(selectedDate).utcOffset("+07:00");
                       var formatted = a.format();
 
-                      simulateCreatePlans(planNum, formatted);
+                      console.log("Depart at: " + formatted);
+
+                      var arrivedAt = moment(formatted).add({
+                        hours: 5,
+                        minutes: 30,
+                      });
+                      var arrivedAtFormatted = arrivedAt.format();
+
+                      console.log("Arrival at: " + arrivedAtFormatted);
+
+                      var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
+
+                      console.log("Arrival time: " + arrivalTime);
+
+                      var arrivedAtNight =
+                        arrivalTime >= "20:00:00" || arrivalTime < "06:00:00";
+                      console.log("Arrive at night: " + arrivedAtNight);
+
+                      var arrivedAtEvening =
+                        !arrivedAtNight && arrivalTime >= "16:00:00";
+
+                      console.log("Arrive at evening: " + arrivedAtEvening);
+
+                      var startAt = arrivedAtNight
+                        ? moment(arrivedAt).add({
+                            days: arrivalTime > "06:00:00" ? 1 : 0,
+                            hours: 6,
+                          })
+                        : arrivedAt;
+
+                      console.log("Start at: " + startAt.format());
+
+                      const minCeiled = Math.ceil(2);
+                      const maxFloored = Math.floor(30);
+
+                      function getOddNumber(min, max) {
+                        // Ensure even minimum for odd number generation
+                        min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
+
+                        let per;
+                        do {
+                          per = Math.floor(
+                            Math.random() * (max - min + 1) + min
+                          );
+                        } while (per % 2 === 0); // Loop until an odd number is found
+
+                        return per;
+                      }
+
+                      let period = getOddNumber(minCeiled, maxFloored);
+
+                      console.log("old period: " + period);
+
+                      if (
+                        arrivalTime >= "16:00:00" &&
+                        arrivalTime <= "20:00:00"
+                      ) {
+                        period = period + 1;
+                      }
+
+                      console.log("period: " + period);
+
+                      var dayEqualNight = period % 2 == 0;
+
+                      console.log("dayEqualNight: " + dayEqualNight);
+
+                      var maxDateLength = Math.ceil((period * 1.0) / 2);
+
+                      console.log("maxDateLength: " + maxDateLength);
+
+                      var isEndAtNoon =
+                        (arrivedAtEvening && dayEqualNight) ||
+                        (!arrivedAtEvening && !dayEqualNight);
+
+                      console.log("isEndAtNoon: " + isEndAtNoon);
+
+                      var endAt = moment(startAt).add({
+                        days:
+                          maxDateLength -
+                          (arrivedAtEvening && dayEqualNight ? 0 : 1),
+                        date: isEndAtNoon ? 14 : 22,
+                      });
+
+                      console.log("endAt: " + endAt.format());
+
+                      var maxIndex = moment(endAt).diff(
+                        moment(startAt),
+                        "days"
+                      );
+
+                      console.log("maxIndex: " + maxIndex);
+
+                      simulateCreatePlans(
+                        planNum,
+                        formatted,
+                        period,
+                        maxDateLength
+                      );
                     } else if (selectedSimulator === 2) {
                       if (companionsHostJoinNum > 5) {
                         const msg = `Giới hạn thành viên đi kèm 5 người`;
