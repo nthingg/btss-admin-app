@@ -21,11 +21,27 @@ export const destinationPlansColumns = [
   },
   {
     field: "name",
-    width: 240,
+    width: 200,
     renderCell: (params) => {
       return <div>{params.row.name}</div>;
     },
     renderHeader: () => <span>KẾ HOẠCH</span>,
+  },
+  {
+    field: "status",
+    width: 150,
+    renderCell: (params) => {
+      const statusType = {
+        "COMPLETED": "Đã hoàn thành",
+        "CANCELED": "Đã hủy",
+        "READY": "Sắp diễn ra",
+        "FLAWED": "Đã hoàn thành",
+        "VERIFIED": "Đang diễn ra",
+        "REGISTERING": "Chưa chốt"
+      }
+      return <div>{statusType[params.row.status]}</div>;
+    },
+    renderHeader: () => <span>TRẠNG THÁI</span>,
   },
   {
     field: "host",

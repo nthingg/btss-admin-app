@@ -5,13 +5,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import StaticMap from "../../components/map/StaticMap";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { LOAD_DETAIL_DESTINATION } from "../../services/graphql/destination";
+import { CHANGE_STATUS_DESTINATION, LOAD_DETAIL_DESTINATION } from "../../services/graphql/destination";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -26,6 +26,8 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Switch,
+  Alert, Snackbar
 } from "@mui/material";
 import EmergencyTable from "../../components/tables/EmergencyTable";
 import MapIcon from "@mui/icons-material/Map";
@@ -66,13 +68,21 @@ const DestinationDetailPage = () => {
   `;
 
   const { destinationId } = useParams();
+  const [vertical, setVertical] = useState("top");
+  const [horizontal, setHorizontal] = useState("right");
+  const [errorMsg, setErrMsg] = useState(false);
+  const [successMsg, setSucessMsg] = useState(false);
+  const [snackBarErrorOpen, setsnackBarErrorOpen] = useState(false);
+  const [snackBarSuccessOpen, setsnackBarSucessOpen] = useState(false);
   const [destination, setDestination] = useState(null);
   const [emergencies, setEmergencies] = useState([]);
   const [activities, setActivities] = useState("");
   const [seasons, setSeasons] = useState("");
   const [open, setOpen] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [position, setPosition] = useState(null);
   const [emerQuery, setEmerQuery] = useState(initQuery);
+  const [isVisible, setIsVisible] = useState(true);
   const [plans, setPlans] = useState([]);
 
   const containerStyle = {
@@ -86,6 +96,27 @@ const DestinationDetailPage = () => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleClickOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
+
+  const openErrorSnackBar = () => {
+    setsnackBarErrorOpen(true);
+  };
+
+  const openSuccessSnackBar = () => {
+    setsnackBarSucessOpen(true);
+  };
+
+  const handleCloseSnack = () => {
+    setsnackBarErrorOpen(false);
+    setsnackBarSucessOpen(false);
   };
 
   const { error, loading, data, refetch } = useQuery(LOAD_DETAIL_DESTINATION, {
@@ -132,6 +163,7 @@ const DestinationDetailPage = () => {
       data["destinations"]["nodes"]
     ) {
       setDestination(data["destinations"]["nodes"][0]);
+      setIsVisible(Boolean(data["destinations"]["nodes"][0]["isVisible"]));
 
       let acts = "";
       for (
@@ -306,6 +338,28 @@ const DestinationDetailPage = () => {
   //   }
   // }, [dataProvi, errorProvi, loadingProvi])
 
+  const [changeStatus, { }] = useMutation(CHANGE_STATUS_DESTINATION);
+
+  const handleConfirmChangeStatus = () => {
+    try {
+      changeStatus({
+        variables: {
+          id: parseInt(destinationId)
+        }
+      });
+      setIsVisible(!isVisible);
+      setSucessMsg("Cập nhật thành công!");
+      openSuccessSnackBar();
+      handleCloseConfirm();
+    } catch {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      setErrMsg(msg);
+      openErrorSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
   var settings = {
     dots: true,
     infinite: false,
@@ -367,7 +421,7 @@ const DestinationDetailPage = () => {
                   <p>{destination?.name}</p>
                 </div>
                 <div className="destination-status">
-                  {!destination?.isVisible && (
+                  {/* {!destination?.isVisible && (
                     <a className="status cancelled" title="Tạm ẩn">
                       <CancelIcon />
                     </a>
@@ -376,7 +430,56 @@ const DestinationDetailPage = () => {
                     <a className="status served" title="Đang hoạt động">
                       <CheckCircleIcon />
                     </a>
-                  )}
+                  )} */}
+                  <a className="status active" title={isVisible ? "Đang hoạt động" : "Tạm ẩn"}>
+                    <Switch checked={isVisible} color={isVisible ? "success" : "error"} onClick={handleClickOpenConfirm}/>
+                  </a>
+                  <Dialog
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                    className="confirmDialog"
+                  >
+                    <DialogTitle id="alert-dialog-title">
+                      {"Xác nhận"}
+                    </DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        Bạn có xác nhận muốn đổi trạng thái hiển thị của địa điểm này không?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <button className="btn-change-status-cancel" onClick={handleCloseConfirm}
+                        style={{
+                          textDecoration: "none",
+                          color: "rgb(44, 61, 80)",
+                          backgroundColor: "white",
+                          fontSize: "16px",
+                          padding: "10px",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          border: "1px solid",
+                          transition: "0.4s"
+                        }}>
+                        Hủy bỏ
+                      </button>
+                      <button className="btn-change-status-confirm" onClick={handleConfirmChangeStatus} autoFocus
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          backgroundColor: "#2c3d50",
+                          fontSize: "16px",
+                          padding: "10px",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          border: "none",
+                          transition: "0.4s"
+                        }}>
+                        Đồng ý
+                      </button>
+                    </DialogActions>
+                  </Dialog>
                 </div>
               </div>
             </div>
@@ -542,7 +645,7 @@ const DestinationDetailPage = () => {
               </Accordion>
             </div> */}
             <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
                 <AccordionSummary
                   sx={{
                     fontSize: 24,
@@ -567,7 +670,7 @@ const DestinationDetailPage = () => {
               </Accordion>
             </div>
             <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
+              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
                 <AccordionSummary
                   sx={{
                     fontSize: 24,
@@ -645,6 +748,40 @@ const DestinationDetailPage = () => {
           </Dialog>
         </div>
       )}
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarErrorOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "error"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {/* <Typography whiteSpace="pre-line">{errorMsg}</Typography> */}
+          {errorMsg}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackBarSuccessOpen}
+        onClose={handleCloseSnack}
+        autoHideDuration={2000}
+        key={vertical + horizontal + "success"}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {successMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

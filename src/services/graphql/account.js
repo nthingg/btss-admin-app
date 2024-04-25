@@ -310,7 +310,7 @@ export const GET_PROVIDER_BRIEF_BY_ID = gql`
 
 export const CHANGE_STATUS_ACCOUNT = gql`
   mutation changeStatusDes($id: Int!) {
-    changeDestinationStatus(destinationId: $id) {
+    changeAccountStatus(accountId: $id) {
       id
       name
     }
