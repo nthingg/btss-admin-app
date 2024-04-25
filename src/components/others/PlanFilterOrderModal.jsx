@@ -42,9 +42,10 @@ export default function FilterModal({
   React.useEffect(() => {
     if (!loading && !error && data && data["accounts"]["nodes"]) {
       let res = data.accounts.nodes.map((account, index) => {
+        const phoneFormatted = account.phone.toString();
         return {
           value: account.id,
-          label: `${index + 1}. ${account.name}`,
+          label: `${index + 1}. ${account.name} - 0${phoneFormatted.substring(2).replace(/(\d{3})\d*(\d{3})/, '$1****$2')}`,
         };
       });
       setOptions(res);

@@ -125,6 +125,7 @@ export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
       nodes {
         id
         name
+        phone
       }
     }
   }
