@@ -25,7 +25,7 @@ export const plansColumns = [
   },
   {
     field: "name",
-    width: 200,
+    width: 240,
     renderCell: (params) => {
       return <div>{params.row.node.name}</div>;
     },

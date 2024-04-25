@@ -26,7 +26,7 @@ export const planTotalColumns = [
   },
   {
     field: "name",
-    width: 200,
+    width: 240,
     renderCell: (params) => {
       return <div>{params.row.node.name}</div>;
     },
@@ -37,13 +37,13 @@ export const planTotalColumns = [
     width: 150,
     renderCell: (params) => {
       const statusType = {
-        "COMPLETED": "Đã hoàn thành",
-        "CANCELED": "Đã hủy",
-        "READY": "Sắp diễn ra",
-        "FLAWED": "Đã hoàn thành",
-        "VERIFIED": "Đang diễn ra",
-        "REGISTERING": "Chưa chốt"
-      }
+        COMPLETED: "Đã hoàn thành",
+        CANCELED: "Đã hủy",
+        READY: "Sắp diễn ra",
+        FLAWED: "Đã hoàn thành",
+        VERIFIED: "Đang diễn ra",
+        REGISTERING: "Chưa chốt",
+      };
       return <div>{statusType[params.row.node.status]}</div>;
     },
     renderHeader: () => <span>TRẠNG THÁI</span>,

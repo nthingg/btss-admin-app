@@ -1,7 +1,7 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import UnpublishedIcon from '@mui/icons-material/Unpublished';
-import OfflinePinIcon from '@mui/icons-material/OfflinePin';
+import UnpublishedIcon from "@mui/icons-material/Unpublished";
+import OfflinePinIcon from "@mui/icons-material/OfflinePin";
 
 export const plansCompletedColumns = [
   {
@@ -26,7 +26,7 @@ export const plansCompletedColumns = [
   },
   {
     field: "name",
-    width: 180,
+    width: 240,
     renderCell: (params) => {
       return <div>{params.row.node.name}</div>;
     },
@@ -120,13 +120,13 @@ export const plansCompletedColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-        if (params.row.node.status === "COMPLETED") {
-          return (
-            <div className="cellWithStatus AVAILABLE">{<OfflinePinIcon />}</div>
-          );
-        } else {
-          return <div className="cellWithStatus NONE">{<UnpublishedIcon />}</div>;
-        }
+      if (params.row.node.status === "COMPLETED") {
+        return (
+          <div className="cellWithStatus AVAILABLE">{<OfflinePinIcon />}</div>
+        );
+      } else {
+        return <div className="cellWithStatus NONE">{<UnpublishedIcon />}</div>;
+      }
     },
     renderHeader: () => <span>ĐÃ XÁC NHẬN</span>,
   },

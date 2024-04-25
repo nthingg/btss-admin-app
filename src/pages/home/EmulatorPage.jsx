@@ -353,24 +353,7 @@ const EmulatorPage = () => {
     schedule
   ) => {
     try {
-      console.log({
-        departAt: dateTime,
-        departure: plan.departure,
-        destinationId: plan.destinationId,
-        maxMemberCount: plan.maxMemberCount,
-        maxMemberWeight: plan.maxMemberWeight,
-        departureAddress: plan.departureAddress,
-        name: plan.name + moment().valueOf(),
-        note: plan.note,
-        periodCount: period,
-        savedProviderIds: plan.savedProviderIds,
-        schedule: schedule,
-        surcharges: plan.surcharges,
-        travelDuration: plan.travelDuration,
-        tempOrders: tempOrders,
-      });
-
-      let appendName = moment().valueOf();
+      let appendName = moment().format("DDMMYYYY-HH:mm") + `_{${acc.id}}`;
 
       const { data } = await create({
         variables: {
@@ -2493,6 +2476,7 @@ const EmulatorPage = () => {
                   onClick={async () => {
                     setIsLoadingVisible(true);
                     setIsEmulatorLoading(true);
+
                     try {
                       if (loadingState) {
                         const { data } = await refetchAccounts();
