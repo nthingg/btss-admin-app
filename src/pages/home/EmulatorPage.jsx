@@ -355,6 +355,23 @@ const EmulatorPage = () => {
     try {
       let appendName = moment().format("DDMMYYYY-HH:mm") + `_{${acc.id}}`;
 
+      console.log({
+        departAt: dateTime,
+        departure: plan.departure,
+        destinationId: plan.destinationId,
+        maxMemberCount: plan.maxMemberCount,
+        maxMemberWeight: plan.maxMemberWeight,
+        departureAddress: plan.departureAddress,
+        name: plan.name + appendName,
+        note: plan.note,
+        periodCount: period,
+        savedProviderIds: plan.savedProviderIds,
+        schedule: schedule,
+        surcharges: plan.surcharges,
+        travelDuration: plan.travelDuration,
+        tempOrders: tempOrders,
+      });
+
       const { data } = await create({
         variables: {
           dto: {
@@ -438,13 +455,7 @@ const EmulatorPage = () => {
     return result.data;
   }
 
-  const simulateCreatePlans = async (
-    planNum,
-    dateTime,
-    period,
-    maxDateLength,
-    arrivalTime
-  ) => {
+  const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
     let countLatest = 0;
@@ -468,6 +479,35 @@ const EmulatorPage = () => {
       localStorage.setItem("userToken", loggedAcc[i].token);
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
       count++;
+
+      var arrivedAt = moment(dateTime).add({
+        hours: 5,
+        minutes: 30,
+      });
+      var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
+
+      const minCeiled = Math.ceil(2);
+      const maxFloored = Math.floor(18);
+      function getOddNumber(min, max) {
+        // Ensure even minimum for odd number generation
+        min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
+
+        let per;
+        do {
+          per = Math.floor(Math.random() * (max - min + 1) + min);
+        } while (per % 2 === 0); // Loop until an odd number is found
+
+        return per;
+      }
+      let period = getOddNumber(minCeiled, maxFloored);
+      if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+        period++;
+      }
+      var maxDateLength = Math.ceil((period * 1.0) / 2);
+      if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+        maxDateLength++;
+      }
+
       let random = Math.floor(Math.random() * destinations.length);
 
       let destination = destinations[random];
@@ -561,20 +601,22 @@ const EmulatorPage = () => {
 
               products = dataProduct.products.nodes;
             }
-          } else if (schedule[m][k].type === "VISIT") {
-            if (vehicleProviders.length > 0) {
-              let findProvider = Math.floor(
-                Math.random() * vehicleProviders.length
-              );
+          }
+          // else if (schedule[m][k].type === "VISIT") {
+          //   if (vehicleProviders.length > 0) {
+          //     let findProvider = Math.floor(
+          //       Math.random() * vehicleProviders.length
+          //     );
 
-              const { data: dataProduct } = await refetchProduct({
-                id: vehicleProviders[findProvider].id,
-                type: ["VEHICLE"],
-              });
+          //     const { data: dataProduct } = await refetchProduct({
+          //       id: vehicleProviders[findProvider].id,
+          //       type: ["VEHICLE"],
+          //     });
 
-              products = dataProduct.products.nodes;
-            }
-          } else if (schedule[m][k].type === "CHECKIN") {
+          //     products = dataProduct.products.nodes;
+          //   }
+          // }
+          else if (schedule[m][k].type === "CHECKIN") {
             if (acmdationProviders.length > 0) {
               let findProvider = Math.floor(
                 Math.random() * acmdationProviders.length
@@ -594,7 +636,7 @@ const EmulatorPage = () => {
             let numOfProducts = 0;
 
             if (schedule[m][k].type === "EAT") {
-              numOfProducts = 4;
+              numOfProducts = 1;
             } else if (schedule[m][k].type === "VISIT") {
               numOfProducts = 1;
             } else if (schedule[m][k].type === "CHECKIN") {
@@ -643,9 +685,7 @@ const EmulatorPage = () => {
               cart: tempCart,
               note: null,
               period: fixedPeriod,
-              // providerId: providers[j].id,
               serveDateIndexes: [m],
-              // total: tempTotal,
               type: schedule[m][k].type,
             });
           }
@@ -2510,112 +2550,7 @@ const EmulatorPage = () => {
                       var a = moment.utc(selectedDate).utcOffset("+07:00");
                       var formatted = a.format();
 
-                      console.log("Depart at: " + formatted);
-
-                      var arrivedAt = moment(formatted).add({
-                        hours: 5,
-                        minutes: 30,
-                      });
-                      var arrivedAtFormatted = arrivedAt.format();
-
-                      console.log("Arrival at: " + arrivedAtFormatted);
-
-                      var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
-
-                      console.log("Arrival time: " + arrivalTime);
-
-                      var arrivedAtNight =
-                        arrivalTime >= "20:00:00" || arrivalTime < "06:00:00";
-                      console.log("Arrive at night: " + arrivedAtNight);
-
-                      var arrivedAtEvening =
-                        !arrivedAtNight && arrivalTime >= "16:00:00";
-
-                      console.log("Arrive at evening: " + arrivedAtEvening);
-
-                      var startAt = arrivedAtNight
-                        ? moment(arrivedAt).add({
-                            days: arrivalTime > "06:00:00" ? 1 : 0,
-                            hours: 6,
-                          })
-                        : arrivedAt;
-
-                      console.log("Start at: " + startAt.format());
-
-                      const minCeiled = Math.ceil(2);
-                      const maxFloored = Math.floor(30);
-
-                      function getOddNumber(min, max) {
-                        // Ensure even minimum for odd number generation
-                        min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
-
-                        let per;
-                        do {
-                          per = Math.floor(
-                            Math.random() * (max - min + 1) + min
-                          );
-                        } while (per % 2 === 0); // Loop until an odd number is found
-
-                        return per;
-                      }
-
-                      let period = getOddNumber(minCeiled, maxFloored);
-
-                      console.log("old period: " + period);
-
-                      if (
-                        arrivalTime >= "16:00:00" &&
-                        arrivalTime <= "20:00:00"
-                      ) {
-                        period++;
-                      }
-
-                      console.log("period: " + period);
-
-                      var dayEqualNight = period % 2 == 0;
-
-                      console.log("dayEqualNight: " + dayEqualNight);
-
-                      var maxDateLength = Math.ceil((period * 1.0) / 2);
-
-                      if (
-                        arrivalTime >= "16:00:00" &&
-                        arrivalTime <= "20:00:00"
-                      ) {
-                        maxDateLength++;
-                      }
-
-                      console.log("maxDateLength: " + maxDateLength);
-
-                      var isEndAtNoon =
-                        (arrivedAtEvening && dayEqualNight) ||
-                        (!arrivedAtEvening && !dayEqualNight);
-
-                      console.log("isEndAtNoon: " + isEndAtNoon);
-
-                      var endAt = moment(startAt).add({
-                        days:
-                          maxDateLength -
-                          (arrivedAtEvening && dayEqualNight ? 0 : 1),
-                        date: isEndAtNoon ? 14 : 22,
-                      });
-
-                      console.log("endAt: " + endAt.format());
-
-                      var maxIndex = moment(endAt).diff(
-                        moment(startAt),
-                        "days"
-                      );
-
-                      console.log("maxIndex: " + maxIndex);
-
-                      simulateCreatePlans(
-                        planNum,
-                        formatted,
-                        period,
-                        maxDateLength,
-                        arrivalTime
-                      );
+                      simulateCreatePlans(planNum, formatted);
                     } else if (selectedSimulator === 2) {
                       if (companionsHostJoinNum > 5) {
                         const msg = `Giới hạn thành viên đi kèm 5 người`;
