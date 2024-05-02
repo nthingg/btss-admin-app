@@ -40,10 +40,10 @@ export const destinationsColumns = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      if (params.row.comments.edges.length === 0) {
+      if (params.row.comments.length === 0) {
         return <div>Không có dữ liệu</div>;
       } else {
-        return <div>{params.row.comments.edges.length} / 5</div>;
+        return <div>{params.row.comments.length} / 5</div>;
       }
     },
     renderHeader: () => <span>ĐÁNH GIÁ</span>,

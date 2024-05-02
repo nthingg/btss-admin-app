@@ -21,14 +21,10 @@ export const LOAD_DETAIL_DESTINATION = gql`
           name
         }
         comments {
-          edges {
-            node {
-              comment
-              createdAt
-              account {
-                name
-              }
-            }
+          comment
+          createdAt
+          account {
+            name
           }
         }
       }
@@ -53,14 +49,10 @@ export const LOAD_DESTINATIONS = gql`
           name
         }
         comments {
-          edges {
-            node {
-              comment
-              createdAt
-              account {
-                name
-              }
-            }
+          comment
+          createdAt
+          account {
+            name
           }
         }
         coordinate {
@@ -93,14 +85,10 @@ export const LOAD_DESTINATIONS_FILTER = gql`
           name
         }
         comments {
-          edges {
-            node {
-              comment
-              createdAt
-              account {
-                name
-              }
-            }
+          comment
+          createdAt
+          account {
+            name
           }
         }
         coordinate {

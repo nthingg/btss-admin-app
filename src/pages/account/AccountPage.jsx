@@ -418,13 +418,13 @@ const AccountPage = () => {
           </div>
         )}
         {!isLoading && selectedStatus === "TRAVELER" && (
-          <AccountTable travelers={accounts} />
+          <AccountTable travelers={accounts} refetch={refetch} />
         )}
         {!isLoading && selectedStatus === "PROVIDER" && (
-          <AccountTable suppliers={accounts} />
+          <AccountTable suppliers={accounts} refetch={refetch} />
         )}
         {!isLoading && selectedStatus === "STAFF" && (
-          <AccountTable staffs={accounts} />
+          <AccountTable staffs={accounts} refetch={refetch} />
         )}
       </div>
     </div>

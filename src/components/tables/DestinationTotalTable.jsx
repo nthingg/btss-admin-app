@@ -11,6 +11,11 @@ import {
   MenuItem,
   Snackbar,
   Switch,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { destinationsTotalColumns } from "../../assets/configs/destinations/destinationsTotal";
 import { CHANGE_STATUS_DESTINATION } from "../../services/graphql/destination";
@@ -26,6 +31,7 @@ const DestinationTotalTable = ({ refetch, destinations }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [okMsg, setOkMsg] = useState(false);
   const [snackbarOkOpen, setSnackbarOkOpen] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState([false]);
 
   const options = ["Xem", "Chỉnh sửa"];
   const ITEM_HEIGHT = 48;
@@ -54,6 +60,16 @@ const DestinationTotalTable = ({ refetch, destinations }) => {
     setSnackbarOkOpen(false);
   };
 
+  const handleClickOpenConfirm = (id) => {
+    openConfirm[id] = true;
+    setOpenConfirm([...openConfirm]);
+  };
+
+  const handleCloseConfirm = (id) => {
+    openConfirm[id] = false;
+    setOpenConfirm([...openConfirm]);
+  };
+
   const [change, { data, error }] = useMutation(CHANGE_STATUS_DESTINATION);
 
   const handleChangeStatus = async (id) => {
@@ -67,6 +83,7 @@ const DestinationTotalTable = ({ refetch, destinations }) => {
         `Thay đổi thành công trạng thái của: ${data.changeDestinationStatus.name}`
       );
       handleClickOk();
+      handleCloseConfirm(id);
       refetch();
     } catch (error) {
       console.log(error);
@@ -86,21 +103,82 @@ const DestinationTotalTable = ({ refetch, destinations }) => {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <Switch
-            checked={params.row.isVisible}
-            onChange={() => {
-              handleChangeStatus(params.row.id);
-            }}
-            inputProps={{ "aria-label": "controlled" }}
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#2c3d50",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "#2c3d50",
-              },
-            }}
-          />
+          <div className="destination-status">
+            <a className="status active" title={params.row.isVisible ? "Đang hoạt động" : "Tạm ẩn"}>
+              <Switch
+                checked={params.row.isVisible}
+                color={params.row.isVisible ? "success" : "error"}
+                onClick={() => {
+                  handleClickOpenConfirm(params.row.id);
+                }}
+                inputProps={{ "aria-label": "controlled" }}
+                sx={{
+                  "& .MuiSwitch-switchBase.Mui-checked": {
+                    color: "#2c3d50",
+                  },
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: "#2c3d50",
+                  },
+                }}
+              />
+            </a>
+            <Dialog
+              open={openConfirm[params.row.id]}
+              onClose={() => {
+                handleCloseConfirm(params.row.id);
+              }}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              className="confirmDialog"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Xác nhận"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Bạn có xác nhận muốn đổi trạng thái hiển thị của địa điểm {params.row.name} không?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <button
+                  className="btn-change-status-cancel"
+                  onClose={() => {
+                    handleCloseConfirm(params.row.id);
+                  }}
+                  style={{
+                    textDecoration: "none",
+                    color: "rgb(44, 61, 80)",
+                    backgroundColor: "white",
+                    fontSize: "16px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    border: "1px solid",
+                    transition: "0.4s"
+                  }}>
+                  Hủy bỏ
+                </button>
+                <button className="btn-change-status-confirm"
+                  onClick={() => {
+                    handleChangeStatus(params.row.id);
+                  }}
+                  autoFocus
+                  style={{
+                    textDecoration: "none",
+                    color: "white",
+                    backgroundColor: "#2c3d50",
+                    fontSize: "16px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    border: "none",
+                    transition: "0.4s"
+                  }}>
+                  Đồng ý
+                </button>
+              </DialogActions>
+            </Dialog>
+          </div>
         );
       },
       renderHeader: () => <span>TRẠNG THÁI</span>,
@@ -198,8 +276,7 @@ const DestinationTotalTable = ({ refetch, destinations }) => {
         localeText={{
           MuiTablePagination: {
             labelDisplayedRows: ({ from, to, count }) =>
-              `${from} - ${to} trong ${
-                count === -1 ? `nhiều hơn ${to}` : count
+              `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
               }`,
           },
           noRowsLabel: "Không có dữ liệu",

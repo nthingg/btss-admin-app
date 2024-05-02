@@ -1,13 +1,22 @@
 import "../../assets/scss/accounts.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useState } from "react";
-import { Switch, IconButton, Snackbar, Alert } from "@mui/material";
+import {
+  Switch,
+  IconButton,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { accountTravelersColumn } from "../../assets/configs/accounts/accountTravelers";
 import { providerAccountsColumn } from "../../assets/configs/accounts/accountProvider";
 import { staffAccountsColumn } from "../../assets/configs/accounts/accountStaffs";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
-import { CHANGE_STATUS_DESTINATION } from "../../services/graphql/destination";
 import { useMutation } from "@apollo/client";
 import { CHANGE_STATUS_ACCOUNT } from "../../services/graphql/account";
 
@@ -19,6 +28,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [okMsg, setOkMsg] = useState(false);
   const [snackbarOkOpen, setSnackbarOkOpen] = useState(false);
+  const [open, setOpen] = useState([false]);
 
   const handleClick = () => {
     setSnackbarOpen(true);
@@ -34,6 +44,16 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
     setSnackbarOkOpen(false);
   };
 
+  const handleClickOpen = (id) => {
+    open[id] = true;
+    setOpen([...open]);
+  };
+
+  const handleClose = (id) => {
+    open[id] = false;
+    setOpen([...open]);
+  };
+
   const [change, { data, error }] = useMutation(CHANGE_STATUS_ACCOUNT);
 
   const handleChangeStatus = async (id) => {
@@ -44,9 +64,10 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
         },
       });
       setOkMsg(
-        `Thay đổi thành công trạng thái của: ${data.changeDestinationStatus.name}`
+        `Thay đổi thành công trạng thái của: ${data.changeAccountStatus.name}`
       );
       handleClickOk();
+      handleClose(id);
       refetch();
     } catch (error) {
       console.log(error);
@@ -65,21 +86,89 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <Switch
-            checked={params.row.isActive}
-            onChange={() => {
-              // handleChangeStatus(params.row.id);
-            }}
-            inputProps={{ "aria-label": "controlled" }}
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#2c3d50",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "#2c3d50",
-              },
-            }}
-          />
+          <div className="profile-status">
+            <a className="status active"
+              title={params.row.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}>
+              <Switch
+                checked={params.row.isActive}
+                color={params.row.isActive ? "success" : "error"}
+                onClick={() => {
+                  handleClickOpen(params.row.id);
+                }} />
+            </a>
+            <Dialog
+              open={open[params.row.id]}
+              onClick={() => {
+                handleClose(params.row.id)
+              }}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              className="confirmDialog"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Xác nhận"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Bạn có xác nhận muốn thay đổi trạng thái của tài khoản {params.row.name} không?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <button
+                  className="btn-change-status-cancel"
+                  onClick={() => {
+                    handleClose(params.row.id)
+                  }}
+                  style={{
+                    textDecoration: "none",
+                    color: "rgb(44, 61, 80)",
+                    backgroundColor: "white",
+                    fontSize: "16px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    border: "1px solid",
+                    transition: "0.4s"
+                  }}>
+                  Hủy bỏ
+                </button>
+                <button
+                  className="btn-change-status-confirm"
+                  onClick={() => {
+                    handleChangeStatus(params.row.id);
+                  }}
+                  autoFocus
+                  style={{
+                    textDecoration: "none",
+                    color: "white",
+                    backgroundColor: "#2c3d50",
+                    fontSize: "16px",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    border: "none",
+                    transition: "0.4s"
+                  }}>
+                  Đồng ý
+                </button>
+              </DialogActions>
+            </Dialog>
+          </div>
+          // <Switch
+          //   checked={params.row.isActive}
+          //   onChange={() => {
+          //     handleChangeStatus(params.row.id);
+          //   }}
+          //   inputProps={{ "aria-label": "controlled" }}
+          //   sx={{
+          //     "& .MuiSwitch-switchBase.Mui-checked": {
+          //       color: "#2c3d50",
+          //     },
+          //     "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+          //       backgroundColor: "#2c3d50",
+          //     },
+          //   }}
+          // />
         );
       },
       renderHeader: () => <span>TRẠNG THÁI</span>,
@@ -133,8 +222,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
@@ -165,8 +253,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
@@ -197,8 +284,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             localeText={{
               MuiTablePagination: {
                 labelDisplayedRows: ({ from, to, count }) =>
-                  `${from} - ${to} trong ${
-                    count === -1 ? `nhiều hơn ${to}` : count
+                  `${from} - ${to} trong ${count === -1 ? `nhiều hơn ${to}` : count
                   }`,
               },
               noRowsLabel: "Không có dữ liệu",
