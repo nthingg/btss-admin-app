@@ -187,13 +187,6 @@ const EmulatorPage = () => {
   );
 
   const {
-    data: dataLatest,
-    loading: loadingLatest,
-    error: errLatest,
-    refetch: refetchLatest,
-  } = useQuery(GET_NEWEST_NAME);
-
-  const {
     error: errorPending,
     loading: loadingPending,
     data: dataPending,
@@ -295,7 +288,6 @@ const EmulatorPage = () => {
           variables: {
             dto: {
               channel: "VONAGE",
-              deviceToken: "test",
               otp: "123123",
               phone: travelerPhone,
             },
@@ -348,7 +340,6 @@ const EmulatorPage = () => {
     acc,
     dateTime,
     tempOrders,
-    currentPos,
     period,
     schedule
   ) => {
@@ -431,7 +422,7 @@ const EmulatorPage = () => {
                   }
                 }
               }
-              type: {nin: [GROCERY, REPAIR, TAXI]}
+              type: {nin: [GROCERY, REPAIR]}
             }
             order: {id: DESC}
             first: 100
@@ -455,19 +446,10 @@ const EmulatorPage = () => {
     return result.data;
   }
 
+  // localStorage.setItem("checkIsUserCall", "no");
+
   const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
-
-    let countLatest = 0;
-    const { data: latest } = await refetchLatest();
-    if (latest.plans.nodes.length === 0) {
-      countLatest = 0;
-    } else {
-      const latestPlan = latest.plans.nodes[0].name;
-      const parts = latestPlan.split("-");
-      const number = parseInt(parts[parts.length - 1], 10);
-      countLatest = number;
-    }
 
     localStorage.setItem("checkIsUserCall", "yes");
     let response = [];
@@ -487,7 +469,7 @@ const EmulatorPage = () => {
       var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
 
       const minCeiled = Math.ceil(2);
-      const maxFloored = Math.floor(18);
+      const maxFloored = Math.floor(30);
       function getOddNumber(min, max) {
         // Ensure even minimum for odd number generation
         min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
@@ -539,6 +521,43 @@ const EmulatorPage = () => {
         }
       }
 
+      let productAcmdation = [];
+      let productFB = [];
+      let productVehicle = [];
+
+      if (fbProviders.length > 0) {
+        let findProvider = Math.floor(Math.random() * fbProviders.length);
+
+        const { data: dataProduct } = await refetchProduct({
+          id: fbProviders[findProvider].id,
+          type: ["BEVERAGE", "FOOD"],
+        });
+
+        productFB = dataProduct.products.nodes;
+      }
+      if (vehicleProviders.length > 0) {
+        let findProvider = Math.floor(Math.random() * vehicleProviders.length);
+
+        const { data: dataProduct } = await refetchProduct({
+          id: vehicleProviders[findProvider].id,
+          type: ["VEHICLE"],
+        });
+
+        productVehicle = dataProduct.products.nodes;
+      }
+      if (acmdationProviders.length > 0) {
+        let findProvider = Math.floor(
+          Math.random() * acmdationProviders.length
+        );
+
+        const { data: dataProduct } = await refetchProduct({
+          id: acmdationProviders[findProvider].id,
+          type: ["ROOM", "CAMP"],
+        });
+
+        productAcmdation = dataProduct.products.nodes;
+      }
+
       let planTempData = planData[0];
 
       planTempData.destinationId = destination.id;
@@ -575,143 +594,214 @@ const EmulatorPage = () => {
           schedule[z][y].orderUUID = null;
         }
       }
-      console.log(schedule);
+
+      let tempCartAcmdation = [];
+      if (productAcmdation.length > 0) {
+        let numOfProducts = 1;
+
+        for (let h = 0; h < numOfProducts; h++) {
+          let random = Math.floor(Math.random() * productAcmdation.length);
+
+          const found = tempCartAcmdation.find(
+            (item) => item.key === productAcmdation[random].id
+          );
+
+          if (!found) {
+            let check = true;
+            let num = 0;
+            while (check) {
+              num++;
+              if (num * productAcmdation[random].partySize >= 10) {
+                check = false;
+              }
+            }
+            tempCartAcmdation.push({
+              key: productAcmdation[random].id,
+              value: num,
+            });
+          }
+        }
+      }
+
+      let tempCartFB = [];
+      if (productFB.length > 0) {
+        let numOfProducts = 5;
+
+        for (let h = 0; h < numOfProducts; h++) {
+          let random = Math.floor(Math.random() * productFB.length);
+
+          const found = tempCartFB.find(
+            (item) => item.key === productFB[random].id
+          );
+
+          if (!found) {
+            let check = true;
+            let num = 0;
+            while (check) {
+              num++;
+              if (num * productFB[random].partySize >= 10) {
+                check = false;
+              }
+            }
+            tempCartFB.push({ key: productFB[random].id, value: num });
+          }
+        }
+      }
+
+      let tempCartVehicle = [];
+      if (productVehicle.length > 0) {
+        let numOfProducts = 1;
+
+        for (let h = 0; h < numOfProducts; h++) {
+          let random = Math.floor(Math.random() * productVehicle.length);
+
+          const found = tempCartVehicle.find(
+            (item) => item.key === productVehicle[random].id
+          );
+
+          if (!found) {
+            let check = true;
+            let num = 0;
+            while (check) {
+              num++;
+              if (num * productVehicle[random].partySize >= 10) {
+                check = false;
+              }
+            }
+            tempCartVehicle.push({
+              key: productVehicle[random].id,
+              value: num,
+            });
+          }
+        }
+      }
+
+      console.log(productFB);
+      console.log(productVehicle);
+      console.log(productAcmdation);
+
+      console.log(tempCartFB);
+      console.log(tempCartVehicle);
+      console.log(tempCartAcmdation);
+
+      let fixedPeriod = "NOON";
+
+      let fixedServeDate = [];
+
+      let checkInServe = [];
+      for (let g = 0; g < schedule.length; g++) {
+        if (g < schedule.length - 1) {
+          checkInServe.push(g);
+        }
+      }
+      fixedServeDate = checkInServe;
+
+      const uuidFB = uuidv4();
+      const uuidVehicle = uuidv4();
+
+      if (schedule[0].length === 1) {
+        let changedServeDate = fixedServeDate;
+        changedServeDate.shift();
+        if (tempCartFB.length > 0) {
+          tempOrders.push({
+            uuid: uuidFB,
+            cart: tempCartFB,
+            note: null,
+            period: fixedPeriod,
+            serveDateIndexes: changedServeDate,
+            type: "EAT",
+          });
+        }
+      } else {
+        if (tempCartFB.length > 0) {
+          tempOrders.push({
+            uuid: uuidFB,
+            cart: tempCartFB,
+            note: null,
+            period: fixedPeriod,
+            serveDateIndexes: fixedServeDate,
+            type: "EAT",
+          });
+        }
+      }
+
+      if (tempCartVehicle.length > 0) {
+        tempOrders.push({
+          uuid: uuidVehicle,
+          cart: tempCartVehicle,
+          note: null,
+          period: fixedPeriod,
+          serveDateIndexes: fixedServeDate,
+          type: "VISIT",
+        });
+      }
 
       for (let m = 0; m < schedule.length; m++) {
+        let haveFB = false;
+        let haveVehicle = false;
+
         for (let k = 0; k < schedule[m].length; k++) {
-          let isOrder = Math.floor(Math.random() * 2);
-          if (
-            isOrder === 1 &&
-            schedule[m][k].type !== "CHECKIN" &&
-            schedule[m][k].type !== "CHECKOUT"
-          ) {
-            continue;
-          }
+          let fixedPeriod = "NOON";
 
-          let products = [];
-
-          if (schedule[m][k].type === "EAT") {
-            if (fbProviders.length > 0) {
-              let findProvider = Math.floor(Math.random() * fbProviders.length);
-
-              const { data: dataProduct } = await refetchProduct({
-                id: fbProviders[findProvider].id,
-                type: ["BEVERAGE", "FOOD"],
-              });
-
-              products = dataProduct.products.nodes;
+          let checkIn = [];
+          let fixedServe = [0];
+          for (let g = 0; g < schedule.length; g++) {
+            if (g < schedule.length - 1) {
+              checkIn.push(g);
             }
           }
-          // else if (schedule[m][k].type === "VISIT") {
-          //   if (vehicleProviders.length > 0) {
-          //     let findProvider = Math.floor(
-          //       Math.random() * vehicleProviders.length
-          //     );
+          fixedServe = checkIn;
 
-          //     const { data: dataProduct } = await refetchProduct({
-          //       id: vehicleProviders[findProvider].id,
-          //       type: ["VEHICLE"],
-          //     });
-
-          //     products = dataProduct.products.nodes;
-          //   }
-          // }
-          else if (schedule[m][k].type === "CHECKIN") {
-            if (acmdationProviders.length > 0) {
-              let findProvider = Math.floor(
-                Math.random() * acmdationProviders.length
-              );
-
-              const { data: dataProduct } = await refetchProduct({
-                id: acmdationProviders[findProvider].id,
-                type: ["ROOM", "CAMP"],
-              });
-
-              products = dataProduct.products.nodes;
-            }
-          }
-
-          let tempCart = [];
-          if (products.length > 0) {
-            let numOfProducts = 0;
-
-            if (schedule[m][k].type === "EAT") {
-              numOfProducts = 1;
-            } else if (schedule[m][k].type === "VISIT") {
-              numOfProducts = 1;
-            } else if (schedule[m][k].type === "CHECKIN") {
-              numOfProducts = 1;
-            }
-
-            for (let h = 0; h < numOfProducts; h++) {
-              let random = Math.floor(Math.random() * products.length);
-
-              const found = tempCart.find(
-                (item) => item.key === products[random].id
-              );
-
-              if (!found) {
-                let check = true;
-                let num = 0;
-                while (check) {
-                  num++;
-                  if (num * products[random].partySize >= 10) {
-                    check = false;
-                  }
-                }
-                tempCart.push({ key: products[random].id, value: num });
-              }
-            }
-          }
-
-          if (tempCart.length > 0) {
-            let fixedPeriod = "NOON";
-
-            if (schedule[m][k].type === "CHECKIN") {
-              if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
-                fixedPeriod = "EVENING";
-              } else if (
-                arrivalTime >= "10:00:00" &&
-                arrivalTime < "16:00:00"
-              ) {
-                fixedPeriod = "AFTERNOON";
-              }
+          if (schedule[m][k].type === "CHECKIN") {
+            if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+              fixedPeriod = "EVENING";
+            } else if (arrivalTime >= "10:00:00" && arrivalTime < "16:00:00") {
+              fixedPeriod = "AFTERNOON";
             }
 
             const uuid = uuidv4();
             schedule[m][k].orderUUID = uuid;
             tempOrders.push({
               uuid: schedule[m][k].orderUUID,
-              cart: tempCart,
+              cart: tempCartAcmdation,
               note: null,
               period: fixedPeriod,
-              serveDateIndexes: [m],
+              serveDateIndexes: fixedServe,
               type: schedule[m][k].type,
             });
           }
 
-          if (schedule[m][k].type === "CHECKOUT") {
-            schedule[m][k].orderUUID = schedule[0][0].orderUUID;
-            tempOrders.push({
-              uuid: schedule[0][0].orderUUID,
-              cart: tempOrders[0].cart,
-              note: null,
-              period: "NOON",
-              serveDateIndexes: [m],
-              type: "CHECKOUT",
-            });
+          if (
+            schedule[m][k].type === "EAT" &&
+            haveFB === false &&
+            m !== schedule.length - 1 &&
+            tempCartFB.length > 0
+          ) {
+            schedule[m][k].orderUUID = uuidFB;
+            haveFB = true;
+          }
+
+          if (
+            schedule[m][k].type === "VISIT" &&
+            haveVehicle === false &&
+            m !== schedule.length - 1 &&
+            tempCartVehicle.length > 0
+          ) {
+            schedule[m][k].orderUUID = uuidVehicle;
+            haveVehicle = true;
           }
         }
       }
 
-      countLatest++;
+      console.log(schedule);
+      console.log(tempOrders);
+
       const res = await handleCreatePlan(
         planData[0],
         count,
         loggedAcc[i],
         dateTime,
         tempOrders,
-        countLatest,
         period,
         schedule
       );
