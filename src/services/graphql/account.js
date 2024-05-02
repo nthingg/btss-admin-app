@@ -29,12 +29,11 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
 `;
 
 export const LOAD_ACCOUNTS_FILTER = gql`
-  query LoadAccounts($role: [Role!], $searchTerm: String) {
+  query LoadAccounts($role: [Role!]) {
     accounts(
       first: 100
       order: { id: DESC }
       where: { role: { in: $role } }
-      searchTerm: $searchTerm
     ) {
       nodes {
         id
@@ -132,8 +131,8 @@ export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
 `
 
 export const LOAD_ACCOUNTS = gql`
-  query LoadAccount($searchTerm: String) {
-    accounts(first: 100, order: { id: ASC }, searchTerm: $searchTerm) {
+  query LoadAccount {
+    accounts(first: 100, order: { id: ASC }) {
       nodes {
         id
         role
@@ -181,7 +180,9 @@ export const LOAD_DETAIL_ACCOUNT = gql`
 
 export const LOAD_ACCOUNT_USERS = gql`
   {
-    accounts(where: { role: { eq: TRAVELER } }) {
+    accounts(
+      dto: { role: TRAVELER, isProviderNameSearch: false, searchTerm: "" }
+    ) {
       totalCount
     }
   }
@@ -189,7 +190,7 @@ export const LOAD_ACCOUNT_USERS = gql`
 
 export const LOAD_ACCOUNTS_TRAVELER = gql`
   query {
-    accounts(where: { plans: { some: { isPublished: { eq: true } } } }) {
+    accounts(where: { publishedPlanCount: { gt: 0 } }) {
       totalCount
     }
   }
@@ -197,7 +198,10 @@ export const LOAD_ACCOUNTS_TRAVELER = gql`
 
 export const LOAD_NUMBERS_NEWEST_TRAVELER = gql`
   query QueryNewAccounts($input: DateTime) {
-    accounts(where: { role: { eq: TRAVELER }, createdAt: { gte: $input } }) {
+    accounts(
+      where: { createdAt: { gte: $input } }
+      dto: { role: TRAVELER, isProviderNameSearch: false, searchTerm: "" }
+    ) {
       totalCount
     }
   }

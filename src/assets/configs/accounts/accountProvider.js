@@ -19,7 +19,7 @@ export const providerAccountsColumn = [
     align: "left",
     headerAlign: "left",
     renderCell: (params) => {
-      return <div>{params.row.name}</div>;
+      return <div>{params.row.node.name}</div>;
     },
     renderHeader: () => <span>TÀI KHOẢN</span>,
   },
@@ -29,7 +29,7 @@ export const providerAccountsColumn = [
     align: "left",
     headerAlign: "left",
     renderCell: (params) => {
-      if (params.row.provider === null) {
+      if (params.row.node.provider === null) {
         return <div>Không có</div>;
       } else {
         return (
@@ -37,13 +37,13 @@ export const providerAccountsColumn = [
             {/* <img
               className="cellImg"
               src={
-                params.row.supplier.imageUrl === null
+                params.row.node.supplier.imageUrl === null
                   ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-                  : params.row.supplier.imageUrl
+                  : params.row.node.supplier.imageUrl
               }
               alt="avatar"
             /> */}
-            {params.row.provider.name}
+            {params.row.node.provider.name}
           </div>
         );
       }
@@ -91,11 +91,11 @@ export const providerAccountsColumn = [
         return formattedParts.join("");
       }
 
-      if (params.row.phone !== null) {
+      if (params.row.node.phone !== null) {
         return (
           <div>
             <span className="itemValue">
-              {formatPhoneNumberCen(params.row.phone)}
+              {formatPhoneNumberCen(params.row.node.phone)}
             </span>
           </div>
         );
@@ -111,7 +111,7 @@ export const providerAccountsColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.email}</div>;
+      return <div>{params.row.node.email}</div>;
     },
     renderHeader: () => <span>EMAIL</span>,
   },

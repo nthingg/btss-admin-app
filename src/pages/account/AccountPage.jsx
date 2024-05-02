@@ -4,7 +4,7 @@ import "../../assets/scss/filter.scss";
 import "../../assets/scss/shared.scss";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -14,234 +14,397 @@ import { Link, useParams } from "react-router-dom";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import {
-  LOAD_ACCOUNTS,
-  LOAD_ACCOUNTS_FILTER,
-  LOAD_NON_TRAVELER_FILTER,
-  LOAD_TRAVELER_ACCOUNT_FILTER,
-  LOAD_TRAVELER_FILTER,
-} from "../../services/graphql/account";
 import AccountTable from "../../components/tables/AccountTable";
 import Slider from "react-slick";
 import { Box, FormControl, FormControlLabel, FormLabel, Modal, Radio, RadioGroup, Typography } from "@mui/material";
+import client from "../../services/apollo/config";
 
 const AccountPage = () => {
   const { sbsNumber } = useParams();
   const accountRole = ["TRAVELER", "PROVIDER", "STAFF"];
   const [selectedDiv, setSelectedDiv] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(accountRole[0]);
-  const [accountQuery, setAccoutQuery] = useState(LOAD_ACCOUNTS_FILTER);
-  const [totalQuery, setTotalQuery] = useState(LOAD_ACCOUNTS);
   const [searchTerm, setSearchTerm] = useState("");
-  const [phoneSearchTerm, setPhoneSearchTerm] = useState("");
-  const [searchedTraveler, setSearchedTraveler] = useState(null);
+  const [phoneSearchTerm, setPhoneSearchTerm] = useState(null);
   const [filterTraveler, setFilterTraveler] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
-
+  //count variables
+  const [accountTravelers, setTravelers] = useState(0);
+  const [accountSuppliers, setSuppliers] = useState(0);
+  const [accountStaffs, setStaffs] = useState(0);
+  //modal variables
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [accounts, setAccounts] = useState([]);
+  const accountQueryInit = async (selectedRole, searchTerm, phoneQuery, filterQuery) => {
+    let query = gql`
+      query LoadAccountsInit {
+        accounts(
+          first: 100
+          order: { id: DESC }
+          where: { 
+            ${phoneQuery}
+            ${filterQuery}
+          }
+          dto: {
+            role: ${selectedRole}
+            isProviderNameSearch: false
+            searchTerm: "${searchTerm}"
+          }
+        ) {
+          edges {
+            node {
+              id
+              name
+              phone
+              email
+              isMale
+              isActive
+              prestigePoint
+              provider {
+                name
+              }
+              plans {
+                id
+              }
+              publishedPlanCount
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `
+
+    try {
+      const result = await client.query({ query, fetchPolicy: "network-only" });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClickSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
+  const providerSearch = async (searchTerm, phoneQuery, filterQuery) => {
+    let query = gql`
+      query LoadProviderInit {
+        accounts(
+          first: 100
+          order: { id: DESC }
+          where: { 
+            ${phoneQuery}
+            ${filterQuery}
+          }
+          dto: {
+            role: PROVIDER
+            isProviderNameSearch: true
+            searchTerm: "${searchTerm}"
+          }
+        ) {
+          edges {
+            node {
+              id
+              name
+              phone
+              email
+              isMale
+              isActive
+              prestigePoint
+              provider {
+                name
+              }
+              plans {
+                id
+              }
+              publishedPlanCount
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          totalCount
+        }
+      }
+    `
+
+    try {
+      const result = await client.query({ query, fetchPolicy: "network-only" });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClickSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
+  const countAccount = async (role, searchTerm, phoneQuery, filterQuery) => {
+    const query = gql`
+      query CountAccounts {
+        accounts(
+          where: { 
+            ${phoneQuery}
+            ${filterQuery}
+          }
+          dto: {
+            role: ${role}
+            isProviderNameSearch: false
+            searchTerm: "${searchTerm}"
+          }
+        ) {
+          totalCount
+        }
+      }
+    `
+
+    try {
+      const result = await client.query({ query, fetchPolicy: "network-only" });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      const msg = localStorage.getItem("errorMsg");
+      // setErrMsg(msg);
+      // handleClickSnackBar();
+      localStorage.removeItem("errorMsg");
+    }
+  }
+
+  const fetchAccount = async (role, searchTerm, phoneSearchTerm, filterValue) => {
+    let phoneQuery = "";
+    let filterQuery = "";
+    if (phoneSearchTerm) {
+      phoneQuery = `phone: { contains: "${phoneSearchTerm}" }`
+    }
+    if (filterValue && filterValue !== 'all') {
+      if (filterValue === 'travelers') {
+        filterQuery = `publishedPlanCount: { gt: 0 }`
+      } else if (filterValue === 'others') {
+        filterQuery = `publishedPlanCount: { lte: 0 }`
+      }
+    }
+
+    const data = await accountQueryInit(role, searchTerm, phoneQuery, filterQuery);
+    let accountData = data.accounts.edges;
+    // if (data.plans.pageInfo.hasNextPage === true) {
+    //   let check = true;
+    //   let endCursor = data.plans.pageInfo.endCursor;
+    //   while (check) {
+    //     const dataRefetch = await planQuery(
+    //       endCursor,
+    //       statusQuery,
+    //       searchTerm,
+    //       utcDepartAtQuery,
+    //       publishedQuery,
+    //       onGoingQuery,
+    //       ordersQuery,
+    //       accountQuery
+    //     );
+
+    //     planData = planData.concat(dataRefetch.plans.edges);
+
+    //     if (dataRefetch.plans.pageInfo.hasNextPage === true) {
+    //       endCursor = dataRefetch.plans.pageInfo.endCursor;
+    //     } else {
+    //       check = false;
+    //     }
+    //   }
+    // }
+
+    if (role === "PROVIDER") {
+      const dataProvider = await providerSearch(searchTerm, phoneQuery, filterQuery);
+      if (dataProvider.accounts.edges.length > 0) {
+        accountData = dataProvider.accounts.edges;
+      }
+    }
+
+    let res = accountData.map((node, index) => {
+      if (node) {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 };
+      }
+    });
+    setAccounts(res);
+    setIsLoading(false);
+  }
+
+  const fetchCountAccount = async (searchTerm, phoneSearchTerm, filterValue) => {
+    let phoneQuery = "";
+    let filterQuery = "";
+    if (phoneSearchTerm) {
+      phoneQuery = `phone: { contains: "${phoneSearchTerm}" }`
+    }
+    if (filterValue && filterValue !== 'all') {
+      if (filterValue === 'travelers') {
+        filterQuery = `publishedPlanCount: { gt: 0 }`
+      } else if (filterValue === 'others') {
+        filterQuery = `publishedPlanCount: { lte: 0 }`
+      }
+    }
+    for (let role of accountRole) {
+      const data = await countAccount(role, searchTerm, phoneQuery, filterQuery);
+      let totalCount = data.accounts.totalCount;
+
+      switch (role) {
+        case "TRAVELER":
+          setTravelers(totalCount);
+          break;
+        case "PROVIDER":
+          const dataProvider = await providerSearch(searchTerm, phoneQuery, filterQuery);
+          if (dataProvider.accounts.edges.length > 0) {
+            totalCount = dataProvider.accounts.totalCount;
+          }
+          setSuppliers(totalCount);
+          break;
+        case "STAFF":
+          setStaffs(totalCount);
+          break;
+      }
+    }
+    setIsLoading(false);
+  }
 
   const handleClick = (index) => {
     setSelectedDiv(index);
     switch (index) {
       case 0:
-        if (filterTraveler !== 'all') {
-          if (filterTraveler === 'travelers') {
-            setAccoutQuery(LOAD_TRAVELER_FILTER);
-          } else {
-            setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
-          }
-        } else if (searchTerm !== "" || phoneSearchTerm !== "") {
-          setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
-        }
+        fetchAccount(accountRole[0], searchTerm, phoneSearchTerm, filterTraveler);
         setSelectedStatus(accountRole[0]);
-        refetch();
         break;
       case 1:
-        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+        fetchAccount(accountRole[1], searchTerm, phoneSearchTerm, filterTraveler);
         setSelectedStatus(accountRole[1]);
-        refetch();
         break;
       case 2:
-        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
+        fetchAccount(accountRole[2], searchTerm, phoneSearchTerm, filterTraveler);
         setSelectedStatus(accountRole[2]);
-        refetch();
         break;
       default:
         break;
     }
   };
 
-  const {
-    error: errorTotal,
-    loading: loadingTotal,
-    data: dataTotal,
-    refetch: refetchTotal,
-  } = useQuery(filterTraveler === 'all' ? LOAD_ACCOUNTS : (filterTraveler === 'travelers' ? LOAD_ACCOUNTS_FILTER : LOAD_NON_TRAVELER_FILTER), {
-    variables: {
-      searchTerm: searchTerm,
-    },
-    fetchPolicy: "network-only"
-  });
+  // const {
+  //   error: errorTotal,
+  //   loading: loadingTotal,
+  //   data: dataTotal,
+  //   refetch: refetchTotal,
+  // } = useQuery(LOAD_ACCOUNTS, {
+  //   variables: {
+  //     searchTerm: searchTerm,
+  //   },
+  //   fetchPolicy: "network-only"
+  // });
 
-  const [accountTravelers, setTravelers] = useState(0);
-  const [accountSuppliers, setSuppliers] = useState(0);
-  const [accountStaffs, setStaffs] = useState(0);
-  useEffect(() => {
-    if (
-      !loadingTotal &&
-      !errorTotal &&
-      dataTotal &&
-      dataTotal["accounts"]["nodes"]
-    ) {
-      fetchNumberAccount(dataTotal["accounts"]["nodes"], false);
-      setIsLoading(false);
-    }
-  }, [dataTotal, loadingTotal, errorTotal]);
+  // useEffect(() => {
+  //   if (
+  //     !loadingTotal &&
+  //     !errorTotal &&
+  //     dataTotal &&
+  //     dataTotal["accounts"]["nodes"]
+  //   ) {
+  //     fetchNumberAccount(dataTotal["accounts"]["nodes"], false);
+  //     setIsLoading(false);
+  //   }
+  // }, [dataTotal, loadingTotal, errorTotal]);
 
-  const fetchNumberAccount = (data, isCountTravelerOnly) => {
-    let countTraveler = 0;
-    for (const item of data) {
-      if (item["role"] === "TRAVELER" && item["plans"]) {
-        countTraveler++;
-      }
-    }
+  // const fetchNumberAccount = (data, isCountTravelerOnly) => {
+  //   let countTraveler = 0;
+  //   for (const item of data) {
+  //     if (item["role"] === "TRAVELER" && item["plans"]) {
+  //       countTraveler++;
+  //     }
+  //   }
 
-    setTravelers(countTraveler);
+  //   setTravelers(countTraveler);
 
-    if (!isCountTravelerOnly) {
-      let countSupplier = 0;
-      for (const item of data) {
-        if (item["role"] === "PROVIDER") {
-          countSupplier++;
-        }
-      }
+  //   if (!isCountTravelerOnly) {
+  //     let countSupplier = 0;
+  //     for (const item of data) {
+  //       if (item["role"] === "PROVIDER") {
+  //         countSupplier++;
+  //       }
+  //     }
 
-      let countStaff = 0;
-      for (const item of data) {
-        if (item["role"] === "STAFF") {
-          countStaff++;
-        }
-      }
-      setSuppliers(countSupplier);
-      setStaffs(countStaff);
-    }
-  };
+  //     let countStaff = 0;
+  //     for (const item of data) {
+  //       if (item["role"] === "STAFF") {
+  //         countStaff++;
+  //       }
+  //     }
+  //     setSuppliers(countSupplier);
+  //     setStaffs(countStaff);
+  //   }
+  // };
 
-  const { error, loading, data, refetch } = useQuery(accountQuery, {
-    variables: {
-      role: selectedStatus,
-      searchTerm: searchTerm,
-      phone: phoneSearchTerm,
-    },
-    fetchPolicy: "network-only"
-  });
+  // const { error, loading, data, refetch } = useQuery(accountQuery, {
+  //   variables: {
+  //     role: selectedStatus,
+  //     searchTerm: searchTerm,
+  //     phone: phoneSearchTerm,
+  //   },
+  //   fetchPolicy: "network-only"
+  // });
 
-  const [accounts, setAccounts] = useState([]);
-  useEffect(() => {
-    if (!loading && !error && data && data["accounts"]["nodes"]) {
-      let res = data.accounts.nodes.map((node, index) => {
-        const { __typename, ...rest } = node;
-        return { ...rest, index: index + 1 }; // Add the index to the object
-      });
-      setAccounts(res);
-      if (accountQuery === LOAD_TRAVELER_ACCOUNT_FILTER || accountQuery === LOAD_TRAVELER_FILTER || accountQuery === LOAD_NON_TRAVELER_FILTER) {
-        setSearchedTraveler(res);
-      }
-      setIsLoading(false);
-    }
-  }, [data, loading, error]);
+  // useEffect(() => {
+  //   if (!loading && !error && data && data["accounts"]["nodes"]) {
+  //     let res = data.accounts.nodes.map((node, index) => {
+  //       const { __typename, ...rest } = node;
+  //       return { ...rest, index: index + 1 }; // Add the index to the object
+  //     });
+  //     setAccounts(res);
+  //   }
+  // }, [data, loading, error]);
 
   const handleSearchSubmit = () => {
     setIsLoading(true);
     let search = document.getElementById("floatingValue").value;
     //isNaN(num): returns true if the variable does NOT contain a valid number
+    if (!search) {
+      setIsLoading(false);
+      return;
+    }
     if (isNaN(search)) {
       setSearchTerm(search);
       setPhoneSearchTerm("");
+      fetchAccount(selectedStatus, search, null, filterTraveler);
+      fetchCountAccount(search, null, filterTraveler);
     } else {
       if (search.startsWith("0")) {
         search = "84" + search.substring(1);
       }
-      if (filterTraveler !== 'all') {
-        if (filterTraveler === 'travelers') {
-          setAccoutQuery(LOAD_TRAVELER_FILTER);
-        } else {
-          setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
-        }
-      } else {
-        setAccoutQuery(LOAD_TRAVELER_ACCOUNT_FILTER);
-      }
       setSearchTerm("");
       setPhoneSearchTerm(search);
+      fetchAccount(selectedStatus, "", search, filterTraveler);
+      fetchCountAccount("", search, filterTraveler);
     }
-    refetch();
-    refetchTotal();
   };
 
   useEffect(() => {
-    if (searchedTraveler) {
-      let countTraveler = 0;
-      for (const item of searchedTraveler) {
-        countTraveler++;
-      }
-      setTravelers(countTraveler);
-    }
-  }, [searchedTraveler]);
-
-  const fetchData = async () => {
-    setAccoutQuery(LOAD_ACCOUNTS_FILTER);
-    setSearchTerm("");
-    setPhoneSearchTerm("");
-    refetchTotal();
-  };
-
-  useEffect(() => {
-    fetchData();
     if (sbsNumber === "1") {
       setFilterTraveler('travelers');
-      setAccoutQuery(LOAD_TRAVELER_FILTER);
-      refetch();
+      fetchCountAccount(searchTerm, phoneSearchTerm, 'travelers');
+      fetchAccount(accountRole[0], searchTerm, phoneSearchTerm, 'travelers');
+    }
+    else {
+      fetchCountAccount(searchTerm);
+      fetchAccount(accountRole[0], searchTerm);
     }
   }, []);
 
-  const [countTraveler, { }] = useLazyQuery(LOAD_TRAVELER_FILTER);
-  const [countNonTraveler, { }] = useLazyQuery(LOAD_NON_TRAVELER_FILTER);
-
-  const handleChangeFilter = async (e) => {
+  const handleChangeFilter = (e) => {
     const filterValue = e.target.value;
     setFilterTraveler(filterValue);
-    switch (filterValue) {
-      case 'all':
-        setAccoutQuery(LOAD_ACCOUNTS_FILTER);
-        refetch();
-        break;
-      case 'travelers':
-        setAccoutQuery(LOAD_TRAVELER_FILTER);
-        const { data: dataTravelers } = await countTraveler({
-          variables: {
-            role: selectedStatus,
-            searchTerm: searchTerm,
-            phone: phoneSearchTerm,
-          }
-        });
-        setTravelers(dataTravelers.accounts.totalCount);
-        refetch();
-        break;
-      case 'others':
-        setAccoutQuery(LOAD_NON_TRAVELER_FILTER);
-        const { data: dataNonTravelers } = await countNonTraveler({
-          variables: {
-            role: selectedStatus,
-            searchTerm: searchTerm,
-            phone: phoneSearchTerm,
-          }
-        });
-        setTravelers(dataNonTravelers.accounts.totalCount);
-        refetch();
-        break;
-    }
+    fetchAccount(selectedStatus, searchTerm, phoneSearchTerm, filterValue);
+    fetchCountAccount(searchTerm, phoneSearchTerm, filterValue);
     handleClose();
   }
 
@@ -360,18 +523,13 @@ const AccountPage = () => {
           <button
             className="link"
             onClick={() => {
-              setAccoutQuery(LOAD_ACCOUNTS_FILTER);
               setIsLoading(true);
               document.getElementById('floatingValue').value = "";
               setSearchTerm("");
-              setPhoneSearchTerm("");
+              setPhoneSearchTerm(null);
               setFilterTraveler('all');
-              setSearchedTraveler(null);
-              refetch();
-              refetchTotal();
-              setTimeout(() => {
-                setIsLoading(false);
-              }, 300);
+              fetchAccount(selectedStatus, "");
+              fetchCountAccount("");
             }}
           >
             <RefreshIcon />
@@ -418,13 +576,22 @@ const AccountPage = () => {
           </div>
         )}
         {!isLoading && selectedStatus === "TRAVELER" && (
-          <AccountTable travelers={accounts} refetch={refetch} />
+          <AccountTable travelers={accounts}
+            fetchAccount={() => {
+              fetchAccount(selectedStatus, searchTerm, phoneSearchTerm, filterTraveler)
+            }} />
         )}
         {!isLoading && selectedStatus === "PROVIDER" && (
-          <AccountTable suppliers={accounts} refetch={refetch} />
+          <AccountTable suppliers={accounts}
+            fetchAccount={() => {
+              fetchAccount(selectedStatus, searchTerm, phoneSearchTerm, filterTraveler)
+            }} />
         )}
         {!isLoading && selectedStatus === "STAFF" && (
-          <AccountTable staffs={accounts} refetch={refetch} />
+          <AccountTable staffs={accounts}
+            fetchAccount={() => {
+              fetchAccount(selectedStatus, searchTerm, phoneSearchTerm, filterTraveler)
+            }} />
         )}
       </div>
     </div>

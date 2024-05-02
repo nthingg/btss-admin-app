@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { CHANGE_STATUS_ACCOUNT } from "../../services/graphql/account";
 
-const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
+const AccountTable = ({ fetchAccount, travelers, suppliers, staffs }) => {
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
       );
       handleClickOk();
       handleClose(id);
-      refetch();
+      fetchAccount();
     } catch (error) {
       console.log(error);
       const msg = localStorage.getItem("errorMsg");
@@ -88,18 +88,18 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
         return (
           <div className="profile-status">
             <a className="status active"
-              title={params.row.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}>
+              title={params.row.node.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}>
               <Switch
-                checked={params.row.isActive}
-                color={params.row.isActive ? "success" : "error"}
+                checked={params.row.node.isActive}
+                color={params.row.node.isActive ? "success" : "error"}
                 onClick={() => {
-                  handleClickOpen(params.row.id);
+                  handleClickOpen(params.row.node.id);
                 }} />
             </a>
             <Dialog
-              open={open[params.row.id]}
+              open={open[params.row.node.id]}
               onClick={() => {
-                handleClose(params.row.id)
+                handleClose(params.row.node.id)
               }}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
@@ -110,14 +110,14 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                  Bạn có xác nhận muốn thay đổi trạng thái của tài khoản {params.row.name} không?
+                  Bạn có xác nhận muốn thay đổi trạng thái của tài khoản {params.row.node.name} không?
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <button
                   className="btn-change-status-cancel"
                   onClick={() => {
-                    handleClose(params.row.id)
+                    handleClose(params.row.node.id)
                   }}
                   style={{
                     textDecoration: "none",
@@ -135,7 +135,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
                 <button
                   className="btn-change-status-confirm"
                   onClick={() => {
-                    handleChangeStatus(params.row.id);
+                    handleChangeStatus(params.row.node.id);
                   }}
                   autoFocus
                   style={{
@@ -155,9 +155,9 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             </Dialog>
           </div>
           // <Switch
-          //   checked={params.row.isActive}
+          //   checked={params.row.node.isActive}
           //   onChange={() => {
-          //     handleChangeStatus(params.row.id);
+          //     handleChangeStatus(params.row.node.id);
           //   }}
           //   inputProps={{ "aria-label": "controlled" }}
           //   sx={{
@@ -186,7 +186,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
           <IconButton
             color="info"
             onClick={() => {
-              navigate(`/accounts/${params.row.id}`);
+              navigate(`/accounts/${params.row.node.id}`);
             }}
           >
             <VisibilityIcon />
@@ -208,6 +208,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             rowSelection={false}
             pagination
             autoPageSize={true}
+            getRowId={(row) => row.node.id}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
@@ -238,6 +239,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             rowSelection={false}
             pagination
             autoPageSize={true}
+            getRowId={(row) => row.node.id}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {
@@ -269,6 +271,7 @@ const AccountTable = ({ refetch, travelers, suppliers, staffs }) => {
             rowSelection={false}
             pagination
             autoPageSize={true}
+            getRowId={(row) => row.node.id}
             showColumnVerticalBorder={true}
             sx={{
               "& .MuiDataGrid-columnHeader": {

@@ -26,13 +26,13 @@ export const accountTravelersColumn = [
           {/* <img
             className="cellImg"
             src={
-              params.row.avatarUrl === null
+              params.row.node.avatarUrl === null
                 ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-                : params.row.avatarUrl
+                : params.row.node.avatarUrl
             }
             alt="avatar"
           /> */}
-          {params.row.name}
+          {params.row.node.name}
         </div>
       );
     },
@@ -79,11 +79,11 @@ export const accountTravelersColumn = [
         return formattedParts.join("");
       }
 
-      if (params.row.phone !== null) {
+      if (params.row.node.phone !== null) {
         return (
           <div>
             <span className="itemValue">
-              {formatPhoneNumberCen(params.row.phone)}
+              {formatPhoneNumberCen(params.row.node.phone)}
             </span>
           </div>
         );
@@ -99,7 +99,7 @@ export const accountTravelersColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.isMale === true ? "Nam" : "Nữ"}</div>;
+      return <div>{params.row.node.isMale === true ? "Nam" : "Nữ"}</div>;
     },
     renderHeader: () => <span>GIỚI TÍNH</span>,
   },
@@ -109,7 +109,7 @@ export const accountTravelersColumn = [
     align: "right",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div className="prestigePoint">{params.row.prestigePoint}</div>;
+      return <div className="prestigePoint">{params.row.node.prestigePoint}</div>;
     },
     renderHeader: () => <span>ĐIỂM UY TÍN</span>,
   },
@@ -119,7 +119,7 @@ export const accountTravelersColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      if (params.row.publishedPlanCount > 0) {
+      if (params.row.node.publishedPlanCount > 0) {
         return (
           <div className="cellWithStatus AVAILABLE">{<CheckCircleIcon />}</div>
         );
@@ -135,7 +135,7 @@ export const accountTravelersColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.publishedPlanCount}</div>
+      return <div>{params.row.node.publishedPlanCount}</div>
     },
     renderHeader: () => <span>KẾ HOẠCH ĐÃ CHIA SẺ</span>,
   },

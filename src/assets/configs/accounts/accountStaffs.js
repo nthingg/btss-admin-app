@@ -20,13 +20,13 @@ export const staffAccountsColumn = [
           {/* <img
             className="cellImg"
             src={
-              params.row.avatarUrl === null
+              params.row.node.avatarUrl === null
                 ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-                : params.row.avatarUrl
+                : params.row.node.avatarUrl
             }
             alt="avatar"
           /> */}
-          {params.row.name}
+          {params.row.node.name}
         </div>
       );
     },
@@ -38,7 +38,7 @@ export const staffAccountsColumn = [
     align: "left",
     headerAlign: "left",
     renderCell: (params) => {
-      return <div>{params.row.email}</div>;
+      return <div>{params.row.node.email}</div>;
     },
     renderHeader: () => <span>EMAIL</span>,
   },
