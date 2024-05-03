@@ -702,7 +702,7 @@ const EmulatorPage = () => {
       if (schedule[0].length === 1) {
         let changedServeDate = fixedServeDate;
         changedServeDate.shift();
-        if (tempCartFB.length > 0) {
+        if (tempCartFB.length > 0 && schedule.length > 2) {
           tempOrders.push({
             uuid: uuidFB,
             cart: tempCartFB,
@@ -713,7 +713,7 @@ const EmulatorPage = () => {
           });
         }
       } else {
-        if (tempCartFB.length > 0) {
+        if (tempCartFB.length > 0 && schedule.length > 2) {
           tempOrders.push({
             uuid: uuidFB,
             cart: tempCartFB,
@@ -725,7 +725,7 @@ const EmulatorPage = () => {
         }
       }
 
-      if (tempCartVehicle.length > 0) {
+      if (tempCartVehicle.length > 0 && schedule.length > 2) {
         tempOrders.push({
           uuid: uuidVehicle,
           cart: tempCartVehicle,
