@@ -54,7 +54,7 @@ const LoginPage = () => {
         },
       });
       console.log(data);
-      const newToken = data["staffRequestAuthorize"]["accessToken"];
+      const newToken = data["adminRequestAuthorize"]["accessToken"];
       const decoded = jwtDecode(newToken);
 
       let role =
@@ -69,7 +69,7 @@ const LoginPage = () => {
 
       localStorage.setItem(
         "adminToken",
-        data["staffRequestAuthorize"]["accessToken"]
+        data["adminRequestAuthorize"]["accessToken"]
       );
       localStorage.setItem("checkIsUserCall", "no");
 
