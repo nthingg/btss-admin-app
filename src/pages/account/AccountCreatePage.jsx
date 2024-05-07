@@ -158,17 +158,6 @@ const AccountCreatePage = () => {
       </div>
       <div className="create-cont">
         <div className="create-cont-header">
-          <div className="left">
-            <div className="image_container">
-              <img
-                src={
-                  file
-                    ? file
-                    : "https://vinhphucwater.com.vn/wp-content/uploads/2023/05/no-image.jpg"
-                }
-              />
-            </div>
-          </div>
           <div className="right">
             <div className="details">
               <div className="left">
@@ -242,97 +231,113 @@ const AccountCreatePage = () => {
                 </div>
               </div>
               <div className="right">
-                <div className="detailItem">
-                  <span className="itemKey">Nhà cung cấp:</span>
-                  <Select
-                    placeholder={"Không có dữ liệu"}
-                    className="basic-single"
-                    classNamePrefix="select"
-                    isDisabled={false}
-                    isClearable={true}
-                    name="province"
-                    options={providers}
-                    onChange={async (e) => {
-                      if (e) {
-                        setProviderId(e.value);
-                        const { data } = await getProviderBrief({
-                          variables: { id: e.value },
-                        });
+                <div className="rightCont">
+                  <div className="detailItem">
+                    <span className="itemKey">Nhà cung cấp:</span>
+                    <Select
+                      placeholder={"Không có dữ liệu"}
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isDisabled={false}
+                      isClearable={true}
+                      name="province"
+                      options={providers}
+                      onChange={async (e) => {
+                        if (e) {
+                          setProviderId(e.value);
+                          const { data } = await getProviderBrief({
+                            variables: { id: e.value },
+                          });
 
-                        let type = "";
-                        switch (data.providers.nodes[0].type) {
-                          case "FOOD_STALL":
-                            type = "Quán ăn";
-                            break;
-                          case "HOTEL":
-                            type = "Khách sạn";
-                            break;
-                          case "MOTEL":
-                            type = "Nhà nghỉ";
-                            break;
-                          case "RESTAURANT":
-                            type = "Nhà hàng";
-                            break;
-                          case "VEHICLE_RENTAL":
-                            type = "Thuê xe";
-                            break;
-                          default:
-                            type = data.providers.nodes[0].type;
-                            break;
+                          let type = "";
+                          switch (data.providers.nodes[0].type) {
+                            case "FOOD_STALL":
+                              type = "Quán ăn";
+                              break;
+                            case "HOTEL":
+                              type = "Khách sạn";
+                              break;
+                            case "MOTEL":
+                              type = "Nhà nghỉ";
+                              break;
+                            case "RESTAURANT":
+                              type = "Nhà hàng";
+                              break;
+                            case "VEHICLE_RENTAL":
+                              type = "Thuê xe";
+                              break;
+                            default:
+                              type = data.providers.nodes[0].type;
+                              break;
+                          }
+
+                          setType(type);
+                          setAddress(data.providers.nodes[0].address);
+                          setFile(
+                            `https://d38ozmgi8b70tu.cloudfront.net${data.providers.nodes[0].imagePath}`
+                          );
+                        } else {
+                          setProviderId(null);
+                          setType("");
+                          setAddress("");
+                          setFile("");
                         }
-
-                        setType(type);
-                        setAddress(data.providers.nodes[0].address);
-                        setFile(
-                          `https://d38ozmgi8b70tu.cloudfront.net${data.providers.nodes[0].imagePath}`
-                        );
-                      } else {
-                        setProviderId(null);
-                        setType("");
-                        setAddress("");
-                        setFile("");
-                      }
-                    }}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        primary: "#2c3d50",
-                      },
-                    })}
-                  />
+                      }}
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary: "#2c3d50",
+                        },
+                      })}
+                    />
+                  </div>
+                  <div className="detailItem">
+                    <span className="itemKey">Danh mục:</span>
+                    <TextField
+                      id="outlined-disabled"
+                      className="basic-single"
+                      type="text"
+                      placeholder="Không có dữ liệu"
+                      size="small"
+                      name="type"
+                      value={type}
+                      disabled={true}
+                      sx={{
+                        width: "15%",
+                      }}
+                    />
+                  </div>
+                  <div className="detailItem">
+                    <span className="itemKey">Địa chỉ nhà cung cấp:</span>
+                    <TextField
+                      id="outlined-disabled"
+                      className="basic-single"
+                      type="text"
+                      placeholder="Không có dữ liệu"
+                      size="small"
+                      value={address}
+                      disabled={true}
+                      name="address"
+                      sx={{
+                        width: "15%",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="detailItem">
-                  <span className="itemKey">Danh mục:</span>
-                  <TextField
-                    id="outlined-disabled"
-                    className="basic-single"
-                    type="text"
-                    placeholder="Không có dữ liệu"
-                    size="small"
-                    name="type"
-                    value={type}
-                    disabled={true}
-                    sx={{
-                      width: "15%",
-                    }}
-                  />
-                </div>
-                <div className="detailItem">
-                  <span className="itemKey">Địa chỉ nhà cung cấp:</span>
-                  <TextField
-                    id="outlined-disabled"
-                    className="basic-single"
-                    type="text"
-                    placeholder="Không có dữ liệu"
-                    size="small"
-                    value={address}
-                    disabled={true}
-                    name="address"
-                    sx={{
-                      width: "15%",
-                    }}
-                  />
+                <div className="leftCont">
+                  <div className="detailItem">
+                    <span className="itemKey">Hình ảnh:</span>
+                    <div className="image_container">
+                      <img
+                        src={
+                          file
+                            ? file
+                            : "https://vinhphucwater.com.vn/wp-content/uploads/2023/05/no-image.jpg"
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

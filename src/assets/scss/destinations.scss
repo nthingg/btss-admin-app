@@ -128,9 +128,8 @@
 
         .details {
             .detailItem {
-                margin-bottom: 20px;
                 padding: 10px;
-                margin: 0 20px 20px 20px;
+                margin: 0 20px 0 20px;
                 height: 40px;
                 width: 680px;
 
@@ -152,6 +151,16 @@
                     a {
                         color: #2c3d50;
                     }
+                }
+
+                .destination-description {
+                    margin-top: 10px;
+                    width: 600px;
+                    height: 80px;
+                    overflow: auto;
+                    background-color: #f8f9f9;
+                    padding: 10px;
+                    border-radius: 4px;
                 }
             }
         }

@@ -11,7 +11,10 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { CHANGE_STATUS_DESTINATION, LOAD_DETAIL_DESTINATION } from "../../services/graphql/destination";
+import {
+  CHANGE_STATUS_DESTINATION,
+  LOAD_DETAIL_DESTINATION,
+} from "../../services/graphql/destination";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -27,7 +30,8 @@ import {
   DialogTitle,
   IconButton,
   Switch,
-  Alert, Snackbar
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import EmergencyTable from "../../components/tables/EmergencyTable";
 import MapIcon from "@mui/icons-material/Map";
@@ -338,14 +342,14 @@ const DestinationDetailPage = () => {
   //   }
   // }, [dataProvi, errorProvi, loadingProvi])
 
-  const [changeStatus, { }] = useMutation(CHANGE_STATUS_DESTINATION);
+  const [changeStatus, {}] = useMutation(CHANGE_STATUS_DESTINATION);
 
   const handleConfirmChangeStatus = () => {
     try {
       changeStatus({
         variables: {
-          id: parseInt(destinationId)
-        }
+          id: parseInt(destinationId),
+        },
       });
       setIsVisible(!isVisible);
       setSucessMsg("Cập nhật thành công!");
@@ -358,7 +362,7 @@ const DestinationDetailPage = () => {
       openErrorSnackBar();
       localStorage.removeItem("errorMsg");
     }
-  }
+  };
 
   var settings = {
     dots: true,
@@ -431,8 +435,15 @@ const DestinationDetailPage = () => {
                       <CheckCircleIcon />
                     </a>
                   )} */}
-                  <a className="status active" title={isVisible ? "Đang hoạt động" : "Tạm ẩn"}>
-                    <Switch checked={isVisible} color={isVisible ? "success" : "error"} onClick={handleClickOpenConfirm}/>
+                  <a
+                    className="status active"
+                    title={isVisible ? "Đang hoạt động" : "Tạm ẩn"}
+                  >
+                    <Switch
+                      checked={isVisible}
+                      color={isVisible ? "success" : "error"}
+                      onClick={handleClickOpenConfirm}
+                    />
                   </a>
                   <Dialog
                     open={openConfirm}
@@ -446,11 +457,14 @@ const DestinationDetailPage = () => {
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        Bạn có xác nhận muốn đổi trạng thái hiển thị của địa điểm này không?
+                        Bạn có xác nhận muốn đổi trạng thái hiển thị của địa
+                        điểm này không?
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                      <button className="btn-change-status-cancel" onClick={handleCloseConfirm}
+                      <button
+                        className="btn-change-status-cancel"
+                        onClick={handleCloseConfirm}
                         style={{
                           textDecoration: "none",
                           color: "rgb(44, 61, 80)",
@@ -460,11 +474,15 @@ const DestinationDetailPage = () => {
                           borderRadius: "5px",
                           cursor: "pointer",
                           border: "1px solid",
-                          transition: "0.4s"
-                        }}>
+                          transition: "0.4s",
+                        }}
+                      >
                         Hủy bỏ
                       </button>
-                      <button className="btn-change-status-confirm" onClick={handleConfirmChangeStatus} autoFocus
+                      <button
+                        className="btn-change-status-confirm"
+                        onClick={handleConfirmChangeStatus}
+                        autoFocus
                         style={{
                           textDecoration: "none",
                           color: "white",
@@ -474,8 +492,9 @@ const DestinationDetailPage = () => {
                           borderRadius: "5px",
                           cursor: "pointer",
                           border: "none",
-                          transition: "0.4s"
-                        }}>
+                          transition: "0.4s",
+                        }}
+                      >
                         Đồng ý
                       </button>
                     </DialogActions>
@@ -513,21 +532,6 @@ const DestinationDetailPage = () => {
                       </IconButton>
                     </span>
                   </div>
-                  {/* <div className="detailItem">
-                    <span className="itemKey">Trạng thái:</span>
-                    <span className="itemValue">
-                      {(() => {
-                        switch (destination?.isVisible) {
-                          case false:
-                            return "Tạm ẩn";
-                          case true:
-                            return "Đang hiển thị";
-                          default:
-                            return "Khác";
-                        }
-                      })()}
-                    </span>
-                  </div> */}
                   <div className="detailItem">
                     <span className="itemKey">Tỉnh:</span>
                     <span className="itemValue">
@@ -569,83 +573,28 @@ const DestinationDetailPage = () => {
                   </div>
                   <div className="detailItem">
                     <span className="itemKey">Thời điểm lí tưởng:</span>
-                    <span className="itemValue">
-                      {/* {destination?.seasons.map((season) => (
-                      <div
-                        key={season}
-                        className={`period-item ${season.toLowerCase()}`}
-                      >
-                        <span className="period-text">
-                          {(() => {
-                            switch (season) {
-                              case "SPRING":
-                                return "Xuân, ";
-                              case "SUMMER":
-                                return "Hạ, ";
-                              case "FALL":
-                                return "Thu, ";
-                              case "WINTER":
-                                return "Đông, ";
-                              default:
-                                return "Khác";
-                            }
-                          })()}
-                        </span>
-                      </div>
-                    ))} */}
-                      {seasons}
-                    </span>
+                    <span className="itemValue">{seasons}</span>
                   </div>
                   <div className="detailItem">
                     <span className="itemKey">Mô tả:</span>
-                    <span
+                    <div className="destination-description">
+                      <span>{destination?.description}</span>
+                    </div>
+                    {/* <span
                       className="itemValue"
                       style={{ wordWrap: "break-word", whiteSpace: "normal" }}
                     >
                       <ReadMore children={destination?.description} />
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* <div className="destination">
-          <div className="item">
-            <div className="reasonTable">
-              <p className="title">Mô tả</p>
-              <div className="body">
-                <p>{destination?.description}</p>
-              </div>
-            </div>
-          </div>
-        </div> */}
-            {/* <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }}>
-                <AccordionSummary
-                  sx={{
-                    fontSize: 24,
-                    backgroundColor: "#2c3d50",
-                    color: "white",
-                    borderRadius: "10px",
-                    fontWeight: "600",
-                  }}
-                  expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
-                  aria-controls="panel1-content"
-                  id="panel1-header"
-                >
-                  Mô tả
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{
-                    backgroundColor: "#f8f9f9",
-                  }}
-                >
-                  {destination?.description}
-                </AccordionDetails>
-              </Accordion>
-            </div> */}
-            <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
+            <div className="bottom" style={{ paddingTop: 40 }}>
+              <Accordion
+                sx={{ boxShadow: "none", width: 1400 }}
+                defaultExpanded
+              >
                 <AccordionSummary
                   sx={{
                     fontSize: 24,
@@ -670,7 +619,10 @@ const DestinationDetailPage = () => {
               </Accordion>
             </div>
             <div className="bottom">
-              <Accordion sx={{ boxShadow: "none", width: 1400 }} defaultExpanded>
+              <Accordion
+                sx={{ boxShadow: "none", width: 1400 }}
+                defaultExpanded
+              >
                 <AccordionSummary
                   sx={{
                     fontSize: 24,

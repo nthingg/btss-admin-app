@@ -11,8 +11,7 @@ const EmergencyTable = ({ list }) => {
         columns={emergenciesColumns}
         rowSelection={false}
         pagination
-        pageSizeOptions={[]}
-        autoHeight={true}
+        autoPageSize={true}
         showColumnVerticalBorder={true}
         sx={{
           "& .MuiDataGrid-columnHeader": {

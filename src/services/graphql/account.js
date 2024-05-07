@@ -30,11 +30,7 @@ export const LOAD_TRAVELER_ACCOUNT_FILTER = gql`
 
 export const LOAD_ACCOUNTS_FILTER = gql`
   query LoadAccounts($role: [Role!]) {
-    accounts(
-      first: 100
-      order: { id: DESC }
-      where: { role: { in: $role } }
-    ) {
+    accounts(first: 100, order: { id: DESC }, where: { role: { in: $role } }) {
       nodes {
         id
         name
@@ -60,7 +56,11 @@ export const LOAD_TRAVELER_FILTER = gql`
     accounts(
       first: 100
       order: { id: DESC }
-      where: { role: { in: $role }, phone: { contains: $phone }, publishedPlanCount: { gt: 0 } }
+      where: {
+        role: { in: $role }
+        phone: { contains: $phone }
+        publishedPlanCount: { gt: 0 }
+      }
       searchTerm: $searchTerm
     ) {
       nodes {
@@ -82,14 +82,18 @@ export const LOAD_TRAVELER_FILTER = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_NON_TRAVELER_FILTER = gql`
   query LoadAccounts($role: [Role!], $searchTerm: String, $phone: String) {
     accounts(
       first: 100
       order: { id: DESC }
-      where: { role: { in: $role }, phone: { contains: $phone }, publishedPlanCount: { lte: 0 } }
+      where: {
+        role: { in: $role }
+        phone: { contains: $phone }
+        publishedPlanCount: { lte: 0 }
+      }
       searchTerm: $searchTerm
     ) {
       nodes {
@@ -111,7 +115,7 @@ export const LOAD_NON_TRAVELER_FILTER = gql`
       totalCount
     }
   }
-`
+`;
 
 export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
   query LoadTravelerOptions($searchTerm: String) {
@@ -128,7 +132,7 @@ export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
       }
     }
   }
-`
+`;
 
 export const LOAD_ACCOUNTS = gql`
   query LoadAccount {
@@ -214,7 +218,7 @@ export const LOAD_PROVIDER_INIT = gql`
       order: { id: DESC }
       where: {
         isActive: { eq: true }
-        type: { nin: [EMERGENCY, GROCERY, REPAIR, TAXI] }
+        type: { nin: [EMERGENCY, GROCERY, REPAIR] }
       }
     ) {
       edges {
@@ -244,7 +248,7 @@ export const LOAD_PROVIDER = gql`
       after: $cursor
       where: {
         isActive: { eq: true }
-        type: { nin: [EMERGENCY, GROCERY, REPAIR, TAXI] }
+        type: { nin: [EMERGENCY, GROCERY, REPAIR] }
       }
     ) {
       edges {
