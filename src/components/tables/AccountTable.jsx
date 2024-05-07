@@ -94,7 +94,17 @@ const AccountTable = ({ fetchAccount, travelers, suppliers, staffs }) => {
                 color={params.row.node.isActive ? "success" : "error"}
                 onClick={() => {
                   handleClickOpen(params.row.node.id);
-                }} />
+                }}
+                inputProps={{ "aria-label": "controlled" }}
+                sx={{
+                  "& .MuiSwitch-switchBase.Mui-checked": {
+                    color: "#2c3d50",
+                  },
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: "#2c3d50",
+                  },
+                }}
+              />
             </a>
             <Dialog
               open={open[params.row.node.id]}

@@ -758,17 +758,12 @@ const PlanPage = () => {
   };
 
   //#region UseState
-
   const {
     error: errTotal,
     loading: loadTotal,
     data: dataTotal,
     refetch: refetchTotal,
-  } = useQuery(LOAD_NUMBERS_TOTAL, {
-    variables: {
-      searchTerm: searchTerm,
-    },
-  });
+  } = useQuery(LOAD_NUMBERS_TOTAL);
   const [total, setTotal] = useState(0);
   useEffect(() => {
     if (!loadTotal && !errTotal && dataTotal && dataTotal["plans"]) {
@@ -781,11 +776,7 @@ const PlanPage = () => {
     loading: loadingRegis,
     data: dataRegis,
     refetch: refetchRegis,
-  } = useQuery(LOAD_NUMBERS_REGISTERING, {
-    variables: {
-      searchTerm: searchTerm,
-    },
-  });
+  } = useQuery(LOAD_NUMBERS_REGISTERING);
   const [registering, setRegistering] = useState(0);
   useEffect(() => {
     if (!loadingRegis && !errRegis && dataRegis && dataRegis["plans"]) {
@@ -894,6 +885,7 @@ const PlanPage = () => {
       setPublished(dataPublished["plans"].totalCount);
     }
   }, [dataPublished, loadingPublished, errorPublished]);
+  //#endregion
 
   var settings = {
     dots: false,
@@ -909,7 +901,6 @@ const PlanPage = () => {
     setSearchTerm(search);
     fetchPlanFilter(`[${selectedStatus}]`, search, filterOrder);
   };
-  //#endregion
 
   const handleChangeFilter = (e) => {
     var orderFilter = e.target.value;

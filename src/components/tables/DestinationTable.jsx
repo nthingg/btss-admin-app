@@ -142,7 +142,7 @@ const DestinationTable = ({ refetch, destinations }) => {
               <DialogActions>
                 <button
                   className="btn-change-status-cancel"
-                  onClose={() => {
+                  onClick={() => {
                     handleCloseConfirm(params.row.id);
                   }}
                   style={{

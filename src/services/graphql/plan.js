@@ -642,8 +642,8 @@ export const LOAD_NUMBERS_READY = gql`
 `;
 
 export const LOAD_NUMBERS_REGISTERING = gql`
-  query RegisteringPlans($searchTerm: String) {
-    plans(where: { status: { eq: REGISTERING } }, searchTerm: $searchTerm) {
+  query RegisteringPlans {
+    plans(where: { status: { eq: REGISTERING } }) {
       edges {
         node {
           id
@@ -705,14 +705,13 @@ export const LOAD_NUMBERS_PUBLISHED = gql`
 `;
 
 export const LOAD_NUMBERS_TOTAL = gql`
-  query LoadTotalPlans($searchTerm: String) {
+  query LoadTotalPlans {
     plans(
       where: {
         status: {
           in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
         }
       }
-      searchTerm: $searchTerm
     ) {
       totalCount
     }
