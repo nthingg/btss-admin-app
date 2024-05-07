@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../../assets/scss/sidebar.scss";
 import Dashboard from "@mui/icons-material/Dashboard";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
@@ -9,15 +9,37 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import { REFRESH_AUTH } from "../../services/graphql/auth";
+import { useMutation } from "@apollo/client";
 
 const SideBar = () => {
   const navigate = useNavigate();
 
-  function logout() {
-    localStorage.removeItem("adminToken");
-    navigate("/");
-    navigate(0);
-  }
+  const refreshToken = localStorage.getItem("refreshToken");
+
+  const [refresh, { data, loading, error }] = useMutation(REFRESH_AUTH);
+
+  const refreshAuth = async (e) => {
+    try {
+      const { data } = await refresh({
+        variables: {
+          token: refreshToken,
+        },
+      });
+
+      localStorage.setItem("adminToken", data["refreshAuth"]["accessToken"]);
+      localStorage.setItem("refreshToken", data["refreshAuth"]["refreshToken"]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (refreshToken) {
+      refreshAuth();
+      console.log("call");
+    }
+  }, []);
 
   return (
     <div className="sidebar">
@@ -96,6 +118,7 @@ const SideBar = () => {
               type="button"
               onClick={(e) => {
                 localStorage.removeItem("adminToken");
+                localStorage.removeItem("refreshToken");
                 navigate("/");
                 navigate(0);
               }}

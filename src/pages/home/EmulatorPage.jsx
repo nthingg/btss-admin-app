@@ -344,7 +344,7 @@ const EmulatorPage = () => {
     schedule
   ) => {
     try {
-      let appendName = moment().format("DDMMYYYY-HH:mm") + `_{${acc.id}}`;
+      let appendName = moment().format("DDMMYYYY-HH:mm") + `_${acc.id}`;
 
       console.log({
         departAt: dateTime,
@@ -468,8 +468,8 @@ const EmulatorPage = () => {
       });
       var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
 
-      const minCeiled = Math.ceil(2);
-      const maxFloored = Math.floor(30);
+      const minCeiled = Math.ceil(4);
+      const maxFloored = Math.floor(15);
       function getOddNumber(min, max) {
         // Ensure even minimum for odd number generation
         min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
@@ -625,7 +625,7 @@ const EmulatorPage = () => {
 
       let tempCartFB = [];
       if (productFB.length > 0) {
-        let numOfProducts = 5;
+        let numOfProducts = 4;
 
         for (let h = 0; h < numOfProducts; h++) {
           let random = Math.floor(Math.random() * productFB.length);
@@ -698,6 +698,7 @@ const EmulatorPage = () => {
 
       const uuidFB = uuidv4();
       const uuidVehicle = uuidv4();
+      const uuidAcmdation = uuidv4();
 
       if (schedule[0].length === 1) {
         let changedServeDate = fixedServeDate;
@@ -759,8 +760,7 @@ const EmulatorPage = () => {
               fixedPeriod = "AFTERNOON";
             }
 
-            const uuid = uuidv4();
-            schedule[m][k].orderUUID = uuid;
+            schedule[m][k].orderUUID = uuidAcmdation;
             tempOrders.push({
               uuid: schedule[m][k].orderUUID,
               cart: tempCartAcmdation,
@@ -769,6 +769,10 @@ const EmulatorPage = () => {
               serveDateIndexes: fixedServe,
               type: schedule[m][k].type,
             });
+          }
+
+          if (schedule[m][k].type === "CHECKOUT") {
+            schedule[m][k].orderUUID = uuidAcmdation;
           }
 
           if (
@@ -1095,13 +1099,12 @@ const EmulatorPage = () => {
                 );
                 if (resJoin.status) {
                   successCount++;
+                  response.push(resJoin);
+                  limitMember++;
                 }
-                response.push(resJoin);
-                limitMember++;
               }
             }
             limitMassJoin++;
-            console.log(limitMassJoin);
           } else {
             const cancelData = {
               id: currentPlans[j].id,
@@ -1372,7 +1375,11 @@ const EmulatorPage = () => {
     let count = 0;
     let successCount = 0;
     let log = "";
-    for (let i = 0; i < numJoin; i++) {
+    let joinByIDNum = 1;
+    for (let i = 0; i < loggedAcc?.length; i++) {
+      if (joinByIDNum > numJoin) {
+        break;
+      }
       log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
       localStorage.setItem("userToken", loggedAcc[i].token);
 
@@ -1393,10 +1400,11 @@ const EmulatorPage = () => {
       const resJoin = await handleJoinPlan(joinData, count, loggedAcc[i]);
       if (resJoin.status) {
         successCount++;
+        response.push(resJoin);
+        setResponseMsg(response);
+        setLoginMsg(log);
+        joinByIDNum++;
       }
-      response.push(resJoin);
-      setResponseMsg(response);
-      setLoginMsg(log);
     }
     setTotalMsg(count);
     setSuccessMsg(successCount);

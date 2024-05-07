@@ -818,14 +818,7 @@ export const planData = [
         },
       ],
     ],
-    surcharges: [
-      { gcoinAmount: 1000, note: "Mua thêm thức ăn" },
-      { gcoinAmount: 2000, note: "Phí tổ chức hoạt động vui chơi" },
-      {
-        gcoinAmount: 1000,
-        note: "Mua dụng cụ cắm trại trong lúc tham quan",
-      },
-    ], //done
+    surcharges: [], //done
     travelDuration: "05:30:00", //done
     sourceId: null, //done
   },

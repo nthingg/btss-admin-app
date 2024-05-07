@@ -71,6 +71,10 @@ const LoginPage = () => {
         "adminToken",
         data["adminRequestAuthorize"]["accessToken"]
       );
+      localStorage.setItem(
+        "refreshToken",
+        data["adminRequestAuthorize"]["refreshToken"]
+      );
       localStorage.setItem("checkIsUserCall", "no");
 
       navigate("/");
@@ -170,7 +174,7 @@ const LoginPage = () => {
                 setPassword(e.target.value);
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   login();
                 }
               }}

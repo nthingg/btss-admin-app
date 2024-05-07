@@ -1,4 +1,4 @@
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider, useMutation } from "@apollo/client";
 import client from ".//services/apollo/config";
 import SideBar from ".//components/widgets/SideBar";
 import HomePage from ".//pages/home/HomePage";
@@ -17,6 +17,8 @@ import DestinationAddPage from "./pages/destination/DestinationAddPage";
 import DestinationUpdatePage from "./pages/destination/DestinationUpdatePage";
 import TransactionPage from "./pages/transactions/TransactionPage";
 import AccountCreatePage from "./pages/account/AccountCreatePage";
+import { REFRESH_AUTH } from "./services/graphql/auth";
+import { useEffect } from "react";
 
 const App = () => {
   const token = localStorage.getItem("adminToken");
