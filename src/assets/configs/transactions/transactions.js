@@ -76,16 +76,27 @@ export const transactionsColumns = [
     renderHeader: () => <span>TRẠNG THÁI</span>,
   },
   {
-    field: "gcoinAmount",
-    width: 180,
+    field: "amount",
+    width: 120,
     align: "right",
     headerAlign: "center",
     renderCell: (params) => {
-      let amount = parseInt(params.row.node.gcoinAmount);
+      let amount = parseInt(params.row.node.amount);
       // let fixAmount = amount.toFixed(4);
       return <div style={{ marginRight: 40 }}>{amount}</div>;
     },
-    renderHeader: () => <span>SỐ GCOIN</span>,
+    renderHeader: () => <span>SỐ TIỀN</span>,
+  },
+  {
+    field: "currency",
+    width: 120,
+    align: "right",
+    headerAlign: "center",
+    renderCell: (params) => {
+      // let fixAmount = amount.toFixed(4);
+      return <div style={{ marginRight: 24 }}>{params.row.node.currency}</div>;
+    },
+    renderHeader: () => <span>ĐƠN VỊ</span>,
   },
   {
     field: "gateway",

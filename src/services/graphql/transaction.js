@@ -12,7 +12,8 @@ export const LOAD_TRANSACTIONS_FILTER = gql`
         orderId
         type
         status
-        gcoinAmount
+        amount
+          currency
         gateway
         bankTransCode
         createdAt
@@ -43,7 +44,8 @@ export const LOAD_TRAVELER_TRANSACTIONS = gql`
         type
         status
         type
-        gcoinAmount
+        amount
+          currency
         gateway
         bankTransCode
         createdAt
@@ -74,7 +76,8 @@ export const LOAD_TRANSACTIONS_TOTAL_INIT = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -114,7 +117,8 @@ export const LOAD_TRANSACTIONS_TOTAL = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -149,7 +153,8 @@ export const LOAD_TRANSACTION_SEARCH = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -186,7 +191,8 @@ export const LOAD_TRAVELER_TRANSACTION_FILTER_INIT = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -231,7 +237,8 @@ export const LOAD_TRAVELER_TRANSACTION_FILTER = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -292,7 +299,8 @@ export const LOAD_PROVIDER_TRANSACTION_FILTER_INIT = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt
@@ -337,7 +345,8 @@ export const LOAD_PROVIDER_TRANSACTION_FILTER = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
+          currency
           gateway
           bankTransCode
           createdAt

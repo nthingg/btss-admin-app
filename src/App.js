@@ -1,4 +1,4 @@
-import { ApolloProvider, useMutation } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
 import client from ".//services/apollo/config";
 import SideBar from ".//components/widgets/SideBar";
 import HomePage from ".//pages/home/HomePage";
@@ -10,18 +10,27 @@ import DestinationPage from "./pages/destination/DestinationPage";
 import DestinationDetailPage from "./pages/destination/DestinationDetailPage";
 import PlanPage from "./pages/plan/PlanPage";
 import PlanDetailPage from "./pages/plan/PlanDetailPage";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import "./index.css";
 import ConfigurationPage from "./pages/configuration/ConfigurationPage";
 import DestinationAddPage from "./pages/destination/DestinationAddPage";
 import DestinationUpdatePage from "./pages/destination/DestinationUpdatePage";
 import TransactionPage from "./pages/transactions/TransactionPage";
 import AccountCreatePage from "./pages/account/AccountCreatePage";
-import { REFRESH_AUTH } from "./services/graphql/auth";
-import { useEffect } from "react";
 
 const App = () => {
+  const navigate = useNavigate();
+
   const token = localStorage.getItem("adminToken");
+  if (token) {
+    const decode = JSON.parse(atob(token.split('.')[1]));
+    if (decode.exp * 1000 < new Date().getTime()) {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("refreshToken");
+      navigate("/");
+      navigate(0);
+    }
+  }
 
   return (
     <ApolloProvider client={client}>
