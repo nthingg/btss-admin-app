@@ -30,7 +30,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "01:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description: "Khám phá khu vực xung quanh, đi bộ hoặc thuê xe đạp.",
           shortDescription: "Khám phá khu vực.",
@@ -40,13 +40,14 @@ export const planData = [
           type: "EAT",
           duration: "01:00:00",
           isStarred: true,
-          description: "Ăn trưa tại quán ăn địa phương.",
-          shortDescription: "Ăn trưa",
+          description:
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "01:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description: "Tham quan các điểm du lịch địa phương.",
           shortDescription: "Tham quan.",
@@ -54,7 +55,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "01:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Dạo chơi và tận hưởng cảnh đẹp hoàng sơ của địa phương.",
@@ -63,10 +64,18 @@ export const planData = [
         },
         {
           type: "FREE",
-          duration: "01:30:00",
+          duration: "01:00:00",
           isStarred: false,
           description: "Tự túc hoặc tham gia hoạt động cộng đồng địa phương.",
           shortDescription: "Tự túc.",
+          orderUUID: null,
+        },
+        {
+          type: "EAT",
+          duration: "01:00:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
           orderUUID: null,
         },
       ],
@@ -75,13 +84,13 @@ export const planData = [
           type: "EAT",
           duration: "01:30:00",
           isStarred: true,
-          description: "Ăn sáng tại quán cà phê hoặc nhà hàng địa phương.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "01:30:00",
+          duration: "02:30:00",
           isStarred: false,
           description: "Tham gia hoạt động mạo hiểm tại vị trí vui chơi.",
           shortDescription: "Tham gia hoạt động.",
@@ -89,16 +98,16 @@ export const planData = [
         },
         {
           type: "EAT",
-          duration: "01:30:00",
+          duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa cùng thiên nhiên hoặc tại một quán ăn địa phương.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "01:30:00",
+          duration: "02:30:00",
           isStarred: false,
           description:
             "Khám phá những điểm tham quan khác hoặc dành thời gian thư giãn.",
@@ -107,35 +116,42 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "02:30:00",
           isStarred: false,
-          description:
-            "Tham gia hoạt động vui chơi như đốt lửa trại, tổ chức tiệc BBQ.",
+          description: "Tham gia hoạt động vui chơi như đốt lửa trại.",
           shortDescription: "Tập trung vui chơi.",
           orderUUID: null,
         },
         {
           type: "FREE",
-          duration: "01:30:00",
+          duration: "02:30:00",
           isStarred: false,
           description:
             "Tự túc hoặc tham gia các hoạt động giao lưu với dân địa phương như trò chơi dân gian, hòa nhạc nhỏ.",
           shortDescription: "Tự túc.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -147,8 +163,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -170,26 +186,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -201,8 +225,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -224,26 +248,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -255,8 +287,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -278,26 +310,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -309,8 +349,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -332,26 +372,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -363,8 +411,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -386,26 +434,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -417,8 +473,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -440,26 +496,34 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
+        {
+          type: "EAT",
+          duration: "01:30:00",
+          isStarred: false,
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
+          orderUUID: null,
+        },
       ],
       [
         {
           type: "EAT",
-          duration: "01:00:00",
+          duration: "02:00:00",
           isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
+          description: "Cả đoàn tập trung ăn sáng và bắt đầu một ngày mới.",
           shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
           type: "VISIT",
-          duration: "02:00:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
@@ -471,8 +535,8 @@ export const planData = [
           duration: "01:00:00",
           isStarred: true,
           description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
+            "Cả đoàn tập trung ăn trưa và chuẩn bị cho lịch trình tiếp theo.",
+          shortDescription: "Ăn trưa.",
           orderUUID: null,
         },
         {
@@ -494,281 +558,19 @@ export const planData = [
         },
         {
           type: "GATHER",
-          duration: "01:30:00",
+          duration: "03:00:00",
           isStarred: false,
           description:
             "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
           shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
           orderUUID: null,
         },
-      ],
-      [
         {
           type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
-          shortDescription: "Ăn sáng.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description:
-            "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
-          shortDescription: "Tham gia giải trí.",
-          orderUUID: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
           duration: "01:30:00",
           isStarred: false,
-          description: "Khám phá các địa điểm thú vị xung quanh địa điểm.",
-          shortDescription: "Khám phá.",
-          orderUUID: null,
-        },
-        {
-          type: "FREE",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Thư giãn và thưởng thức cảnh đẹp hoàng sơ của địa phương.",
-          shortDescription: "Tự do.",
-          orderUUID: null,
-        },
-        {
-          type: "GATHER",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
-          shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
-          orderUUID: null,
-        },
-      ],
-      [
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
-          shortDescription: "Ăn sáng.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description:
-            "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
-          shortDescription: "Tham gia giải trí.",
-          orderUUID: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "01:30:00",
-          isStarred: false,
-          description: "Khám phá các địa điểm thú vị xung quanh địa điểm.",
-          shortDescription: "Khám phá.",
-          orderUUID: null,
-        },
-        {
-          type: "FREE",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Thư giãn và thưởng thức cảnh đẹp hoàng sơ của địa phương.",
-          shortDescription: "Tự do.",
-          orderUUID: null,
-        },
-        {
-          type: "GATHER",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
-          shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
-          orderUUID: null,
-        },
-      ],
-      [
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
-          shortDescription: "Ăn sáng.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description:
-            "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
-          shortDescription: "Tham gia giải trí.",
-          orderUUID: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "01:30:00",
-          isStarred: false,
-          description: "Khám phá các địa điểm thú vị xung quanh địa điểm.",
-          shortDescription: "Khám phá.",
-          orderUUID: null,
-        },
-        {
-          type: "FREE",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Thư giãn và thưởng thức cảnh đẹp hoàng sơ của địa phương.",
-          shortDescription: "Tự do.",
-          orderUUID: null,
-        },
-        {
-          type: "GATHER",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
-          shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
-          orderUUID: null,
-        },
-      ],
-      [
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
-          shortDescription: "Ăn sáng.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description:
-            "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
-          shortDescription: "Tham gia giải trí.",
-          orderUUID: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "01:30:00",
-          isStarred: false,
-          description: "Khám phá các địa điểm thú vị xung quanh địa điểm.",
-          shortDescription: "Khám phá.",
-          orderUUID: null,
-        },
-        {
-          type: "FREE",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Thư giãn và thưởng thức cảnh đẹp hoàng sơ của địa phương.",
-          shortDescription: "Tự do.",
-          orderUUID: null,
-        },
-        {
-          type: "GATHER",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
-          shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
-          orderUUID: null,
-        },
-      ],
-      [
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description: "Ăn sáng và chuẩn bị cho một ngày mới.",
-          shortDescription: "Ăn sáng.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "02:00:00",
-          isStarred: false,
-          description:
-            "Tham gia vào một hoạt động vui chơi mới tại địa điểm du lịch do trưởng đoàn tổ chức.",
-          shortDescription: "Tham gia giải trí.",
-          orderUUID: null,
-        },
-        {
-          type: "EAT",
-          duration: "01:00:00",
-          isStarred: true,
-          description:
-            "Dùng bữa trưa tại một quán ăn địa phương hoặc dùng cơm trưa pic-nic ngoài trời.",
-          shortDescription: "Dùng bữa.",
-          orderUUID: null,
-        },
-        {
-          type: "VISIT",
-          duration: "01:30:00",
-          isStarred: false,
-          description: "Khám phá các địa điểm thú vị xung quanh địa điểm.",
-          shortDescription: "Khám phá.",
-          orderUUID: null,
-        },
-        {
-          type: "FREE",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Thư giãn và thưởng thức cảnh đẹp hoàng sơ của địa phương.",
-          shortDescription: "Tự do.",
-          orderUUID: null,
-        },
-        {
-          type: "GATHER",
-          duration: "01:30:00",
-          isStarred: false,
-          description:
-            "Tự do hoặc tham gia các hoạt động giao lưu với dân địa phương như đốt lửa trại và chia sẻ câu chuyện.",
-          shortDescription: "Tự túc, giao lưu với cư dân địa phương.",
+          description: "Cả đoàn tập trung ăn tối sau đó nghỉ ngơi.",
+          shortDescription: "Ăn tối.",
           orderUUID: null,
         },
       ],
@@ -778,7 +580,7 @@ export const planData = [
           duration: "01:00:00",
           isStarred: false,
           description: "Ăn sáng và thu xếp đồ đạc để trả phòng.",
-          shortDescription: "Ăn sáng",
+          shortDescription: "Ăn sáng.",
           orderUUID: null,
         },
         {
@@ -818,7 +620,11 @@ export const planData = [
         },
       ],
     ],
-    surcharges: [], //done
+    surcharges: [
+      { gcoinAmount: 300, note: "Mua dụng cụ hỗ trợ du lịch" },
+      { gcoinAmount: 200, note: "Mua đồ dùng chung" },
+      { gcoinAmount: 250, note: "Mua dụng cụ sơ cứu" },
+    ], //done
     travelDuration: "05:30:00", //done
     sourceId: null, //done
   },

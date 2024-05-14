@@ -45,6 +45,7 @@ import { companionData } from "../../assets/constants/companions";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const EmulatorPage = () => {
+  //#region Declaration
   const [vertical, setVertical] = useState("top");
   const [horizontal, setHorizontal] = useState("right");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -272,6 +273,7 @@ const EmulatorPage = () => {
   const [createOrder, { data: dataOrder, error: errorOrder }] = useMutation(
     ORDER_CREATE_SIMULATOR
   );
+  //#endregion
 
   const handlingAuth = async (travelerPhone, accs) => {
     try {
@@ -446,8 +448,6 @@ const EmulatorPage = () => {
     return result.data;
   }
 
-  // localStorage.setItem("checkIsUserCall", "no");
-
   const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
@@ -471,22 +471,21 @@ const EmulatorPage = () => {
       const minCeiled = Math.ceil(4);
       const maxFloored = Math.floor(15);
       function getOddNumber(min, max) {
-        // Ensure even minimum for odd number generation
-        min = Math.ceil(min / 2) * 2; // Adjust min to nearest even number
+        min = Math.ceil(min / 2) * 2;
 
         let per;
         do {
           per = Math.floor(Math.random() * (max - min + 1) + min);
-        } while (per % 2 === 0); // Loop until an odd number is found
+        } while (per % 2 === 0);
 
         return per;
       }
       let period = getOddNumber(minCeiled, maxFloored);
-      if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+      if (arrivalTime >= "16:00:00" && arrivalTime < "20:00:00") {
         period++;
       }
       var maxDateLength = Math.ceil((period * 1.0) / 2);
-      if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
+      if (arrivalTime >= "16:00:00" && arrivalTime < "20:00:00") {
         maxDateLength++;
       }
 
@@ -523,6 +522,8 @@ const EmulatorPage = () => {
 
       let productAcmdation = [];
       let productFB = [];
+      let productFBMorning = [];
+      let productFBEve = [];
       let productVehicle = [];
 
       if (fbProviders.length > 0) {
@@ -531,20 +532,48 @@ const EmulatorPage = () => {
         const { data: dataProduct } = await refetchProduct({
           id: fbProviders[findProvider].id,
           type: ["BEVERAGE", "FOOD"],
+          period: ["MORNING"],
+        });
+
+        productFBMorning = dataProduct.products.nodes;
+      }
+
+      if (fbProviders.length > 0) {
+        let findProvider = Math.floor(Math.random() * fbProviders.length);
+
+        const { data: dataProduct } = await refetchProduct({
+          id: fbProviders[findProvider].id,
+          type: ["BEVERAGE", "FOOD"],
+          period: ["EVENING"],
+        });
+
+        productFBEve = dataProduct.products.nodes;
+      }
+
+      if (fbProviders.length > 0) {
+        let findProvider = Math.floor(Math.random() * fbProviders.length);
+
+        const { data: dataProduct } = await refetchProduct({
+          id: fbProviders[findProvider].id,
+          type: ["BEVERAGE", "FOOD"],
+          period: ["NOON"],
         });
 
         productFB = dataProduct.products.nodes;
       }
+
       if (vehicleProviders.length > 0) {
         let findProvider = Math.floor(Math.random() * vehicleProviders.length);
 
         const { data: dataProduct } = await refetchProduct({
           id: vehicleProviders[findProvider].id,
           type: ["VEHICLE"],
+          period: ["NOON"],
         });
 
         productVehicle = dataProduct.products.nodes;
       }
+
       if (acmdationProviders.length > 0) {
         let findProvider = Math.floor(
           Math.random() * acmdationProviders.length
@@ -553,6 +582,7 @@ const EmulatorPage = () => {
         const { data: dataProduct } = await refetchProduct({
           id: acmdationProviders[findProvider].id,
           type: ["ROOM", "CAMP"],
+          period: ["NOON"],
         });
 
         productAcmdation = dataProduct.products.nodes;
@@ -576,18 +606,76 @@ const EmulatorPage = () => {
       let tempOrders = [];
       let schedule = [];
 
+      const [hours, minutes, seconds] = arrivalTime.split(":");
+      const remainSpan = 22 - hours;
+
+      console.log(arrivalTime);
       if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
-        schedule.push([planData[0].schedule[0][0]]);
+        if (remainSpan <= 2) {
+          schedule.push([planData[0].schedule[0][0]]);
+        } else if (remainSpan <= 4) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan <= 5) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        } else {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][6],
+          ]);
+        }
       } else if (arrivalTime >= "10:00:00" && arrivalTime < "16:00:00") {
-        schedule.push([planData[0].schedule[0][0]]);
+        if (remainSpan <= 7) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan > 7 && remainSpan < 11) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan >= 11 && remainSpan <= 12) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][2],
+            planData[0].schedule[0][3],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        }
       } else {
-        schedule.push(planData[0].schedule[0]);
+        if (remainSpan <= 13) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][2],
+            planData[0].schedule[0][3],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        } else {
+          schedule.push(planData[0].schedule[0]);
+        }
       }
 
       for (let l = 1; l < maxDateLength - 1; l++) {
         schedule.push(planData[0].schedule[l]);
       }
-      schedule.push(planData[0].schedule[14]);
+      schedule.push(planData[0].schedule[9]);
+
+      console.log(schedule);
 
       for (let z = 0; z < schedule.length; z++) {
         for (let y = 0; y < schedule[z].length; y++) {
@@ -625,7 +713,7 @@ const EmulatorPage = () => {
 
       let tempCartFB = [];
       if (productFB.length > 0) {
-        let numOfProducts = 4;
+        let numOfProducts = 2;
 
         for (let h = 0; h < numOfProducts; h++) {
           let random = Math.floor(Math.random() * productFB.length);
@@ -644,6 +732,59 @@ const EmulatorPage = () => {
               }
             }
             tempCartFB.push({ key: productFB[random].id, value: num });
+          }
+        }
+      }
+
+      let tempCartFBMorning = [];
+      if (productFBMorning.length > 0) {
+        let numOfProducts = 2;
+
+        for (let h = 0; h < numOfProducts; h++) {
+          let random = Math.floor(Math.random() * productFBMorning.length);
+
+          const found = tempCartFBMorning.find(
+            (item) => item.key === productFBMorning[random].id
+          );
+
+          if (!found) {
+            let check = true;
+            let num = 0;
+            while (check) {
+              num++;
+              if (num * productFBMorning[random].partySize >= 10) {
+                check = false;
+              }
+            }
+            tempCartFBMorning.push({
+              key: productFBMorning[random].id,
+              value: num,
+            });
+          }
+        }
+      }
+
+      let tempCartFBEve = [];
+      if (productFBEve.length > 0) {
+        let numOfProducts = 2;
+
+        for (let h = 0; h < numOfProducts; h++) {
+          let random = Math.floor(Math.random() * productFBEve.length);
+
+          const found = tempCartFBEve.find(
+            (item) => item.key === productFBEve[random].id
+          );
+
+          if (!found) {
+            let check = true;
+            let num = 0;
+            while (check) {
+              num++;
+              if (num * productFBEve[random].partySize >= 10) {
+                check = false;
+              }
+            }
+            tempCartFBEve.push({ key: productFBEve[random].id, value: num });
           }
         }
       }
@@ -686,59 +827,100 @@ const EmulatorPage = () => {
 
       let fixedPeriod = "NOON";
 
-      let fixedServeDate = [];
-
-      let checkInServe = [];
-      for (let g = 0; g < schedule.length; g++) {
-        if (g < schedule.length - 1) {
-          checkInServe.push(g);
+      let productsServe = [];
+      if (schedule[0].length < 6) {
+        for (let g = 1; g < schedule.length; g++) {
+          productsServe.push(g);
+        }
+      } else {
+        for (let g = 0; g < schedule.length; g++) {
+          productsServe.push(g);
         }
       }
-      fixedServeDate = checkInServe;
+
+      let vehicleServe = [];
+      let checkVehicleServe = false;
+      for (let d = 0; d < schedule[0].length; d++) {
+        if (schedule[0][d].type === "VISIT") {
+          checkVehicleServe = true;
+          break;
+        }
+      }
+      if (checkVehicleServe) {
+        for (let g = 0; g < schedule.length - 1; g++) {
+          vehicleServe.push(g);
+        }
+      } else {
+        for (let g = 1; g < schedule.length - 1; g++) {
+          vehicleServe.push(g);
+        }
+      }
+
+      let morningServe = [];
+      for (let g = 1; g < schedule.length; g++) {
+        morningServe.push(g);
+      }
+
+      let eveServe = [];
+      if (schedule[0].length < 2) {
+        for (let g = 1; g < schedule.length - 1; g++) {
+          eveServe.push(g);
+        }
+      } else {
+        for (let g = 0; g < schedule.length - 1; g++) {
+          eveServe.push(g);
+        }
+      }
 
       const uuidFB = uuidv4();
+      const uuidFBEve = uuidv4();
+      const uuidFBMorning = uuidv4();
       const uuidVehicle = uuidv4();
       const uuidAcmdation = uuidv4();
 
-      if (schedule[0].length === 1) {
-        let changedServeDate = fixedServeDate;
-        changedServeDate.shift();
-        if (tempCartFB.length > 0 && schedule.length > 2) {
-          tempOrders.push({
-            uuid: uuidFB,
-            cart: tempCartFB,
-            note: null,
-            period: fixedPeriod,
-            serveDateIndexes: changedServeDate,
-            type: "EAT",
-          });
-        }
-      } else {
-        if (tempCartFB.length > 0 && schedule.length > 2) {
-          tempOrders.push({
-            uuid: uuidFB,
-            cart: tempCartFB,
-            note: null,
-            period: fixedPeriod,
-            serveDateIndexes: fixedServeDate,
-            type: "EAT",
-          });
-        }
+      if (tempCartFB.length > 0) {
+        tempOrders.push({
+          uuid: uuidFB,
+          cart: tempCartFB,
+          note: null,
+          period: fixedPeriod,
+          serveDateIndexes: productsServe,
+          type: "EAT",
+        });
+      }
+      if (tempCartFBMorning.length > 0) {
+        tempOrders.push({
+          uuid: uuidFBMorning,
+          cart: tempCartFBMorning,
+          note: null,
+          period: "MORNING",
+          serveDateIndexes: morningServe,
+          type: "EAT",
+        });
+      }
+      if (tempCartFBEve.length > 0) {
+        tempOrders.push({
+          uuid: uuidFBEve,
+          cart: tempCartFBEve,
+          note: null,
+          period: "EVENING",
+          serveDateIndexes: eveServe,
+          type: "EAT",
+        });
       }
 
-      if (tempCartVehicle.length > 0 && schedule.length > 2) {
+      if (tempCartVehicle.length > 0) {
         tempOrders.push({
           uuid: uuidVehicle,
           cart: tempCartVehicle,
           note: null,
           period: fixedPeriod,
-          serveDateIndexes: fixedServeDate,
+          serveDateIndexes: vehicleServe,
           type: "VISIT",
         });
       }
 
       for (let m = 0; m < schedule.length; m++) {
-        let haveFB = false;
         let haveVehicle = false;
 
         for (let k = 0; k < schedule[m].length; k++) {
@@ -777,18 +959,35 @@ const EmulatorPage = () => {
 
           if (
             schedule[m][k].type === "EAT" &&
-            haveFB === false &&
-            m !== schedule.length - 1 &&
+            // m !== schedule.length - 1 &&
+            schedule[m][k].shortDescription === "Ăn trưa." &&
             tempCartFB.length > 0
           ) {
             schedule[m][k].orderUUID = uuidFB;
-            haveFB = true;
+          }
+
+          if (
+            schedule[m][k].type === "EAT" &&
+            // m !== schedule.length - 1 &&
+            schedule[m][k].shortDescription === "Ăn tối." &&
+            tempCartFBEve.length > 0
+          ) {
+            schedule[m][k].orderUUID = uuidFBEve;
+          }
+
+          if (
+            schedule[m][k].type === "EAT" &&
+            // m !== schedule.length - 1 &&
+            schedule[m][k].shortDescription === "Ăn sáng." &&
+            tempCartFBMorning.length > 0
+          ) {
+            schedule[m][k].orderUUID = uuidFBMorning;
           }
 
           if (
             schedule[m][k].type === "VISIT" &&
             haveVehicle === false &&
-            m !== schedule.length - 1 &&
+            // m !== schedule.length - 1 &&
             tempCartVehicle.length > 0
           ) {
             schedule[m][k].orderUUID = uuidVehicle;
@@ -823,6 +1022,8 @@ const EmulatorPage = () => {
     setIsEmulatorLoading(false);
     localStorage.setItem("checkIsUserCall", "no");
   };
+
+  //#region Simulator
 
   const handleJoinPlan = async (dto, count, acc) => {
     try {
@@ -1721,6 +1922,7 @@ const EmulatorPage = () => {
     setIsEmulatorLoading(false);
     localStorage.setItem("checkIsUserCall", "no");
   };
+  //#endregion
 
   return (
     <div>
