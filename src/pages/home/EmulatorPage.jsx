@@ -43,6 +43,7 @@ import client from "../../services/apollo/config";
 import { v4 as uuidv4 } from "uuid";
 import { companionData } from "../../assets/constants/companions";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import * as turf from "@turf/turf";
 
 const EmulatorPage = () => {
   //#region Declaration
@@ -343,10 +344,25 @@ const EmulatorPage = () => {
     dateTime,
     tempOrders,
     period,
-    schedule
+    schedule,
+    destination
   ) => {
     try {
-      let appendName = moment().format("DDMMYYYY-HH:mm") + `_${acc.id}`;
+      let appendName = moment(dateTime).format("DDMMYYYY-HH:mm") + `_${acc.id}`;
+
+      let destinationLoc = [
+        destination.coordinate.coordinates[0],
+        destination.coordinate.coordinates[1],
+      ];
+
+      let from = turf.point(destinationLoc);
+      let to = turf.point(plan.departure);
+
+      let distance = turf.distance(from, to);
+
+      let duration = moment
+        .utc((distance / 60).toFixed(1) * 3600 * 1000)
+        .format("HH:mm:ss");
 
       console.log({
         departAt: dateTime,
@@ -361,7 +377,7 @@ const EmulatorPage = () => {
         savedProviderIds: plan.savedProviderIds,
         schedule: schedule,
         surcharges: plan.surcharges,
-        travelDuration: plan.travelDuration,
+        travelDuration: duration,
         tempOrders: tempOrders,
       });
 
@@ -380,7 +396,7 @@ const EmulatorPage = () => {
             savedProviderIds: plan.savedProviderIds,
             schedule: schedule,
             surcharges: plan.surcharges,
-            travelDuration: plan.travelDuration,
+            travelDuration: duration,
             tempOrders: tempOrders,
           },
         },
@@ -1006,7 +1022,8 @@ const EmulatorPage = () => {
         dateTime,
         tempOrders,
         period,
-        schedule
+        schedule,
+        destination
       );
 
       if (res.status) {
