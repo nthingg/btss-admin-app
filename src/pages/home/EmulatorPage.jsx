@@ -2834,23 +2834,29 @@ const EmulatorPage = () => {
                     setIsLoadingVisible(true);
                     setIsEmulatorLoading(true);
 
-                    try {
-                      if (loadingState) {
-                        const { data } = await refetchAccounts();
-                        let res = data["accounts"]["nodes"].map((account) => {
-                          const { __typename, ...rest } = account;
-                          return { ...rest, token: "" };
-                        });
-                        await MassLogin(res);
-                        setLoading(false);
+                    if (
+                      selectedSimulator !== 6 &&
+                      selectedSimulator !== 7 &&
+                      selectedSimulator !== 10
+                    ) {
+                      try {
+                        if (loadingState) {
+                          const { data } = await refetchAccounts();
+                          let res = data["accounts"]["nodes"].map((account) => {
+                            const { __typename, ...rest } = account;
+                            return { ...rest, token: "" };
+                          });
+                          await MassLogin(res);
+                          setLoading(false);
+                        }
+                      } catch (error) {
+                        console.log(error);
+                        const msg = localStorage.getItem("errorMsg");
+                        setErrMsg(msg);
+                        handleClick();
+                        localStorage.removeItem("errorMsg");
+                        return;
                       }
-                    } catch (error) {
-                      console.log(error);
-                      const msg = localStorage.getItem("errorMsg");
-                      setErrMsg(msg);
-                      handleClick();
-                      localStorage.removeItem("errorMsg");
-                      return;
                     }
 
                     if (selectedSimulator === 1) {
