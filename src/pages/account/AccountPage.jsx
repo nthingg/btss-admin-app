@@ -459,9 +459,6 @@ const AccountPage = () => {
             <AddCircleIcon />
             <span>Thêm quản lý</span>
           </Link>
-          {/* <button className="link">
-            <CloudDownloadIcon />
-          </button> */}
           <div>
             <button className="link" id="filterTraveler" onClick={handleOpen}>
               <FilterAltIcon />
