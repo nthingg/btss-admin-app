@@ -279,17 +279,6 @@ const HomePage = () => {
   }, [errTrendDest, loadingTrendDest, dataTrendDest]);
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      const decode = JSON.parse(atob(token.split('.')[1]));
-      if (decode.exp * 1000 < new Date().getTime()) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("refreshToken");
-        navigate("/");
-        navigate(0);
-      }
-    }
-
     const timer = setInterval(() => {
       setNow(new Date());
       // refetch();
@@ -502,7 +491,7 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/5`} className="navigateButton">
-                        {published == 0 ? (
+                        {published === 0 ? (
                           <p>{published} </p>
                         ) : (
                           <p>
