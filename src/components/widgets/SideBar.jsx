@@ -35,6 +35,17 @@ const SideBar = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      const decode = JSON.parse(atob(token.split('.')[1]));
+      if (decode.exp * 1000 < new Date().getTime()) {
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("refreshToken");
+        navigate("/");
+        navigate(0);
+      }
+    }
+    
     if (refreshToken) {
       refreshAuth();
       console.log("call");

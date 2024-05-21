@@ -118,12 +118,15 @@ export const LOAD_NON_TRAVELER_FILTER = gql`
 `;
 
 export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
-  query LoadTravelerOptions($searchTerm: String) {
+  query LoadTravelerOptions {
     accounts(
       first: 100
       order: { id: DESC }
-      where: { role: { eq: TRAVELER } }
-      searchTerm: $searchTerm
+      dto: {
+        isProviderNameSearch: false
+        role: TRAVELER
+        searchTerm: ""
+      }
     ) {
       nodes {
         id

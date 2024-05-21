@@ -30,7 +30,7 @@ import {
   LOAD_ACCOUNT_USERS,
   LOAD_NUMBERS_NEWEST_TRAVELER,
 } from "../../services/graphql/account";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TrendingDestinationChart } from "../../components/charts/TrendingDestinationChart";
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
@@ -38,6 +38,7 @@ import { CategoryScale } from "chart.js";
 Chart.register(CategoryScale);
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [now, setNow] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
 
@@ -280,15 +281,15 @@ const HomePage = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(new Date());
-      refetch();
-      refetchCancelled();
-      refetchOnGoing();
-      refetchTemp();
-      refetchDestination();
-      refetchComplete();
-      refetchTotal();
-      refetchTravelers();
-      refetchPublished();
+      // refetch();
+      // refetchCancelled();
+      // refetchOnGoing();
+      // refetchTemp();
+      // refetchDestination();
+      // refetchComplete();
+      // refetchTotal();
+      // refetchTravelers();
+      // refetchPublished();
     }, 1000); // Update every second
 
     return () => clearInterval(timer); // Cleanup function to stop the timer when the component unmounts
@@ -490,7 +491,7 @@ const HomePage = () => {
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/5`} className="navigateButton">
-                        {published == 0 ? (
+                        {published === 0 ? (
                           <p>{published} </p>
                         ) : (
                           <p>

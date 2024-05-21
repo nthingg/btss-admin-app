@@ -242,7 +242,7 @@ const DestinationPage = () => {
   };
 
   //#region Import excel
-  const [add, { data: dataAdd, error: errorAdd }] = useMutation(
+  const [add] = useMutation(
     IMPORT_EXCEL_DESTINATION
   );
 
