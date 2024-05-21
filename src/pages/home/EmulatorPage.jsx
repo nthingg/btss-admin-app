@@ -3030,7 +3030,13 @@ const EmulatorPage = () => {
                       log +=
                         "[Chỉnh sửa thời gian hệ thống] Quản trị hệ thống \n";
                       let response = [];
-                      const res = await handleChangeSystemTime(dateSimulator);
+
+                      let selectedDate = new Date(dateSimulator);
+
+                      var a = moment.utc(selectedDate).utcOffset("+07:00");
+                      var formatted = a.format();
+
+                      const res = await handleChangeSystemTime(formatted);
 
                       response.push(res);
                       setResponseMsg(response);
