@@ -30,7 +30,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "03:00:00",
+          duration: "01:00:00",
           isStarred: false,
           description: "Khám phá khu vực xung quanh, đi bộ hoặc thuê xe đạp.",
           shortDescription: "Khám phá khu vực.",
@@ -47,7 +47,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "03:00:00",
+          duration: "01:00:00",
           isStarred: false,
           description: "Tham quan các điểm du lịch địa phương.",
           shortDescription: "Tham quan.",
@@ -55,7 +55,7 @@ export const planData = [
         },
         {
           type: "VISIT",
-          duration: "03:00:00",
+          duration: "01:00:00",
           isStarred: false,
           description:
             "Dạo chơi và tận hưởng cảnh đẹp hoàng sơ của địa phương.",

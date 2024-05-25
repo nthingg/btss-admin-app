@@ -9,6 +9,7 @@ import {
   CANCEL_PLAN_SIMULATOR,
   CHANGE_JOIN_METHOD_SIMULATOR,
   CHECK_NUMBERS_COMPLETED_PLANS,
+  CHECK_NUMBERS_ONGOING_PLANS,
   CHECK_NUMBERS_PENDING_PLANS,
   CHECK_NUMBERS_READY_PLANS,
   CHECK_NUMBERS_REGISTERING_PLANS,
@@ -208,6 +209,13 @@ const EmulatorPage = () => {
     data: dataReady,
     refetch: refetchReady,
   } = useQuery(CHECK_NUMBERS_READY_PLANS);
+
+  const {
+    error: errOngoing,
+    loading: loadingOngoing,
+    data: dataOngoing,
+    refetch: refetchOngoing,
+  } = useQuery(CHECK_NUMBERS_ONGOING_PLANS);
 
   const {
     error: errorVeri,
@@ -1792,7 +1800,7 @@ const EmulatorPage = () => {
       try {
         const { data } = await refetchLoadPlans({
           id: loggedAcc[i].id, // Always refetches a new list,
-          status: "READY",
+          status: "ONGOING",
         });
         currentPlans = data["plans"]["nodes"];
       } catch (error) {
@@ -3060,10 +3068,10 @@ const EmulatorPage = () => {
                       setIsEmulatorLoading(false);
                     } else if (selectedSimulator === 8) {
                       try {
-                        const { data } = await refetchReady();
+                        const { data } = await refetchOngoing();
                         const limitReady = data.plans.totalCount;
                         if (planVerifyNum > limitReady) {
-                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã sẵn sàng)`;
+                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitReady} kế hoạch đã đang diễn ra)`;
                           setErrMsg(msg);
                           handleClick();
                           setIsLoadingVisible(false);

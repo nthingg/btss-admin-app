@@ -320,6 +320,32 @@ export const CHECK_NUMBERS_READY_PLANS = gql`
   }
 `;
 
+export const CHECK_NUMBERS_ONGOING_PLANS = gql`
+  query {
+    plans(
+      where: {
+        account: { name: { startsWith: "test-account" } }
+        status: { eq: ONGOING }
+      }
+    ) {
+      edges {
+        node {
+          id
+          name
+          status
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
 export const CHECK_NUMBERS_COMPLETED_PLANS = gql`
   query {
     plans(
