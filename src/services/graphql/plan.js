@@ -587,17 +587,9 @@ export const LOAD_NUMBERS_COMPLETED = gql`
 `;
 
 export const LOAD_NUMBERS_ONGOING = gql`
-  query OnGoingPlan($searchTerm: String, $dateTime: DateTime) {
+  query OnGoingPlan($searchTerm: String) {
     plans(
-      where: {
-        or: [
-          {
-            status: { eq: READY }
-            utcDepartAt: { lte: $dateTime }
-          }
-          { status: { eq: VERIFIED }}
-        ]
-      }
+      where: { status: { in: [ONGOING, VERIFIED] } }
       searchTerm: $searchTerm
     ) {
       totalCount
@@ -627,8 +619,11 @@ export const LOAD_NUMBERS_PENDING = gql`
 `;
 
 export const LOAD_NUMBERS_READY = gql`
-  query CommingSoon($searchTerm: String, $dateTime: DateTime) {
-    plans(where: { utcDepartAt: { gte: $dateTime }, status: { eq: READY } }, searchTerm: $searchTerm) {
+  query CommingSoon($searchTerm: String) {
+    plans(
+      where: { status: { eq: READY } }
+      searchTerm: $searchTerm
+    ) {
       edges {
         node {
           id
@@ -643,7 +638,7 @@ export const LOAD_NUMBERS_READY = gql`
 
 export const LOAD_NUMBERS_REGISTERING = gql`
   query RegisteringPlans {
-    plans(where: { status: { eq: REGISTERING } }) {
+    plans(where: { status: { in: [PENDING, REGISTERING] } }) {
       edges {
         node {
           id
@@ -709,7 +704,7 @@ export const LOAD_NUMBERS_TOTAL = gql`
     plans(
       where: {
         status: {
-          in: [REGISTERING, READY, VERIFIED, COMPLETED, CANCELED, FLAWED]
+          in: [PENDING, REGISTERING, READY, ONGOING, VERIFIED, COMPLETED, CANCELED, FLAWED]
         }
       }
     ) {

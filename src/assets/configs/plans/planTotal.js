@@ -37,12 +37,14 @@ export const planTotalColumns = [
     width: 150,
     renderCell: (params) => {
       const statusType = {
-        COMPLETED: "Đã hoàn thành",
+        COMPLETED: "Đã kết thúc",
         CANCELED: "Đã hủy",
         READY: "Sắp diễn ra",
-        FLAWED: "Đã hoàn thành",
+        FLAWED: "Đã kết thúc",
         VERIFIED: "Đang diễn ra",
-        REGISTERING: "Chưa chốt",
+        REGISTERING: "Chờ tham gia",
+        ONGOING: "Đang diễn ra",
+        PENDING: "Chờ tham gia"
       };
       return <div>{statusType[params.row.node.status]}</div>;
     },

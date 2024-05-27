@@ -92,11 +92,11 @@ const PlanPage = () => {
       }
     } else {
       setSelectedStatus(planStat);
-      fetchPlanFilter(`[${planStat.toString()}]`, null);
+      fetchPlanFilter(`[${planStat.toString()}, PENDING, ONGOING]`, null);
     }
     setIsLoading(false);
   }, []);
-  
+
   const handleClickSnackBar = () => {
     setSnackbarOpen(true);
   };
@@ -108,7 +108,6 @@ const PlanPage = () => {
   async function planQueryInit(
     statusQuery,
     searchTerm,
-    utcDepartAtQuery,
     publishedQuery,
     onGoingQuery,
     ordersQuery,
@@ -207,7 +206,6 @@ const PlanPage = () => {
             order: { id: DESC }
             where: { 
               ${statusQuery} 
-              ${utcDepartAtQuery}
               ${ordersQuery}
               ${accountQuery}
             }
@@ -260,7 +258,6 @@ const PlanPage = () => {
     cursor,
     statusQuery,
     searchTerm,
-    utcDepartAtQuery,
     publishedQuery,
     onGoingQuery,
     ordersQuery,
@@ -362,7 +359,6 @@ const PlanPage = () => {
             order: { id: DESC }
             where: { 
               ${statusQuery} 
-              ${utcDepartAtQuery}
               ${ordersQuery}
               ${accountQuery}
             }
@@ -414,7 +410,6 @@ const PlanPage = () => {
   async function countPlan(
     statusQuery,
     searchTerm,
-    utcDepartAtQuery,
     publishedQuery,
     onGoingQuery,
     ordersQuery,
@@ -456,7 +451,6 @@ const PlanPage = () => {
           plans(
             where: { 
               ${statusQuery} 
-              ${utcDepartAtQuery}
               ${ordersQuery}
               ${accountQuery}
             }
@@ -487,21 +481,16 @@ const PlanPage = () => {
     accountId
   ) => {
     let statusQuery = `status: { in: ${selectedStatus} }`;
-    let utcDepartAtQuery;
     let onGoingQuery = "";
     let publishedQuery = "";
     let ordersQuery = "";
     let accountQuery = "";
     switch (selectedStatus) {
-      case "READY":
-        utcDepartAtQuery = `utcDepartAt: { gte: "${now.toUTCString()}" }`;
+      case "REGISTERING":
+        statusQuery = `status: { in: [PENDING, REGISTERING] }`;
         break;
       case "VERIFIED":
-        statusQuery = "";
-        onGoingQuery = `or: [
-          { status: { eq: READY }, utcDepartAt: { lte: "${now.toUTCString()}" } },
-          { status: { eq: VERIFIED } }
-        ]`;
+        statusQuery = "status: { in: [ONGOING, VERIFIED] }";
         break;
       case true: {
         statusQuery = "";
@@ -513,9 +502,6 @@ const PlanPage = () => {
         publishedQuery = `isPublished: { eq: true }`;
         break;
       }
-      default:
-        utcDepartAtQuery = "";
-        break;
     }
     if (filterOrder && filterOrder !== "all") {
       ordersQuery = ` orders: { any: ${filterOrder === "haveOrders"} }`;
@@ -526,7 +512,6 @@ const PlanPage = () => {
     const data = await planQueryInit(
       statusQuery,
       searchTerm,
-      utcDepartAtQuery,
       publishedQuery,
       onGoingQuery,
       ordersQuery,
@@ -541,7 +526,6 @@ const PlanPage = () => {
           endCursor,
           statusQuery,
           searchTerm,
-          utcDepartAtQuery,
           publishedQuery,
           onGoingQuery,
           ordersQuery,
@@ -573,8 +557,7 @@ const PlanPage = () => {
     filterOrder,
     accountId
   ) => {
-    let statusQuery = `status: { in: [${planStat}] }`;
-    let utcDepartAtQuery = "";
+    let statusQuery = `status: { in: [${planStat}, PENDING, ONGOING] }`;
     let onGoingQuery = "";
     let publishedQuery = "";
     let ordersQuery = "";
@@ -588,14 +571,12 @@ const PlanPage = () => {
     const planTotalCount = await countPlan(
       statusQuery,
       searchTerm,
-      utcDepartAtQuery,
       publishedQuery,
       onGoingQuery,
       ordersQuery,
       accountQuery);
     setTotal(planTotalCount.plans.totalCount);
     for (let i = 1; i < 7; i++) {
-      utcDepartAtQuery = "";
       onGoingQuery = "";
       publishedQuery = "";
       let selectedStatus = planStat[i - 1];
@@ -606,31 +587,23 @@ const PlanPage = () => {
       }
       statusQuery = `status: { in: [${selectedStatus}] }`;
       switch (selectedStatus) {
-        case "READY":
-          utcDepartAtQuery = `utcDepartAt: { gte: "${now.toUTCString()}" }`;
+        case "REGISTERING":
+          statusQuery = `status: { in: [PENDING, REGISTERING] }`;
           break;
         case "VERIFIED":
-          statusQuery = "";
-          onGoingQuery = `or: [
-            { status: { eq: READY }, utcDepartAt: { lte: "${now.toUTCString()}" } },
-            { status: { eq: VERIFIED } }
-          ]`;
+          statusQuery = "status: { in: [ONGOING, VERIFIED] }";
           break;
         case true: {
           statusQuery = "";
           publishedQuery = `isPublished: { eq: true }`;
           break;
         }
-        default:
-          utcDepartAtQuery = "";
-          break;
       }
       switch (i) {
         case 1:
           const registeringCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -641,7 +614,6 @@ const PlanPage = () => {
           const commingSoonCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -652,7 +624,6 @@ const PlanPage = () => {
           const onGoingCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -663,7 +634,6 @@ const PlanPage = () => {
           const completedCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -674,7 +644,6 @@ const PlanPage = () => {
           const publishedCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -685,7 +654,6 @@ const PlanPage = () => {
           const cancelledCount = await countPlan(
             statusQuery,
             searchTerm,
-            utcDepartAtQuery,
             publishedQuery,
             onGoingQuery,
             ordersQuery,
@@ -706,7 +674,7 @@ const PlanPage = () => {
         setSelectedStatus(planStat);
         // fetchTotalPlan(searchTerm);
         fetchPlanFilter(
-          `[${planStat.toString()}]`,
+          `[${planStat.toString()}, PENDING, ONGOING]`,
           searchTerm,
           filterOrder,
           accountId
@@ -899,7 +867,10 @@ const PlanPage = () => {
     setIsLoading(true);
     const search = document.getElementById("floatingValue").value;
     setSearchTerm(search);
-    fetchPlanFilter(`[${selectedStatus}]`, search, filterOrder);
+    fetchPlanCount(search, filterOrder);
+    selectedStatus.toString() === planStat.toString()
+      ? fetchPlanFilter(`[${planStat}, PENDING, ONGOING]`, search, filterOrder)
+      : fetchPlanFilter(`[${selectedStatus}]`, search, filterOrder);
   };
 
   const handleChangeFilter = (e) => {
@@ -910,7 +881,9 @@ const PlanPage = () => {
   const handleModalSubmit = async (filterOrder, accountId) => {
     setIsLoading(true);
     fetchPlanCount(searchTerm, filterOrder, accountId);
-    fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
+    selectedStatus.toString() === planStat.toString()
+      ? fetchPlanFilter(`[${planStat}, PENDING, ONGOING]`, searchTerm, filterOrder, accountId)
+      : fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
   };
 
   return (
@@ -966,7 +939,9 @@ const PlanPage = () => {
               refetchOngoing();
               refetchPublished();
               fetchPlanCount();
-              fetchPlanFilter(`[${selectedStatus}]`, null);
+              selectedStatus.toString() === planStat.toString()
+                ? fetchPlanFilter(`[${planStat}, PENDING, ONGOING]`, null)
+                : fetchPlanFilter(`[${selectedStatus}]`, null);
             }}
           >
             <RefreshIcon />
@@ -1000,10 +975,10 @@ const PlanPage = () => {
                 {index === 6 && <CancelIcon sx={{ color: "#E74C3C" }} />}
                 <span>
                   {index === 0 && `Tất cả (${total})`}
-                  {index === 1 && `Chưa chốt (${registering})`}
+                  {index === 1 && `Chờ tham gia (${registering})`}
                   {index === 2 && `Sắp diễn ra (${temp})`}
                   {index === 3 && `Đang diễn ra (${onGoing})`}
-                  {index === 4 && `Đã hoàn thành (${completed})`}
+                  {index === 4 && `Đã kết thúc (${completed})`}
                   {/* {index === 6 && `Có vấn đề (${flawed})`} */}
                   {index === 5 && `Đã chia sẻ (${published})`}
                   {index === 6 && `Đã hủy (${cancelled})`}
@@ -1035,21 +1010,21 @@ const PlanPage = () => {
         )}
       </div>
       <Snackbar
-          anchorOrigin={{ vertical, horizontal }}
-          open={snackbarOpen}
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackbarOpen}
+        onClose={handleClose}
+        autoHideDuration={2000}
+        key={vertical + horizontal}
+      >
+        <Alert
           onClose={handleClose}
-          autoHideDuration={2000}
-          key={vertical + horizontal}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
         >
-          <Alert
-            onClose={handleClose}
-            severity="error"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            {errorMsg}
-          </Alert>
-        </Snackbar>
+          {errorMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
