@@ -489,7 +489,13 @@ const PlanPage = () => {
       case "REGISTERING":
         statusQuery = `status: { in: [PENDING, REGISTERING] }`;
         break;
+      case "[REGISTERING]":
+        statusQuery = `status: { in: [PENDING, REGISTERING] }`;
+        break;
       case "VERIFIED":
+        statusQuery = "status: { in: [ONGOING, VERIFIED] }";
+        break;
+      case "[VERIFIED]":
         statusQuery = "status: { in: [ONGOING, VERIFIED] }";
         break;
       case true: {
