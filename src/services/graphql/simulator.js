@@ -80,6 +80,9 @@ export const LOAD_PLANS_SIMULATOR = gql`
           serveDateIndexes
           note
         }
+        destination {
+          id
+        }
       }
     }
   }

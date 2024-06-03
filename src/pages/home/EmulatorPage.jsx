@@ -38,6 +38,7 @@ import moment from "moment-timezone";
 import {
   LOAD_DESTINATIONS,
   LOAD_DESTINATION_LOC_BY_ID,
+  LOAD_DETAIL_DESTINATION,
 } from "../../services/graphql/destination";
 import { LOAD_PRODUCTS_BY_PROVIDER } from "../../services/graphql/products";
 import client from "../../services/apollo/config";
@@ -165,6 +166,15 @@ const EmulatorPage = () => {
   const [publish, { data: dataPublish, error: errorPublish }] = useMutation(
     PUBLISH_PLAN_SIMULATOR
   );
+
+  const [
+    getDestination,
+    {
+      error: errDestination,
+      loading: loadingDestination,
+      data: dataDestination,
+    },
+  ] = useLazyQuery(LOAD_DETAIL_DESTINATION);
 
   const {
     error,
@@ -1824,9 +1834,24 @@ const EmulatorPage = () => {
           count++;
           log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
 
+          let destinationLoc = [];
+          try {
+            const { data } = await getDestination({
+              variables: {
+                id: parseInt(providerId, 10),
+              },
+            });
+            destinationLoc = [
+              data["destinations"]["nodes"][0].coordinate.coordinates[0],
+              data["destinations"]["nodes"][0].coordinate.coordinates[1],
+            ];
+          } catch (error) {
+            console.log(error);
+          }
+
           const verifyData = {
             planId: currentPlans[j].id,
-            coordinate: [105.04567995200371, 10.573465807537024],
+            coordinate: destinationLoc,
           };
 
           const res = await handleVerifyPlan(
