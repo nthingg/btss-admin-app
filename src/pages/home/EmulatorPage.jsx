@@ -1838,7 +1838,7 @@ const EmulatorPage = () => {
           try {
             const { data } = await getDestination({
               variables: {
-                id: parseInt(providerId, 10),
+                id: parseInt(currentPlans[j].destination.id, 10),
               },
             });
             destinationLoc = [
