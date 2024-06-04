@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../assets/scss/sidebar.scss";
 import Dashboard from "@mui/icons-material/Dashboard";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
@@ -6,18 +6,87 @@ import TerminalIcon from "@mui/icons-material/Terminal";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MapIcon from "@mui/icons-material/Map";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import "../../assets/scss/announce-table.scss";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { REFRESH_AUTH } from "../../services/graphql/auth";
-import { useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Fab,
+  Tooltip,
+} from "@mui/material";
+import {
+  LOAD_ANNOUNCEMENT,
+  MARK_ALL_ANNOUNCE,
+  MARK_SINGLE_ANNOUNCE,
+} from "../../services/graphql/announcement";
 
 const SideBar = () => {
   const navigate = useNavigate();
+  const [announcement, setAnnouncement] = useState([]);
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = async () => {
+    setOpen(false);
+  };
 
   const refreshToken = localStorage.getItem("refreshToken");
 
   const [refresh, { data, loading, error }] = useMutation(REFRESH_AUTH);
+
+  const [getAnnouncements, {}] = useLazyQuery(LOAD_ANNOUNCEMENT, {
+    fetchPolicy: "no-cache",
+  });
+
+  const [markAll, { data: dataAll, loading: loadingAll, error: errorAll }] =
+    useMutation(MARK_ALL_ANNOUNCE);
+
+  const [
+    markSingle,
+    { data: dataSingle, loading: loadingSingle, error: errorSingle },
+  ] = useMutation(MARK_SINGLE_ANNOUNCE);
+
+  const markSingleRead = async (id) => {
+    try {
+      const { data } = await markSingle({
+        variables: {
+          id: id,
+        },
+      });
+      fetchAnnouncements();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      const { data } = await markAll();
+      fetchAnnouncements();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchAnnouncements = async () => {
+    try {
+      const { data } = await getAnnouncements();
+      setAnnouncement(data["announcements"]["nodes"]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const refreshAuth = async (e) => {
     try {
@@ -37,7 +106,7 @@ const SideBar = () => {
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
     if (token) {
-      const decode = JSON.parse(atob(token.split('.')[1]));
+      const decode = JSON.parse(atob(token.split(".")[1]));
       if (decode.exp * 1000 < new Date().getTime()) {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("refreshToken");
@@ -45,10 +114,11 @@ const SideBar = () => {
         navigate(0);
       }
     }
-    
+
     if (refreshToken) {
       refreshAuth();
       console.log("call");
+      fetchAnnouncements();
     }
   }, []);
 
@@ -139,6 +209,70 @@ const SideBar = () => {
           </div>
         </div>
       </div>
+      <Fab
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+          } else {
+            setOpen(true);
+          }
+        }}
+        sx={{ color: "#2c3d50" }}
+        style={{ right: 10, bottom: 10, position: "fixed", zIndex: 1600 }}
+      >
+        <NotificationsActiveIcon />
+      </Fab>
+      <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false);
+        }}
+        PaperProps={{
+          sx: { position: "fixed", bottom: -20, right: 50, width: 500 },
+        }}
+      >
+        <DialogTitle backgroundColor={"#2c3d50"} color={"white"}>
+          <div className="mark">
+            <div className="left">
+              <p>Thông báo đơn hàng</p>
+            </div>
+            <div className="right">
+              <Tooltip title="Đã đọc tất cả">
+                <button
+                  onClick={() => {
+                    markAllRead();
+                  }}
+                >
+                  <FactCheckIcon />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+        </DialogTitle>
+        <DialogContent>
+          <div className="announce-table">
+            <div className="body">
+              {announcement.map((message, index) => (
+                <div
+                  key={index}
+                  className="response-item"
+                  onClick={() => {
+                    markSingleRead(message.id);
+                  }}
+                >
+                  <p className="response-msg">
+                    {message.title}{" "}
+                    {message.isRead === false && (
+                      <span style={{ color: "red", fontSize: 18 }}>!</span>
+                    )}
+                  </p>
+                  <p className="response-detail">{message.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

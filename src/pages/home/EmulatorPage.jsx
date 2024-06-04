@@ -46,6 +46,7 @@ import { v4 as uuidv4 } from "uuid";
 import { companionData } from "../../assets/constants/companions";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import * as turf from "@turf/turf";
+import { getDuration } from "../../services/apis/getDuration";
 
 const EmulatorPage = () => {
   //#region Declaration
@@ -373,14 +374,21 @@ const EmulatorPage = () => {
         destination.coordinate.coordinates[1],
       ];
 
-      let from = turf.point(destinationLoc);
-      let to = turf.point(plan.departure);
+      const carDuration = await getDuration(
+        10.841327798960252,
+        106.80992590984253,
+        destinationLoc[1],
+        destinationLoc[0],
+        "vDVXeg2sci8m0EAv3hy4A60D8xXXe9bgoRgAnYPK"
+      );
 
-      let distance = turf.distance(from, to);
+      console.log(carDuration.routes[0].legs[0].duration.value);
 
-      let duration = moment
-        .utc((distance / 60).toFixed(1) * 3600 * 1000)
+      var durationCal = moment
+        .utc(1000 * carDuration.routes[0].legs[0].duration.value)
         .format("HH:mm:ss");
+
+      console.log(durationCal);
 
       console.log({
         departAt: dateTime,
@@ -395,7 +403,7 @@ const EmulatorPage = () => {
         savedProviderIds: plan.savedProviderIds,
         schedule: schedule,
         surcharges: plan.surcharges,
-        travelDuration: duration,
+        travelDuration: durationCal,
         tempOrders: tempOrders,
       });
 
@@ -414,7 +422,7 @@ const EmulatorPage = () => {
             savedProviderIds: plan.savedProviderIds,
             schedule: schedule,
             surcharges: plan.surcharges,
-            travelDuration: duration,
+            travelDuration: durationCal,
             tempOrders: tempOrders,
           },
         },
