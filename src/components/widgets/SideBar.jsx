@@ -234,7 +234,7 @@ const SideBar = () => {
         <DialogTitle backgroundColor={"#2c3d50"} color={"white"}>
           <div className="mark">
             <div className="left">
-              <p>Thông báo đơn hàng</p>
+              <p>Thông báo mới</p>
             </div>
             <div className="right">
               <Tooltip title="Đã đọc tất cả">
