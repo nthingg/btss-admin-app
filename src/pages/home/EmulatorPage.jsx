@@ -652,18 +652,19 @@ const EmulatorPage = () => {
       const remainSpan = 22 - hours;
 
       console.log(arrivalTime);
+      console.log(remainSpan);
       if (arrivalTime >= "16:00:00" && arrivalTime <= "20:00:00") {
         if (remainSpan <= 2) {
           schedule.push([planData[0].schedule[0][0]]);
-        } else if (remainSpan <= 4) {
+        } else if (remainSpan > 2 && remainSpan <= 4) {
           schedule.push([
             planData[0].schedule[0][0],
             planData[0].schedule[0][6],
           ]);
-        } else if (remainSpan <= 5) {
+        } else if (remainSpan > 4 && remainSpan <= 5) {
           schedule.push([
             planData[0].schedule[0][0],
-            planData[0].schedule[0][5],
+            // planData[0].schedule[0][5],
             planData[0].schedule[0][6],
           ]);
         } else {
@@ -698,7 +699,33 @@ const EmulatorPage = () => {
           ]);
         }
       } else {
-        if (remainSpan <= 13) {
+        if (remainSpan <= 2) {
+          schedule.push([planData[0].schedule[0][0]]);
+        } else if (remainSpan > 2 && remainSpan <= 4) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan > 4 && remainSpan <= 5) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan > 5 && remainSpan <= 7) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan > 7 && remainSpan <= 11) {
+          schedule.push([
+            planData[0].schedule[0][0],
+            planData[0].schedule[0][4],
+            planData[0].schedule[0][5],
+            planData[0].schedule[0][6],
+          ]);
+        } else if (remainSpan > 11 && remainSpan <= 16) {
           schedule.push([
             planData[0].schedule[0][0],
             planData[0].schedule[0][2],
