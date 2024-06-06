@@ -524,7 +524,7 @@ const EmulatorPage = () => {
       var arrivalTime = moment(arrivedAt).format("HH:mm:ss");
 
       const minCeiled = Math.ceil(4);
-      const maxFloored = Math.floor(15);
+      const maxFloored = Math.floor(7);
 
       let period = getOddNumber(minCeiled, maxFloored);
 
