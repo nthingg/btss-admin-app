@@ -13,9 +13,11 @@
         padding: 40px 40px 40px 40px;
         background-color: white;
         /* Optional: Add a max-width to limit the width of the container */
-        max-width: 91%;
+        // max-width: 91%;
         /* Adjust as needed */
-        margin: 0 auto;
+        margin: 0 30px 0 30px;
+        // margin: 0 auto;
+        overflow: auto;
         box-shadow:
             0 4px 8px 0 rgba(0, 0, 0, 0.1),
             0 6px 20px 0 rgba(0, 0, 0, 0.1);
@@ -48,7 +50,7 @@
 
         .item-list-plan {
             display: flex;
-            width: 100%;
+            width: 1400px;
             justify-content: space-between;
             flex-wrap: wrap;
 
@@ -118,9 +120,9 @@
                 }
             }
         }
-        
+
         .item-list-plan::after {
-            content: '';
+            content: "";
             flex-grow: 0;
             width: 20%;
         }
