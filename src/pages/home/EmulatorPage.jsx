@@ -2303,92 +2303,7 @@ const EmulatorPage = () => {
                   }
                 }}
               />
-              {/* Period  */}
-              <TextField
-                style={
-                  planNumVisible
-                    ? { display: "block", marginLeft: 50 }
-                    : { display: "none", marginLeft: 50 }
-                }
-                id="outlined-disabled"
-                className="basic-text"
-                type="number"
-                InputProps={{ inputProps: { min: 1 } }}
-                placeholder="Số buổi"
-                size="small"
-                name="numberPlan"
-                onChange={(e) => {
-                  if (!e.target.value) {
-                    setPlanPeriod(null);
-                  } else {
-                    setPlanPeriod(e.target.value);
-                  }
-                }}
-                fullWidth
-                sx={{
-                  width: "7%",
-                  "& label.Mui-focused": {
-                    color: "black",
-                  },
-                  "& .MuiInput-underline:after": {
-                    borderBottomColor: "black",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "black",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "black",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "black",
-                    },
-                  },
-                }}
-              />
-              {/* Destination  */}
-              <TextField
-                style={
-                  planNumVisible
-                    ? { display: "block", marginLeft: 20 }
-                    : { display: "none", marginLeft: 20 }
-                }
-                id="outlined-disabled"
-                className="basic-text"
-                type="number"
-                InputProps={{ inputProps: { min: 1 } }}
-                placeholder="Địa điểm"
-                size="small"
-                name="numberPlan"
-                onChange={(e) => {
-                  if (!e.target.value) {
-                    setPlanDestination(null);
-                  } else {
-                    setPlanDestination(e.target.value);
-                  }
-                }}
-                fullWidth
-                sx={{
-                  width: "8%",
-                  "& label.Mui-focused": {
-                    color: "black",
-                  },
-                  "& .MuiInput-underline:after": {
-                    borderBottomColor: "black",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "black",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "black",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "black",
-                    },
-                  },
-                }}
-              />
+
               {/* specific plan id to join */}
               <TextField
                 style={
@@ -3013,6 +2928,95 @@ const EmulatorPage = () => {
                 name="id"
                 onChange={(e) => {
                   setDateSimulator(e.target.value);
+                }}
+              />
+            </div>
+            <div
+              className="plan-create-section"
+              style={{ display: "flex", marginTop: 20 }}
+            >
+              {/* Period  */}
+              <TextField
+                style={
+                  planNumVisible
+                    ? { display: "block", marginRight: 20 }
+                    : { display: "none", marginRight: 20 }
+                }
+                id="outlined-disabled"
+                className="basic-text"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                placeholder="Số buổi"
+                size="small"
+                name="numberPlan"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setPlanPeriod(null);
+                  } else {
+                    setPlanPeriod(e.target.value);
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "12%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              {/* Destination  */}
+              <TextField
+                style={
+                  planNumVisible ? { display: "block" } : { display: "none" }
+                }
+                id="outlined-disabled"
+                className="basic-text"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                placeholder="Địa điểm"
+                size="small"
+                name="numberPlan"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setPlanDestination(null);
+                  } else {
+                    setPlanDestination(e.target.value);
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "13%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
                 }}
               />
             </div>
