@@ -18,7 +18,7 @@
 export const getDuration = async (latF, lgnF, latS, lngS, TOKEN) => {
   try {
     const response = await fetch(
-      `https://rsapi.goong.io/Direction?origin=${latF},${lgnF}&destination=${latS},${lngS}&vehicle=car&api_key=${TOKEN}`
+      `https://rsapi.goong.io/Direction?origin=${latF},${lgnF}&destination=${latS},${lngS}&vehicle=bike&api_key=${TOKEN}`
     );
 
     const data = await response.json();

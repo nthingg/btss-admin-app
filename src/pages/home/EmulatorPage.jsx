@@ -384,6 +384,14 @@ const EmulatorPage = () => {
         "vDVXeg2sci8m0EAv3hy4A60D8xXXe9bgoRgAnYPK"
       );
 
+      console.log(
+        `https://rsapi.goong.io/Direction?origin=${10.841327798960252},${106.80992590984253}&destination=${
+          destinationLoc[1]
+        },${
+          destinationLoc[0]
+        }&vehicle=bike&api_key=vDVXeg2sci8m0EAv3hy4A60D8xXXe9bgoRgAnYPK`
+      );
+
       console.log(carDuration.routes[0].legs[0].duration.value);
 
       var durationCal = moment
