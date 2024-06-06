@@ -133,7 +133,7 @@ const SideBar = () => {
           ></img>
         </div>
         <Link to="/" style={{ textDecoration: "none" }}>
-          <span className="logo">BTSS</span>
+          <span className="logo label">BTSS</span>
         </Link>
       </div>
       <div className="center">
@@ -141,43 +141,43 @@ const SideBar = () => {
           <NavLink to="/" style={{ textDecoration: "none" }}>
             <li>
               <Dashboard className="icon" />
-              <span>Trang chủ</span>
+              <span className="label">Trang chủ</span>
             </li>
           </NavLink>
           <NavLink to="/plans" style={{ textDecoration: "none" }}>
             <li>
               <CalendarMonthIcon className="icon" />
-              <span>Quản lý kế hoạch</span>
+              <span className="label">Quản lý kế hoạch</span>
             </li>
           </NavLink>
           <NavLink to="/accounts" style={{ textDecoration: "none" }}>
             <li>
               <AccountCircleIcon className="icon" />
-              <span>Quản lý tài khoản</span>
+              <span className="label">Quản lý tài khoản</span>
             </li>
           </NavLink>
           <NavLink to="/destinations" style={{ textDecoration: "none" }}>
             <li>
               <MapIcon className="icon" />
-              <span>Quản lý địa điểm</span>
+              <span className="label">Quản lý địa điểm</span>
             </li>
           </NavLink>
           <NavLink to="/transactions" style={{ textDecoration: "none" }}>
             <li>
               <ReceiptIcon className="icon" />
-              <span>Quản lý giao dịch</span>
+              <span className="label">Quản lý giao dịch</span>
             </li>
           </NavLink>
           <NavLink to="/emulator" style={{ textDecoration: "none" }}>
             <li>
               <TerminalIcon className="icon" />
-              <span>Giả lập</span>
+              <span className="label">Giả lập</span>
             </li>
           </NavLink>
           <NavLink to="/configuration" style={{ textDecoration: "none" }}>
             <li>
               <SettingsApplicationsIcon className="icon" />
-              <span>Hệ thống</span>
+              <span className="label">Hệ thống</span>
             </li>
           </NavLink>
         </ul>
@@ -191,8 +191,8 @@ const SideBar = () => {
               alt="Profile"
             ></img>
             <div className="user_info">
-              <span className="name">Administrator</span>
-              <span className="role">BTSS Admin</span>
+              <span className="name label">Administrator</span>
+              <span className="role label">BTSS Admin</span>
             </div>
             <button
               className="user_logout"
