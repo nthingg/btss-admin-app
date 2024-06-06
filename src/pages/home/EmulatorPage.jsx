@@ -89,6 +89,8 @@ const EmulatorPage = () => {
   const [isLoadingVisible, setIsLoadingVisible] = useState(false);
   const [totalMsg, setTotalMsg] = useState(0);
   const [successMsg, setSuccessMsg] = useState(0);
+  const [planPeriod, setPlanPeriod] = useState(null);
+  const [planDestination, setPlanDestination] = useState(null);
 
   const {
     error: errDestinations,
@@ -490,6 +492,17 @@ const EmulatorPage = () => {
     return result.data;
   }
 
+  function getOddNumber(min, max) {
+    min = Math.ceil(min / 2) * 2;
+
+    let per;
+    do {
+      per = Math.floor(Math.random() * (max - min + 1) + min);
+    } while (per % 2 === 0);
+
+    return per;
+  }
+
   const simulateCreatePlans = async (planNum, dateTime) => {
     const loggedAcc = JSON.parse(localStorage.getItem("loggedAcc"));
 
@@ -512,17 +525,13 @@ const EmulatorPage = () => {
 
       const minCeiled = Math.ceil(4);
       const maxFloored = Math.floor(15);
-      function getOddNumber(min, max) {
-        min = Math.ceil(min / 2) * 2;
 
-        let per;
-        do {
-          per = Math.floor(Math.random() * (max - min + 1) + min);
-        } while (per % 2 === 0);
-
-        return per;
-      }
       let period = getOddNumber(minCeiled, maxFloored);
+
+      if (planPeriod !== null) {
+        period = parseInt(planPeriod, 10);
+      }
+
       if (arrivalTime >= "16:00:00" && arrivalTime < "20:00:00") {
         period++;
       }
@@ -534,6 +543,15 @@ const EmulatorPage = () => {
       let random = Math.floor(Math.random() * destinations.length);
 
       let destination = destinations[random];
+
+      if (planDestination !== null) {
+        for (let index = 0; index < destinations.length; index++) {
+          if (parseInt(planDestination, 10) === destinations[index].id) {
+            destination = destinations[index];
+            break;
+          }
+        }
+      }
 
       const dataProvider = await fetchData(destination);
 
@@ -1376,25 +1394,26 @@ const EmulatorPage = () => {
               }
             }
             limitMassJoin++;
-          } else {
-            const cancelData = {
-              id: currentPlans[j].id,
-              planName: currentPlans[j].name,
-            };
-            localStorage.setItem("userToken", loggedAcc[i].token);
-            log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
-            count++;
-            log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
-            const resCancel = await handleCancelPlan(
-              cancelData,
-              count,
-              loggedAcc[i]
-            );
-            if (resCancel.status) {
-              successCount++;
-            }
-            response.push(resCancel);
           }
+          // else {
+          //   const cancelData = {
+          //     id: currentPlans[j].id,
+          //     planName: currentPlans[j].name,
+          //   };
+          //   localStorage.setItem("userToken", loggedAcc[i].token);
+          //   log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
+          //   count++;
+          //   log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
+          //   const resCancel = await handleCancelPlan(
+          //     cancelData,
+          //     count,
+          //     loggedAcc[i]
+          //   );
+          //   if (resCancel.status) {
+          //     successCount++;
+          //   }
+          //   response.push(resCancel);
+          // }
 
           setLoginMsg(log);
           setResponseMsg(response);
@@ -1471,24 +1490,39 @@ const EmulatorPage = () => {
 
       if (currentPlans.length > 0) {
         for (let j = 0; j < currentPlans?.length; j++) {
-          if (limitReady > readyNum) {
-            break;
+          if (limitReady <= readyNum) {
+            count++;
+            log += `[Chốt kế hoạch] ${loggedAcc[i].name} \n`;
+            const res = await handleConfirmMember(
+              currentPlans[j].id,
+              count,
+              loggedAcc[i],
+              currentPlans[j].name
+            );
+            if (res.status) {
+              successCount++;
+            }
+            response.push(res);
+            setLoginMsg(log);
+            setResponseMsg(response);
+            limitReady++;
+          } else {
+            const cancelData = {
+              id: currentPlans[j].id,
+              planName: currentPlans[j].name,
+            };
+            count++;
+            log += `[Hủy kế hoạch] ${loggedAcc[i].name} \n`;
+            const resCancel = await handleCancelPlan(
+              cancelData,
+              count,
+              loggedAcc[i]
+            );
+            if (resCancel.status) {
+              successCount++;
+            }
+            response.push(resCancel);
           }
-          count++;
-          log += `[Chốt kế hoạch] ${loggedAcc[i].name} \n`;
-          const res = await handleConfirmMember(
-            currentPlans[j].id,
-            count,
-            loggedAcc[i],
-            currentPlans[j].name
-          );
-          if (res.status) {
-            successCount++;
-          }
-          response.push(res);
-          setLoginMsg(log);
-          setResponseMsg(response);
-          limitReady++;
         }
       }
     }
@@ -2184,7 +2218,7 @@ const EmulatorPage = () => {
                 type="number"
                 value={planNum}
                 InputProps={{ inputProps: { min: 1 } }}
-                placeholder="Số lượng kế hoạch được tạo"
+                placeholder="Số lượng kế hoạch"
                 size="small"
                 name="numberPlan"
                 onChange={(e) => {
@@ -2201,7 +2235,7 @@ const EmulatorPage = () => {
                 }}
                 fullWidth
                 sx={{
-                  width: "18%",
+                  width: "13%",
                   "& label.Mui-focused": {
                     color: "black",
                   },
@@ -2259,6 +2293,92 @@ const EmulatorPage = () => {
                     setDateCreatePlanSimulator(e.target.value);
                     setSelectLoading(false);
                   }
+                }}
+              />
+              {/* Period  */}
+              <TextField
+                style={
+                  planNumVisible
+                    ? { display: "block", marginLeft: 50 }
+                    : { display: "none", marginLeft: 50 }
+                }
+                id="outlined-disabled"
+                className="basic-text"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                placeholder="Số buổi"
+                size="small"
+                name="numberPlan"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setPlanPeriod(null);
+                  } else {
+                    setPlanPeriod(e.target.value);
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "7%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+              {/* Destination  */}
+              <TextField
+                style={
+                  planNumVisible
+                    ? { display: "block", marginLeft: 20 }
+                    : { display: "none", marginLeft: 20 }
+                }
+                id="outlined-disabled"
+                className="basic-text"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                placeholder="Địa điểm"
+                size="small"
+                name="numberPlan"
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    setPlanDestination(null);
+                  } else {
+                    setPlanDestination(e.target.value);
+                  }
+                }}
+                fullWidth
+                sx={{
+                  width: "8%",
+                  "& label.Mui-focused": {
+                    color: "black",
+                  },
+                  "& .MuiInput-underline:after": {
+                    borderBottomColor: "black",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
                 }}
               />
               {/* specific plan id to join */}

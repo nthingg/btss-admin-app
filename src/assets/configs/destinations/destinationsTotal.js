@@ -1,6 +1,6 @@
 export const destinationsTotalColumns = [
   {
-    field: "id",
+    field: "index",
     headerClassName: "prodHeader",
     width: 70,
     align: "center",
@@ -10,6 +10,18 @@ export const destinationsTotalColumns = [
       return <div>{params.row.index}</div>;
     },
     renderHeader: () => <span>#</span>,
+  },
+  {
+    field: "id",
+    headerClassName: "prodHeader",
+    width: 70,
+    align: "center",
+    headerAlign: "center",
+    // renderCell: (params) => params.rowIndex + 1,
+    renderCell: (params) => {
+      return <div>{params.row.id}</div>;
+    },
+    renderHeader: () => <span>ID</span>,
   },
   {
     field: "name",
