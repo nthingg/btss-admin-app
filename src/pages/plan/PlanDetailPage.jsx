@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { PickersDay } from "@mui/x-date-pickers";
 import PlanOrderTable from "../../components/tables/PlanOrderTable";
+import PlanReportTable from "../../components/tables/PlanReportTable";
 
 const PlanDetailPage = () => {
   const { planId, sbsNumber } = useParams();
@@ -52,6 +53,7 @@ const PlanDetailPage = () => {
   const [activities, setActivities] = useState(null);
   const [members, setMembers] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
+  const [haveReport, setHaveReport] = useState(false);
   const [selectedDiv, setSelectedDiv] = useState(
     sbsNumber ? parseInt(sbsNumber, 10) : 0
   );
@@ -193,6 +195,12 @@ const PlanDetailPage = () => {
       }
 
       setDates(dateArray);
+
+      data["plans"]["nodes"][0]["members"].forEach((member) => {
+        if (member.reportReason) {
+          setHaveReport(true);
+        }
+      })
     }
   }, [data, loading, error]);
 
@@ -335,6 +343,16 @@ const PlanDetailPage = () => {
                   </div>
                 </div>
               </div>
+              {haveReport && (
+                <div className="bottom">
+                  <div className="bottom">
+                    <div className="item">
+                      <h1 className="item-title">Danh sách danh sách báo cáo</h1>
+                      <PlanReportTable planMembers={plan.members} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <Dialog

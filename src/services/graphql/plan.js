@@ -536,6 +536,14 @@ export const LOAD_DETAIL_PLAN = gql`
           type
           total
         }
+        members {
+          account {
+            id
+            name
+          }
+          weight
+          reportReason
+        }
       }
     }
   }
