@@ -19,7 +19,7 @@ import HolidaysModal from "../../components/tables/ConfigHolidaysTable";
 const ConfigurationPage = () => {
     const [vertical] = useState("top");
     const [horizontal] = useState("right");
-    
+
     //
     const [configs, setConfig] = useState([]);
     const [isUseFixOtp, setUseFixOtp] = useState(true);
@@ -36,6 +36,13 @@ const ConfigurationPage = () => {
     const [productMaxPriceUp, setProductMaxPriceUp] = useState(0);
     const [planCompleteAfterDays, setPlanCompleteAfterDays] = useState(0);
     const [orderCompleteAfterDays, setOrderCompleteAfterDasy] = useState(0);
+    const [minPlanMember, setMinPlanMember] = useState(0);
+    const [maxPlanMember, setMaxPlanMember] = useState(0);
+    const [minDepartDiff, setMinDepartDiff] = useState(0);
+    const [maxDepartDiff, setMaxDepartDiff] = useState(0);
+    const [minPeriod, setMinPeriod] = useState(0);
+    const [maxPeriod, setMaxPeriod] = useState(0);
+    const [budgetAssuranceRate, setBudgetAssuranceRate] = useState(0);
     const [holidays, setHolidays] = useState([]);
     const [lastModified, setLastModified] = useState("");
 
@@ -49,7 +56,9 @@ const ConfigurationPage = () => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const { error, loading, data, refetch } = useQuery(LOAD_SYSTEM_CONFIGURATIONS);
+    const { error, loading, data, refetch } = useQuery(LOAD_SYSTEM_CONFIGURATIONS, {
+        fetchPolicy: "network-only"
+    });
     const [update] = useMutation(UPDATE_SYSTEM_CONFIGURATIONS);
 
     useEffect(() => {
@@ -59,6 +68,41 @@ const ConfigurationPage = () => {
             loadData(res);
         }
     }, [data, loading, error]);
+
+    const validateConfig = () => {
+        const minValue = 1;
+        const maxValue = 100;
+        let error = "";
+        if (minPlanMember < minValue && minPlanMember > maxValue) {
+            error = `Giá trị cấu hình thành viên tối thiểu chỉ cho phép trong khoảng từ ${minValue} tới ${maxValue}`;
+        }
+        if (maxPlanMember < minValue && maxPlanMember > maxValue) {
+            error = `Giá trị cấu hình thành viên tối thiểu đa cho phép trong khoảng từ ${minValue} tới ${maxValue}`;
+        }
+        if (minDepartDiff < minValue && minDepartDiff > maxValue) {
+            error = `Giá trị cấu hình thời gian khởi hành cách biệt tối thiểu chỉ cho phép trong khoảng từ ${minValue} tới ${maxValue}`;
+        }
+        if (maxDepartDiff < minValue && maxDepartDiff > maxValue) {
+            error = `Giá trị cấu hình thời gian khởi hành cách biệt tối đa chỉ cho phép trong khoảng từ ${minValue} tới ${maxValue}`;
+        }
+        if (minPeriod < 2 && minPeriod > 100) {
+            error = `Giá trị cấu hình tổng số buổi tối thiểu tối thiểu chỉ cho phép trong khoảng từ ${2} tới ${100}`;
+        }
+        if (maxPeriod < 2 && maxPeriod > 100) {
+            error = `Giá trị cấu hình tổng số buổi tối đa chỉ cho phép trong khoảng từ ${2} tới ${100}`;
+        }
+        if (budgetAssuranceRate < minValue && budgetAssuranceRate > maxValue) {
+            error = `Giá trị cấu hình hệ số đảm bảo ngân sách chỉ cho phép trong khoảng từ ${minValue} tới ${maxValue}`;
+        }
+
+        if (error !== "") {
+            setErrMsg(error);
+            openErrorSnackBar();
+            return false;
+        }
+
+        return true;
+    }
 
     const loadData = (configs) => {
         if (configs) {
@@ -76,6 +120,13 @@ const ConfigurationPage = () => {
             setProductMaxPriceUp(configs.PRODUCT_MAX_PRICE_UP_PCT);
             setOrderCompleteAfterDasy(configs.ORDER_COMPLETE_AFTER_DAYS);
             setPlanCompleteAfterDays(configs.PLAN_COMPLETE_AFTER_DAYS);
+            setMinPlanMember(configs.MIN_PLAN_MEMBER);
+            setMaxPlanMember(configs.MAX_PLAN_MEMBER);
+            setMinDepartDiff(configs.MIN_DEPART_DIFF);
+            setMaxDepartDiff(configs.MAX_DEPART_DIFF);
+            setMinPeriod(configs.MIN_PERIOD);
+            setMaxPeriod(configs.MAX_PERIOD);
+            setBudgetAssuranceRate(configs.BUDGET_ASSURANCE_RATE);
             holidays.splice(0, holidays.length);
             configs.HOLIDAYS?.map(holiday => {
                 holidays.push({
@@ -130,27 +181,36 @@ const ConfigurationPage = () => {
             product_MAX_PRICE_UP_PCT: productMaxPriceUp,
             order_COMPLETE_AFTER_DAYS: orderCompleteAfterDays,
             plan_COMPLETE_AFTER_DAYS: planCompleteAfterDays,
+            min_PLAN_MEMBER: minPlanMember,
+            max_PLAN_MEMBER: maxPlanMember,
+            min_DEPART_DIFF: minDepartDiff,
+            max_DEPART_DIFF: maxDepartDiff,
+            min_PERIOD: minPeriod,
+            max_PERIOD: maxPeriod,
+            budget_ASSURANCE_RATE: budgetAssuranceRate,
             holidays: holidays
         };
 
+        const validateResult = validateConfig();
+        if (validateResult) {
+            try {
+                const { data } = await update({
+                    variables: {
+                        input: configData,
+                    },
+                });
 
-        try {
-            const { data } = await update({
-                variables: {
-                    input: configData,
-                },
-            });
-
-            if (data) {
-                setSucessMsg("Cập nhật thành công!");
-                openSuccessSnackBar();
+                if (data) {
+                    setSucessMsg("Cập nhật thành công!");
+                    openSuccessSnackBar();
+                }
+            } catch {
+                console.log(error);
+                const msg = localStorage.getItem("errorMsg");
+                setErrMsg(msg);
+                openErrorSnackBar();
+                localStorage.removeItem("errorMsg");
             }
-        } catch {
-            console.log(error);
-            const msg = localStorage.getItem("errorMsg");
-            setErrMsg(msg);
-            openErrorSnackBar();
-            localStorage.removeItem("errorMsg");
         }
     };
 
@@ -196,7 +256,7 @@ const ConfigurationPage = () => {
                             setIsLoading(true);
                             refetch();
                             setTimeout(() => {
-                                loadData(data.configurations);                                
+                                loadData(data.configurations);
                             }, 500);
                         }}
                     >
@@ -692,7 +752,7 @@ const ConfigurationPage = () => {
                                     },
                                 }}
                                 onChange={(e) => {
-                                    setProductMaxPriceUp(Number(e.target.value));
+                                    setOrderCompleteAfterDasy(Number(e.target.value));
                                 }}
                             />
                         </div>
@@ -731,11 +791,284 @@ const ConfigurationPage = () => {
                                     },
                                 }}
                                 onChange={(e) => {
-                                    setProductMaxPriceUp(Number(e.target.value));
+                                    setPlanCompleteAfterDays(Number(e.target.value));
                                 }}
                             />
                         </div>
-                        <span className="description">: Cấu hình hệ số thời gian kế hoạch hoàn tất</span>
+                        <span className="description">: Cấu hình hệ số thành viên kế hoạch tối thiểu</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MIN_PLAN_MEMBER</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MIN_PLAN_MEMBER"
+                                value={minPlanMember}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMinPlanMember(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số thành viên kế hoạch tối thiểu</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MAX_PLAN_MEMBER</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MAX_PLAN_MEMBER"
+                                value={maxPlanMember}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMaxPlanMember(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số thành viên kế hoạch tối đa</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MIN_DEPART_DIFF</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MIN_DEPART_DIFF"
+                                value={minDepartDiff}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMinDepartDiff(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số thời gian khởi hành cách biệt tối thiểu</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MAX_DEPART_DIFF</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MAX_DEPART_DIFF"
+                                value={maxDepartDiff}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMaxDepartDiff(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số thời gian khởi hành cách biệt tối đa</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MIN_PERIOD</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MIN_PERIOD"
+                                value={minPeriod}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMinPeriod(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số tổng số buổi tối thiểu</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">MAX_PERIOD</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="MAX_PERIOD"
+                                value={maxPeriod}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setMaxPeriod(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số tổng số buổi tối đa</span>
+                    </div>
+
+                    <div className="detailItem">
+                        <span className="itemKey">BUDGET_ASSURANCE_RATE</span>
+                        <div className="itemkeyValue" style={{ display: "inline-block" }}>
+                            <TextField
+                                id="outlined-disabled"
+                                className="basic-single"
+                                type="text"
+                                placeholder="BUDGET_ASSURANCE_RATE"
+                                value={budgetAssuranceRate}
+                                size="small"
+                                name="name"
+                                sx={{
+                                    width: "90%",
+                                    "& label.Mui-focused": {
+                                        color: "black",
+                                    },
+                                    "& .MuiInput-underline:after": {
+                                        borderBottomColor: "black",
+                                    },
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gainsboro",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "black",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "black",
+                                        },
+                                    },
+                                }}
+                                onChange={(e) => {
+                                    setBudgetAssuranceRate(Number(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <span className="description">: Cấu hình hệ số đảm bảo ngân sách</span>
                     </div>
 
                     <div className="detailItem">
