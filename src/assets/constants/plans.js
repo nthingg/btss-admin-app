@@ -621,9 +621,9 @@ export const planData = [
       ],
     ],
     surcharges: [
-      { gcoinAmount: 300, note: "Mua dụng cụ hỗ trợ du lịch" },
-      { gcoinAmount: 200, note: "Mua đồ dùng chung" },
-      { gcoinAmount: 250, note: "Mua dụng cụ sơ cứu" },
+      { gcoinAmount: 100, note: "Mua dụng cụ hỗ trợ du lịch" },
+      { gcoinAmount: 50, note: "Mua đồ dùng chung" },
+      { gcoinAmount: 20, note: "Mua dụng cụ sơ cứu" },
     ], //done
     travelDuration: "05:30:00", //done
     sourceId: null, //done

@@ -369,9 +369,7 @@ const HomePage = () => {
               </div>
               <div className="item-container temp">
                 <div className="item-top">
-                  <div className="item-title">
-                    Kế hoạch đang chờ tham gia
-                  </div>
+                  <div className="item-title">Kế hoạch đang chờ tham gia</div>
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/1`} className="navigateButton">
@@ -487,7 +485,7 @@ const HomePage = () => {
           </div> */}
               <div className="item-container publish">
                 <div className="item-top">
-                  <div className="item-title">Kế hoạch đã được chia sẻ</div>
+                  <div className="item-title">Kế hoạch đã được xuất bản</div>
                   <div className="item-body">
                     <div className="left">
                       <Link to={`/plans/sbs/5`} className="navigateButton">

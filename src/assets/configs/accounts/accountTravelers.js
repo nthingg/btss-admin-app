@@ -109,7 +109,9 @@ export const accountTravelersColumn = [
     align: "right",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div className="prestigePoint">{params.row.node.prestigePoint}</div>;
+      return (
+        <div className="prestigePoint">{params.row.node.prestigePoint}</div>
+      );
     },
     renderHeader: () => <span>ĐIỂM UY TÍN</span>,
   },
@@ -135,8 +137,8 @@ export const accountTravelersColumn = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.node.publishedPlanCount}</div>
+      return <div>{params.row.node.publishedPlanCount}</div>;
     },
-    renderHeader: () => <span>KẾ HOẠCH ĐÃ CHIA SẺ</span>,
+    renderHeader: () => <span>KẾ HOẠCH ĐÃ XUẤT BẢN</span>,
   },
 ];

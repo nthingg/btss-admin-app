@@ -54,6 +54,7 @@ const PlanDetailPage = () => {
   const [members, setMembers] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
   const [haveReport, setHaveReport] = useState(false);
+  const [reportArr, setReportArr] = useState("");
   const [selectedDiv, setSelectedDiv] = useState(
     sbsNumber ? parseInt(sbsNumber, 10) : 0
   );
@@ -200,7 +201,13 @@ const PlanDetailPage = () => {
         if (member.reportReason) {
           setHaveReport(true);
         }
-      })
+      });
+
+      let rp = data["plans"]["nodes"][0]["members"].map((node, index) => {
+        const { __typename, ...rest } = node;
+        return { ...rest, index: index + 1 }; // Add the index to the object
+      });
+      setReportArr(rp);
     }
   }, [data, loading, error]);
 
@@ -347,8 +354,10 @@ const PlanDetailPage = () => {
                 <div className="bottom">
                   <div className="bottom">
                     <div className="item">
-                      <h1 className="item-title">Danh sách danh sách báo cáo</h1>
-                      <PlanReportTable planMembers={plan.members} />
+                      <h1 className="item-title">
+                        Danh sách danh sách báo cáo
+                      </h1>
+                      <PlanReportTable planMembers={reportArr} />
                     </div>
                   </div>
                 </div>

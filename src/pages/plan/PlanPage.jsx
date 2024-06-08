@@ -413,7 +413,8 @@ const PlanPage = () => {
     publishedQuery,
     onGoingQuery,
     ordersQuery,
-    accountQuery) {
+    accountQuery
+  ) {
     let query;
     if (onGoingQuery !== "") {
       query = gql`
@@ -558,11 +559,7 @@ const PlanPage = () => {
     setIsLoading(false);
   };
 
-  const fetchPlanCount = async (
-    searchTerm,
-    filterOrder,
-    accountId
-  ) => {
+  const fetchPlanCount = async (searchTerm, filterOrder, accountId) => {
     let statusQuery = `status: { in: [${planStat}, PENDING, ONGOING] }`;
     let onGoingQuery = "";
     let publishedQuery = "";
@@ -580,7 +577,8 @@ const PlanPage = () => {
       publishedQuery,
       onGoingQuery,
       ordersQuery,
-      accountQuery);
+      accountQuery
+    );
     setTotal(planTotalCount.plans.totalCount);
     for (let i = 1; i < 7; i++) {
       onGoingQuery = "";
@@ -613,7 +611,8 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setRegistering(registeringCount.plans.totalCount);
           break;
         case 2:
@@ -623,7 +622,8 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setTemp(commingSoonCount.plans.totalCount);
           break;
         case 3:
@@ -633,7 +633,8 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setOngoing(onGoingCount.plans.totalCount);
           break;
         case 4:
@@ -643,7 +644,8 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setCompleted(completedCount.plans.totalCount);
           break;
         case 5:
@@ -653,7 +655,8 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setPublished(publishedCount.plans.totalCount);
           break;
         case 6:
@@ -663,14 +666,15 @@ const PlanPage = () => {
             publishedQuery,
             onGoingQuery,
             ordersQuery,
-            accountQuery);
+            accountQuery
+          );
           setCancelled(cancelledCount.plans.totalCount);
           break;
         default:
           break;
       }
     }
-  }
+  };
 
   const handleClick = (index) => {
     setSelectedDiv(index);
@@ -888,8 +892,18 @@ const PlanPage = () => {
     setIsLoading(true);
     fetchPlanCount(searchTerm, filterOrder, accountId);
     selectedStatus.toString() === planStat.toString()
-      ? fetchPlanFilter(`[${planStat}, PENDING, ONGOING]`, searchTerm, filterOrder, accountId)
-      : fetchPlanFilter(`[${selectedStatus}]`, searchTerm, filterOrder, accountId);
+      ? fetchPlanFilter(
+          `[${planStat}, PENDING, ONGOING]`,
+          searchTerm,
+          filterOrder,
+          accountId
+        )
+      : fetchPlanFilter(
+          `[${selectedStatus}]`,
+          searchTerm,
+          filterOrder,
+          accountId
+        );
   };
 
   return (
@@ -960,8 +974,9 @@ const PlanPage = () => {
             {[0, 1, 2, 3, 4, 5, 6].map((index) => (
               <div
                 key={index}
-                className={`icon-item ${selectedDiv === index ? "selected" : ""
-                  }`}
+                className={`icon-item ${
+                  selectedDiv === index ? "selected" : ""
+                }`}
                 onClick={() => {
                   handleClick(index);
                 }}
@@ -986,7 +1001,7 @@ const PlanPage = () => {
                   {index === 3 && `Đang diễn ra (${onGoing})`}
                   {index === 4 && `Đã kết thúc (${completed})`}
                   {/* {index === 6 && `Có vấn đề (${flawed})`} */}
-                  {index === 5 && `Đã chia sẻ (${published})`}
+                  {index === 5 && `Đã xuất bản (${published})`}
                   {index === 6 && `Đã hủy (${cancelled})`}
                 </span>
               </div>
@@ -1007,13 +1022,18 @@ const PlanPage = () => {
           <PlanTable planTotal={plans} sbs={selectedDiv} />
         )}
 
-        {!isLoading && selectedStatus.toString() === [planStat[3], planStat[4]].toString() && (
-          <PlanTable plansCompleted={plans} sbs={selectedDiv} />
-        )}
+        {!isLoading &&
+          selectedStatus.toString() ===
+            [planStat[3], planStat[4]].toString() && (
+            <PlanTable plansCompleted={plans} sbs={selectedDiv} />
+          )}
 
-        {!isLoading && (selectedStatus.toString() !== planStat.toString() && selectedStatus.toString() !== [planStat[3], planStat[4]].toString()) && (
-          <PlanTable plans={plans} sbs={selectedDiv} />
-        )}
+        {!isLoading &&
+          selectedStatus.toString() !== planStat.toString() &&
+          selectedStatus.toString() !==
+            [planStat[3], planStat[4]].toString() && (
+            <PlanTable plans={plans} sbs={selectedDiv} />
+          )}
       </div>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}

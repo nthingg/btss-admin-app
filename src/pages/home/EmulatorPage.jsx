@@ -142,11 +142,11 @@ const EmulatorPage = () => {
     },
     {
       value: 8,
-      label: "Giả lập check-in kế hoạch.",
+      label: "Giả lập xác nhận kế hoạch.",
     },
     {
       value: 9,
-      label: "Giả lập chia sẻ kế hoạch.",
+      label: "Giả lập xuất bản kế hoạch.",
     },
     {
       value: 10,
@@ -1849,8 +1849,8 @@ const EmulatorPage = () => {
       });
       const response = {
         userName: acc.name,
-        action: "Check-in kế hoạch",
-        detail: `[${acc.name}] check-in kế hoạch [${planName}]`,
+        action: "Xác nhận kế hoạch",
+        detail: `[${acc.name}] xác nhận kế hoạch [${planName}]`,
         status: true,
         id: count,
       };
@@ -1863,7 +1863,7 @@ const EmulatorPage = () => {
       localStorage.removeItem("errorMsg");
       const response = {
         userName: acc.name,
-        action: "Check-in kế hoạch",
+        action: "Xác nhận kế hoạch",
         detail: `${msg}`,
         status: false,
         id: count,
@@ -1909,7 +1909,7 @@ const EmulatorPage = () => {
           log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
 
           count++;
-          log += `[Check-in kế hoạch] ${loggedAcc[i].name} \n`;
+          log += `[Xác nhận kế hoạch] ${loggedAcc[i].name} \n`;
 
           let destinationLoc = [];
           try {
@@ -1962,8 +1962,8 @@ const EmulatorPage = () => {
       });
       const response = {
         userName: acc.name,
-        action: "Chia sẻ kế hoạch",
-        detail: `[${acc.name}] chia sẻ kế hoạch [${planName}]`,
+        action: "Xuất bản kế hoạch",
+        detail: `[${acc.name}] xuất bản kế hoạch [${planName}]`,
         status: true,
         id: count,
       };
@@ -1976,7 +1976,7 @@ const EmulatorPage = () => {
       localStorage.removeItem("errorMsg");
       const response = {
         userName: acc.name,
-        action: "Chia sẻ kế hoạch",
+        action: "Xuất bản kế hoạch",
         detail: `${msg}`,
         status: false,
         id: count,
@@ -2022,7 +2022,7 @@ const EmulatorPage = () => {
           log += `[Đăng nhập] ${loggedAcc[i].name} \n`;
 
           count++;
-          log += `[Chia sẻ kế hoạch] ${loggedAcc[i].name} \n`;
+          log += `[Xuất bản kế hoạch] ${loggedAcc[i].name} \n`;
 
           const publishData = {
             planId: currentPlans[j].id,
@@ -2804,7 +2804,7 @@ const EmulatorPage = () => {
                 className="basic-text ml-2"
                 type="number"
                 value={planVerifyNum}
-                placeholder="Số lượng kế hoạch được check-in"
+                placeholder="Số lượng kế hoạch được xác nhận"
                 size="small"
                 name="numVerify"
                 onChange={(e) => {
@@ -2855,7 +2855,7 @@ const EmulatorPage = () => {
                 className="basic-text ml-2"
                 type="number"
                 value={planPublishNum}
-                placeholder="Số lượng kế hoạch được chia sẻ"
+                placeholder="Số lượng kế hoạch được xuất bản"
                 size="small"
                 name="numPublish"
                 onChange={(e) => {
@@ -3285,7 +3285,7 @@ const EmulatorPage = () => {
                         const { data } = await refetchVeri();
                         const limitVerify = data.plans.totalCount;
                         if (planPublishNum > limitVerify) {
-                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch chưa được chia sẻ)`;
+                          const msg = `Số lượng nhập vượt quá số kế hoạch hiện có (${limitVerify} kế hoạch chưa được xuất bản)`;
                           setErrMsg(msg);
                           handleClick();
                           setIsLoadingVisible(false);

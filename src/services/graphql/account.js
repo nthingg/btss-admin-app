@@ -122,11 +122,7 @@ export const LOAD_ACCOUNT_TRAVELERS_OPTIONS = gql`
     accounts(
       first: 100
       order: { id: DESC }
-      dto: {
-        isProviderNameSearch: false
-        role: TRAVELER
-        searchTerm: ""
-      }
+      dto: { isProviderNameSearch: false, role: TRAVELER, searchTerm: "" }
     ) {
       nodes {
         id
@@ -295,7 +291,7 @@ export const LOAD_TRANSACTIONS_TOTAL_INIT_BY_ACCOUNT = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
           gateway
           bankTransCode
           createdAt
@@ -339,7 +335,7 @@ export const LOAD_TRANSACTIONS_TOTAL_BY_ACCOUNT = gql`
           orderId
           type
           status
-          gcoinAmount
+          amount
           gateway
           bankTransCode
           createdAt

@@ -62,12 +62,12 @@ export const accounttransactionsColumns = [
     renderHeader: () => <span>TRẠNG THÁI</span>,
   },
   {
-    field: "gcoinAmount",
+    field: "amount",
     width: 180,
     align: "center",
     headerAlign: "center",
     renderCell: (params) => {
-      return <div>{params.row.node.gcoinAmount}</div>;
+      return <div>{params.row.node.amount}</div>;
     },
     renderHeader: () => <span>SỐ GCOIN</span>,
   },
