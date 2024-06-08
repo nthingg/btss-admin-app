@@ -258,6 +258,7 @@ const SideBar = () => {
                   className="response-item"
                   onClick={() => {
                     markSingleRead(message.id);
+                    navigate(`/plans/${message.plan.id}`);
                   }}
                 >
                   <p className="response-msg">
